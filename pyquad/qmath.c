@@ -8,20 +8,21 @@
 // PyObject * qfloatmod = PyImport_ImportModule("qfloat");
 
 static PyObject *_cos(PyObject *self, PyObject *args){
-    QuadObject *q;
-    __float128 r;
-    char *buf;
+    // QuadObject *q;
+    // __float128 r;
+    // char *buf;
 
-    if (!PyArg_ParseTuple(args, "s:", &buf)){
-        Py_DECREF(&q);
-        return NULL;
-    }
+    // if (!PyArg_ParseTuple(args, "s:", &buf)){
+    //     Py_DECREF(&q);
+    //     return NULL;
+    // }
 
-    r = strtoflt128(buf, NULL);
+    // r = strtoflt128(buf, NULL);
 
-    q->value = cosq(r);
+    // q->value = cosq(r);
 
-    return (PyObject*)q;
+    // return (PyObject*)q;
+    return NULL;
 }
 
 

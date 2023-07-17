@@ -3,6 +3,7 @@
 from qfloat import _qfloat as qfloat
 
 
+#libquadmath constants
 
 M_Eq		= qfloat('2.718281828459045235360287471352662498Q')#  /* e */
 M_LOG2Eq	= qfloat('1.442695040888963407359924681001892137Q')#  /* log_2 e */
@@ -29,3 +30,10 @@ FLT128_MAX_EXP = 16384
 FLT128_DIG = 33
 FLT128_MIN_10_EXP = -4931
 FLT128_MAX_10_EXP = 4932
+
+
+# Export python math library constant names
+
+pi = M_PIq
+e = M_Eq
+# tau = 2 * pi

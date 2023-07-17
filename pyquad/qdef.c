@@ -5,26 +5,39 @@
 #include <quadmath.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+
 
 #include "qdef.h"
 
-int
+
+bool
 PyObject_to_QuadIntObject(PyObject * in, QuadIntObject * out)
 {
-   // PyExc_NotImplementedError(NULL, NULL);
-    return -1;
+    char *buf;
+
+    PyObject * obj_str = PyObject_Str(in);
+    if (obj_str==NULL)
+      return false;
+
+    buf = PyBytes_AsString(obj_str);
+
+    out->value = strtoflt128(buf, NULL);
+    return true;
 }
 
-int
-PyObject_to_QuadObject(PyObject * in, QuadObject * out)
-{
-   // PyExc_NotImplementedError(NULL, NULL);
-    return -1;
-}
-
-int
+bool
 PyObject_to_QuadCmplxObject(PyObject * in, QuadCmplxObject * out)
 {
-  //  PyExc_NotImplementedError(NULL, NULL);
-    return -1;
+    char *buf;
+
+    PyObject * obj_str = PyObject_Str(in);
+    if (obj_str==NULL)
+      return false;
+
+    buf = PyBytes_AsString(obj_str);
+
+    out->value = strtoflt128(buf, NULL);
+    return true;
 }
+
