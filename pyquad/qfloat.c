@@ -240,12 +240,17 @@ static PyMethodDef Quad_methods[] = {
 int
 Quad_init(QuadObject *self, PyObject *args, PyObject *kwds)
 {
-    char *buf;
+    PyObject * obj;
 
-    if (!PyArg_ParseTuple(args, "s:", &buf))
+    if (!PyArg_ParseTuple(args, "O:", &obj)){
+        PyErr_Print();
         return -1;
-
-    self->value = strtoflt128(buf, NULL);
+    }
+        
+    if(!PyObject_to_QuadObject(obj, self)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert value to quad precision.");
+        return -1;
+    }
 
     return 0;
 }
@@ -311,25 +316,62 @@ QuadObject_to_PyObject(QuadObject out) {
 bool
 PyObject_to_QuadObject(PyObject * in, QuadObject * out)
 {
-    PyObject * obj_str = PyObject_Str(in);
-    if (obj_str==NULL){
-      PyErr_Print();
-      return false;
+    alloc_QuadType(out);
+
+    if(PyUnicode_Check(in) || PyObject_TypeCheck(in, &QuadType)){
+        // Is a string
+
+        PyObject * obj_str = PyObject_Str(in);
+        if (obj_str==NULL){
+            PyErr_Print();
+            return false;
+        }
+
+        const char *buf = PyUnicode_AsUTF8(obj_str);
+        if (buf==NULL){
+            PyErr_Print();
+            Py_DECREF(obj_str);
+            return false;
+        }
+
+        if(strcmp(buf,"nan")==0) {
+            out->value = nanq("");
+        } else {
+            char **sp;
+
+            out->value = strtoflt128(buf, &sp);
+            if(sp!=NULL){
+                if(strcmp(sp,"")){
+                    return false;
+                }
+            }
+        } 
+
+        return true;
     }
 
-    const char *buf = PyUnicode_AsUTF8(obj_str);
-    if (buf==NULL){
-        PyErr_Print();
-        Py_DECREF(obj_str);
+    if(PyNumber_Check(in)) {
+        // Is a number
+        
+        if(PyLong_Check(in)){
+            // int
+            out->value = (__float128) PyLong_AsLong(in);
+            return true;
+        }
+
+        if(PyFloat_Check(in)){
+            // float
+            out->value = (__float128) PyFloat_AsDouble(in);
+            return true;
+        }
+
+
         return false;
     }
 
-	alloc_QuadType(out);
-    Py_DECREF(obj_str);
 
-    out->value = strtoflt128(buf, NULL);  
+    return false;
 
-    return true;
 }
 
 void qprintf(QuadObject * out){
