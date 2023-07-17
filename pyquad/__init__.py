@@ -2,9 +2,9 @@
 
 from .constant import *
 
-import qmath 
-import qimath 
-import qcmath 
+import qmath
+import qimath
+import qcmath
 
 from qfloat import _qfloat as qfloat
 from qint import _qint as qint
