@@ -70,6 +70,4 @@ typedef struct {
 
 bool PyObject_to_QuadIntObject(PyObject * in, QuadIntObject * out);
 
-bool PyObject_to_QuadObject(PyObject * in, QuadObject * out);
-
 bool PyObject_to_QuadCmplxObject(PyObject * in, QuadCmplxObject * out);

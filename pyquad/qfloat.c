@@ -5,6 +5,8 @@
 #include <quadmath.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+
 
 #include "qdef.h"
 #include "qfloat.h"
@@ -45,7 +47,7 @@ QuadObject_binary_op1(const int op, PyObject * o1){
 
     QuadObject q1, result;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -74,11 +76,11 @@ QuadObject_binary_op2(const int op, PyObject * o1, PyObject * o2 ){
 
     QuadObject q1, q2, result;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(!PyObject_to_QuadObject(o2, &q2)){
+    if(!PyObject_to_QuadObject(o2, &q2, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -116,11 +118,11 @@ QuadObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
 
     QuadObject q1, q2, result;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(!PyObject_to_QuadObject(o2, &q2)){
+    if(!PyObject_to_QuadObject(o2, &q2, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -186,11 +188,11 @@ static PyObject *
 QuadObject_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
     QuadObject q1, q2, q3, result;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(!PyObject_to_QuadObject(o2, &q2)){
+    if(!PyObject_to_QuadObject(o2, &q2, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -199,7 +201,7 @@ QuadObject_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
     result.value = powq(q1.value, q2.value);
 
     if(o3 != Py_None) {
-        if(!PyObject_to_QuadObject(o2, &q3))
+        if(!PyObject_to_QuadObject(o2, &q3, true))
             Py_RETURN_NOTIMPLEMENTED;
 
         result.value = fmodq(result.value, q3.value);
@@ -228,8 +230,8 @@ static int QuadObject_bool(PyObject * o1){
 
     QuadObject q1;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
-        Py_RETURN_NOTIMPLEMENTED;
+    if(!PyObject_to_QuadObject(o1, &q1, true)){
+        return 0;
     }
 
     if(q1.value==0)
@@ -244,7 +246,7 @@ QuadObject_int(PyObject * o1){
     QuadObject q1;
     PyObject * result;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1,true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -259,7 +261,7 @@ QuadObject_float(PyObject * o1){
     QuadObject q1;
     PyObject * result;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1,true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -296,11 +298,11 @@ static PyObject *
 QuadObject_inplace_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
     QuadObject q1, q2, q3;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1,true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(!PyObject_to_QuadObject(o2, &q2)){
+    if(!PyObject_to_QuadObject(o2, &q2,true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -308,7 +310,7 @@ QuadObject_inplace_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
     q1.value = powq(q1.value, q2.value);
 
     if(o3 != Py_None) {
-        if(!PyObject_to_QuadObject(o2, &q3))
+        if(!PyObject_to_QuadObject(o2, &q3,true))
             Py_RETURN_NOTIMPLEMENTED;
 
         q1.value = fmodq(q1.value, q3.value);
@@ -343,13 +345,13 @@ QuadObject_inplace_true_divide(PyObject * o1, PyObject * o2 ){
 static PyObject *
 QuadType_RichCompare(PyObject * o1, PyObject * o2, int opid){
     QuadObject q1, q2;
-    PyObject * res;
+    PyObject * res=NULL;
 
-    if(!PyObject_to_QuadObject(o1, &q1)){
+    if(!PyObject_to_QuadObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(!PyObject_to_QuadObject(o2, &q2)){
+    if(!PyObject_to_QuadObject(o2, &q2, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
@@ -374,7 +376,7 @@ QuadType_RichCompare(PyObject * o1, PyObject * o2, int opid){
             break;
         default:
             PyErr_SetString(PyExc_AttributeError, "Unknown comparison function.");
-            break;
+            return NULL;
     }
 
     Py_INCREF(res);
@@ -450,7 +452,7 @@ Quad_init(QuadObject *self, PyObject *args, PyObject *kwds)
         return -1;
     }
         
-    if(!PyObject_to_QuadObject(obj, self)){
+    if(!PyObject_to_QuadObject(obj, self, true)){
         PyErr_SetString(PyExc_TypeError, "Can not convert value to quad precision.");
         return -1;
     }
@@ -517,12 +519,29 @@ QuadObject_to_PyObject(QuadObject out) {
 }
 
 
-bool
-PyObject_to_QuadObject(PyObject * in, QuadObject * out)
-{
-    alloc_QuadType(out);
+static __float128 QuadObject_float128(QuadObject * out) {
+    return out->value;
+}
 
-    if(PyUnicode_Check(in) || PyObject_TypeCheck(in, &QuadType)){
+
+bool
+PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
+{
+    if(alloc)
+        alloc_QuadType(out);
+
+    Py_INCREF(out);
+
+    //printf("%d\n",PyObject_TypeCheck(in, &QuadType));
+
+    if(PyObject_TypeCheck(in, &QuadType)){
+        // Is a quad
+        out->value = QuadObject_float128((QuadObject *) in);
+        return true;
+    }
+
+
+    if(PyUnicode_Check(in)){
         // Is a string
 
         PyObject * obj_str = PyObject_Str(in);
@@ -541,11 +560,12 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out)
         if(strcmp(buf,"nan")==0) {
             out->value = nanq("");
         } else {
-            char **sp;
+            char **sp=NULL;
 
             out->value = strtoflt128(buf, &sp);
             if(sp!=NULL){
-                if(strcmp(sp,"")){
+                if(strcmp(sp,"")!=0){
+                   // printf("%s %d\n",sp,strcmp(sp,""));
                     return false;
                 }
             }
@@ -568,8 +588,6 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out)
             out->value = (__float128) PyFloat_AsDouble(in);
             return true;
         }
-
-
         return false;
     }
 

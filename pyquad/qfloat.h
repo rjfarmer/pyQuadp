@@ -5,12 +5,13 @@
 #include <quadmath.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #pragma once
 
 #include "qdef.h"
 
 PyObject* QuadObject_to_PyObject(QuadObject out);
-bool PyObject_to_QuadObject(PyObject * in, QuadObject * out);
+bool PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc);
 void qprintf(QuadObject * out);
 void alloc_QuadType(QuadObject * result);

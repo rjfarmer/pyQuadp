@@ -2,27 +2,30 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <quadmath.h>
+#include <stdbool.h>
 
 #include "qdef.h"
+#include "qfloat.h"
 
-// PyObject * qfloatmod = PyImport_ImportModule("qfloat");
 
 static PyObject *_cos(PyObject *self, PyObject *args){
-    // QuadObject *q;
-    // __float128 r;
-    // char *buf;
+    QuadObject result;
+    PyObject * obj = NULL;
 
-    // if (!PyArg_ParseTuple(args, "s:", &buf)){
-    //     Py_DECREF(&q);
-    //     return NULL;
-    // }
+    if (!PyArg_ParseTuple(args, "O:", &obj)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse object");
+        return NULL;
+    }
 
-    // r = strtoflt128(buf, NULL);
+    if(!PyObject_to_QuadObject(obj, &result, false)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert value to quad precision.");
+        return NULL;
+    }
 
-    // q->value = cosq(r);
+    result.value = cosq(result.value);
 
-    // return (PyObject*)q;
-    return NULL;
+    return QuadObject_to_PyObject(result);
+
 }
 
 
