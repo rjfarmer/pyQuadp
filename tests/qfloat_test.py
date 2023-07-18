@@ -20,6 +20,9 @@ class TestQFloat:
         q = pq.qfloat("1")
         assert str(q) == "1.000000000000000000000000000000000000e+00"
 
+        q2 = pq.qfloat(q)
+        assert str(q) == "1.000000000000000000000000000000000000e+00"
+
         with pytest.raises(TypeError) as cm:
             q = pq.qfloat("abc")
 
@@ -63,3 +66,8 @@ class TestQFloat:
 
         q1 = pq.qfloat(1e300)
         assert int(q1) == 9223372036854775807
+
+    def test_nan(self):
+        q = pq.qfloat("nan")
+
+        assert not q == q

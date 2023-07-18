@@ -37,8 +37,8 @@ FLT128_MAX_10_EXP = 4932
 pi = M_PIq
 e = M_Eq
 tau = 2 * pi
-# inf =
-# nan =
+inf = qfloat("1e900")
+nan = qfloat("nan")
 
 
 # Ctype data
