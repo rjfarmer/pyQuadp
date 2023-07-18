@@ -377,7 +377,8 @@ QuadType_RichCompare(PyObject * o1, PyObject * o2, int opid){
             break;
     }
 
-    return Py_NewRef(res);
+    Py_INCREF(res);
+    return res;
 }
 
 
