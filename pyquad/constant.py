@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 
 from qfloat import _qfloat as qfloat
-
+import ctypes
 
 # libquadmath constants
 
@@ -36,6 +36,17 @@ FLT128_MAX_10_EXP = 4932
 
 pi = M_PIq
 e = M_Eq
-# tau = 2 * pi
+tau = 2 * pi
 # inf =
 # nan =
+
+
+# Ctype data
+c_qfloat = ctypes.c_byte * 16
+
+
+class c_qcmplx(ctypes.Structure):
+    _fields_ = [
+        ("real", c_qfloat),
+        ("imag", c_qfloat),
+    ]
