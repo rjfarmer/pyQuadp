@@ -339,6 +339,49 @@ QuadObject_inplace_true_divide(PyObject * o1, PyObject * o2 ){
 }
 
 
+
+static PyObject *
+QuadType_RichCompare(PyObject * o1, PyObject * o2, int opid){
+    QuadObject q1, q2;
+    PyObject * res;
+
+    if(!PyObject_to_QuadObject(o1, &q1)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(!PyObject_to_QuadObject(o2, &q2)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    switch (opid){
+        case Py_EQ:
+            res = (q1.value == q2.value) ? Py_True : Py_False;
+            break;
+        case Py_NE:
+            res = (q1.value != q2.value) ? Py_True : Py_False;
+            break;
+        case Py_LE:
+            res = (q1.value <= q2.value) ? Py_True : Py_False;
+            break;
+        case Py_LT:
+            res = (q1.value < q2.value) ? Py_True : Py_False;
+            break;
+        case Py_GT:
+            res = (q1.value > q2.value) ? Py_True : Py_False;
+            break;
+        case Py_GE:
+            res = (q1.value >= q2.value) ? Py_True : Py_False;
+            break;
+        default:
+            PyErr_SetString(PyExc_AttributeError, "Unknown comparison function.");
+            break;
+    }
+
+    return Py_NewRef(res);
+}
+
+
+
 // Header data
 
 static PyNumberMethods Quad_math_methods = {
@@ -429,6 +472,7 @@ static PyTypeObject QuadType = {
     .tp_methods = Quad_methods,
     .tp_init = (initproc) Quad_init,
     .tp_as_number = &Quad_math_methods,
+    .tp_richcompare = (richcmpfunc) QuadType_RichCompare,
 };
 
 static PyModuleDef QuadModule = {
