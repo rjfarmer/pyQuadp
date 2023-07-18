@@ -32,3 +32,15 @@ class TestQFloat:
         q1 = pq.qfloat(1)
         q2 = pq.qfloat(2)
         assert str(q2 - q1) == str(q1)
+
+    def test_comp(self):
+        q1 = pq.qfloat(1)
+        q2 = pq.qfloat(2)
+        q3 = pq.qfloat(1)
+
+        assert q1 <= q2
+        assert not q1 == q2
+        assert q1 == q3
+        assert not q1 >= q2
+        assert q1 <= q3
+        assert q1 >= q3
