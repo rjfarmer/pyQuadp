@@ -178,6 +178,51 @@ QuadObject_abs(PyObject * o1){
     return QuadObject_binary_op1(OP_absolute, o1);
 }
 
+static int QuadObject_bool(PyObject * o1){
+
+    QuadObject q1;
+
+    if(!PyObject_to_QuadObject(o1, &q1)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(q1.value==0)
+        return 0;
+
+    return 1;
+
+}
+
+static PyObject *
+QuadObject_int(PyObject * o1){
+    QuadObject q1;
+    PyObject * result;
+
+    if(!PyObject_to_QuadObject(o1, &q1)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    // TODO: Add error checking and switch to fromstring
+   result = PyLong_FromDouble((double) q1.value);
+
+   return result;
+}
+
+static PyObject *
+QuadObject_float(PyObject * o1){
+    QuadObject q1;
+    PyObject * result;
+
+    if(!PyObject_to_QuadObject(o1, &q1)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    // TODO: Add error checking and switch to fromstring
+   result = PyFloat_FromDouble((double) q1.value);
+
+   return result;
+}
+
 
 
 // Header data
@@ -192,16 +237,16 @@ static PyNumberMethods Quad_math_methods = {
     (unaryfunc) QuadObject_neg,
     (unaryfunc) QuadObject_pos,
     (unaryfunc) QuadObject_abs,
-    0,//  inquiry nb_bool;
+    (inquiry) QuadObject_bool,
     0,//  unaryfunc nb_invert;
     0,//  binaryfunc nb_lshift;
     0,//  binaryfunc nb_rshift;
     0,//  binaryfunc nb_and;
     0,//  binaryfunc nb_xor;
     0,//  binaryfunc nb_or;
-    0,//  unaryfunc nb_int;
+    (unaryfunc) QuadObject_int,//  unaryfunc nb_int;
     0,//  void *nb_reserved;
-    0,//  unaryfunc nb_float;
+    (unaryfunc) QuadObject_float,//  unaryfunc nb_float;
 
     0,//  binaryfunc nb_inplace_add;
     0,//  binaryfunc nb_inplace_subtract;
