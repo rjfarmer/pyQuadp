@@ -560,7 +560,7 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
         if(strcmp(buf,"nan")==0) {
             out->value = nanq("");
         } else {
-            char **sp=NULL;
+            char *sp=NULL;
 
             out->value = strtoflt128(buf, &sp);
             if(sp!=NULL){
