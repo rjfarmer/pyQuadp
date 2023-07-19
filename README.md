@@ -61,3 +61,66 @@ str(q) # "1.000000000000000000000000000000000000e+00"
 The ``qmath`` provides the union of math operations from Python's ``math`` library and the routines provided in ``libquadmath``.
 
 This is still under development.
+
+| Name     | Implemented |
+|----------|-------------|
+| ceil | :x: |
+| comb | :x: |
+| copysign | :x: |
+| fabs | :x: |
+| facorial | :x: |
+| floor | :x: |
+| fmod | :x: |
+| frexp | :x: |
+| fsum | :x: |
+| gcd | :x: |
+| isclose | :x: |
+| isfinite | :x: |
+| isinf | :x: |
+| isnan | :x: |
+| isqrt | :x: |
+| lcm | :x: |
+| ldexp | :x: |
+| modf | :x: |
+| nextafter | :x: |
+| perm | :x: |
+| prod | :x: |
+| remainder | :x: |
+| trunc | :x: |
+| ulp | :x: |
+| cbrt | :x: |
+| exp | :x: |
+| exp2 | :x: |
+| expm1 | :x: |
+| log | :x: |
+| log1p | :x: |
+| log2 | :x: |
+| log10 | :x: |
+| pow | :x: |
+| sqrt | :x: |
+| acos | :x: |
+| asin | :x: |
+| atan | :x: |
+| atan2 | :x: |
+| cos | :x: |
+| dist | :x: |
+| hypot | :x: |
+| sin | :x: |
+| tan | :x: |
+| degress | :x: |
+| radians | :x: |
+| acosh | :x: |
+| asinh| :x: |
+| atanh| :x: |
+| cosh| :x: |
+| sinh| :x: |
+| tanh| :x: |
+| erf| :x: |
+| erfc| :x: |
+| gamma| :x: |
+| lgamma| :x: |
+| pi | :heavy_check_mark: |  
+| e | :heavy_check_mark: |  
+| tau | :heavy_check_mark: |  
+| inf | :x: |
+| nan | :heavy_check_mark: |  
