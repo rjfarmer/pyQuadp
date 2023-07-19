@@ -18,7 +18,7 @@ Package is not yet available on pypi.
 
 This package requires ``quadmath.h`` and ``libquadmath.so``. This might come installed with a installation of gcc/gfortran from your package manager. Or it might separate installation. This should be installed before trying to install the python package
 
-###Fedora
+### Fedora
 
 ````bash
 sudo dnf install libquadmath libquadmath-devel
@@ -29,7 +29,7 @@ sudo dnf install libquadmath libquadmath-devel
 
 ### qfloat
 
-A quad precision number is created by passing either a int, float, or strong to ``qfloat``:
+A quad precision number is created by passing either a int, float, or string to ``qfloat``:
 
 ````python
 import pyquad
@@ -52,6 +52,8 @@ q1+=q2 # pyquad.qfloat(3)
 
 q1 <= q2 # True
 q1 == q2 # False
+
+str(q) # "1.000000000000000000000000000000000000e+00"
 ````
 
 ### qmath
