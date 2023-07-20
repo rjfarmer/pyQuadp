@@ -6,9 +6,10 @@
 
 #include "qdef.h"
 #include "qfloat.h"
+#include "qmath.h"
 
 
-static PyObject *_cos(PyObject *self, PyObject *args){
+static PyObject * _cos(PyObject *self, PyObject *args){
     QuadObject result;
     PyObject * obj = NULL;
 
@@ -17,7 +18,7 @@ static PyObject *_cos(PyObject *self, PyObject *args){
         return NULL;
     }
 
-    if(!PyObject_to_QuadObject(obj, &result, false)){
+    if(!PyObject_to_QuadObject(obj, &result, true)){
         PyErr_SetString(PyExc_TypeError, "Can not convert value to quad precision.");
         return NULL;
     }
@@ -52,6 +53,10 @@ PyInit_qmath(void)
     m = PyModule_Create(&QMathModule);
     if (m == NULL)
         return NULL;
+
+
+    //qfloat_m = PyImport_ImportModule("qfloat" );
+    //qfloat_type = PyObject_GetAttrString(qfloat_m, "_qfloat" );
 
     return m;
 }
