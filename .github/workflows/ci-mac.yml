@@ -8,6 +8,13 @@ jobs:
       matrix:
         fortran-compiler:  ['8','9','10','11','12']
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        exclude:
+          - python-version: '3.11'
+            fortran-compilier: '8'
+          - python-version: '3.11'
+            fortran-compilier: '9' 
+          - python-version: '3.11'
+            fortran-compilier: '10'
       fail-fast: false
     env:
       FC: gfortran
