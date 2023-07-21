@@ -96,12 +96,11 @@ class TestQFloat:
 
         assert q1 // q2 == q3
 
-    @pytest.mark.skip
     def test_remainder(self):
-        q1 = pq.qfloat(5.5)
+        q1 = pq.qfloat(4.4)
         q2 = pq.qfloat(2)
 
-        q3 = pq.qfloat(5.5 % 2)
+        q3 = pq.qfloat(4.4 % 2)
 
         assert q1 % q2 == q3
 
@@ -121,12 +120,12 @@ class TestQFloat:
         assert pow(q1, q2, q4) == q3
 
     def test_divmod(self):
-        q1 = pq.qfloat(5.5)
+        q1 = pq.qfloat(4.4)
         q2 = pq.qfloat(2)
 
-        q3 = divmod(5.5, 2)
+        q3 = divmod(4.4, 2)
 
-        assert divmod(5.5, 2) == (pq.qfloat(q3[0]), pq.qfloat(q3[1]))
+        assert divmod(q1, q2) == (pq.qfloat(q3[0]), pq.qfloat(q3[1]))
 
     def test_negative(self):
         q1 = pq.qfloat(5.5)
