@@ -46,7 +46,7 @@
 #define OP_inplace_true_divide 33
 #define OP_index 34
 #define OP_matrix_multiply 35
-#define OP__inplace_matrix_multiply 36
+#define OP_inplace_matrix_multiply 36
 
 #define QUAD_BUF 128
 
@@ -54,8 +54,6 @@ typedef struct {
     PyObject_HEAD
     __float128 value;
 } QuadObject;
-
-
 
 PyObject* QuadObject_to_PyObject(QuadObject out);
 bool PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc);

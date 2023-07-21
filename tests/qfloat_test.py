@@ -71,3 +71,86 @@ class TestQFloat:
         q = pq.qfloat("nan")
 
         assert not q == q
+
+    def test_mult(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q3 = pq.qfloat(2 * 5.5)
+
+        assert q1 * q2 == q3
+
+    def test_true_div(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q3 = pq.qfloat(5.5 / 2)
+
+        assert q1 / q2 == q3
+
+    def test_floor_div(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q3 = pq.qfloat(5.5 // 2)
+
+        assert q1 // q2 == q3
+
+    @pytest.mark.skip
+    def test_remainder(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q3 = pq.qfloat(5.5 % 2)
+
+        assert q1 % q2 == q3
+
+    def test_pow(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q3 = pq.qfloat(pow(5.5, 2))
+
+        assert pow(q1, q2) == q3
+
+        q1 = pq.qfloat(5)
+        q2 = pq.qfloat(2)
+        q4 = pq.qfloat(3)
+        q3 = pq.qfloat(pow(5, 2, 3))
+
+        assert pow(q1, q2, q4) == q3
+
+    def test_divmod(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q3 = divmod(5.5, 2)
+
+        assert divmod(5.5, 2) == (pq.qfloat(q3[0]), pq.qfloat(q3[1]))
+
+    def test_negative(self):
+        q1 = pq.qfloat(5.5)
+
+        q3 = pq.qfloat(-5.5)
+
+        assert -q1 == q3
+
+    def test_positive(self):
+        q1 = pq.qfloat(5.5)
+
+        q3 = pq.qfloat(5.5)
+
+        assert +q1 == q3
+
+    def test_abs(self):
+        q1 = pq.qfloat(-5.5)
+
+        q3 = pq.qfloat(5.5)
+
+        assert abs(q1) == q3
+
+        q1 = pq.qfloat(5.5)
+
+        q3 = pq.qfloat(5.5)
+
+        assert abs(q1) == q3
