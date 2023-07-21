@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "qdef.h"
 #include "qfloat.h"
 
 // PyObject* qfloat_m;

@@ -7,8 +7,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
-#include "qdef.h"
 #include "qfloat.h"
 
 

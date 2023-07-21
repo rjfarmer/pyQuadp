@@ -3,8 +3,6 @@
 #include <Python.h>
 #include <quadmath.h>
 
-#include "qdef.h"
-
 
 static PyMethodDef QMathMethods[] = {
     {NULL, NULL, 0, NULL}

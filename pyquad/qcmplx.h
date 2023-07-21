@@ -5,5 +5,12 @@
 #include <quadmath.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <complex.h>
+#include <stdbool.h>
 
+
+#pragma once
+
+typedef struct {
+    PyObject_HEAD
+    __complex128 value;
+} QuadCmplxObject;

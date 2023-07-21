@@ -4,7 +4,6 @@
 #include <quadmath.h>
 #include <stdbool.h>
 
-#include "qdef.h"
 #include "qfloat.h"
 #include "qmath.h"
 
