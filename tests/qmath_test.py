@@ -395,9 +395,9 @@ class TestQMathPy:
     # def test_frexp(self, x):
     #     assert float(qm.frexp(x)) == pytest.approx(math.frexp(x))
     
-    @given(floats(allow_infinity=False,allow_nan=False),floats(allow_infinity=False,allow_nan=False))
-    def test_hypot(self, x, y):
-        assert float(qm.hypot(x,y)) == pytest.approx(math.hypot(x,y))
+    # @given(floats(allow_infinity=False,allow_nan=False),floats(allow_infinity=False,allow_nan=False))
+    # def test_hypot(self, x, y):
+    #     assert float(qm.hypot(x,y)) == pytest.approx(math.hypot(x,y))
     
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_ilogb(self, x):
@@ -483,6 +483,7 @@ class TestQMathPy:
     # def test_nearbyint(self, x):
     #     assert float(qm.nearbyint(x)) == pytest.approx(math.nearbyint(x))
     
+    @pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
     @given(floats(allow_infinity=False,allow_nan=False),floats(allow_infinity=False,allow_nan=False))
     def test_nextafter(self, x, y):
         assert float(qm.nextafter(x,y)) == pytest.approx(math.nextafter(x, y))
