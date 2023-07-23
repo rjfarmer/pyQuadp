@@ -7,9 +7,10 @@ import numpy as np
 import pytest
 
 import pyquad as pq
+import pyquad.qmath as qm
 
 class TestQFloat:
     def test_cos(self):
         q = pq.qfloat(0.0)
 
-        assert pq.qmath.cos(q) == pq.qfloat(1.0)
+        assert qm.cos(q) == pq.qfloat(1.0)

@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #include "qfloat.h"
-#include "qmath.h"
+#include "qmathc.h"
 
 
 static PyObject * _cos(PyObject *self, PyObject *args){
@@ -30,21 +30,21 @@ static PyObject * _cos(PyObject *self, PyObject *args){
 
 
 static PyMethodDef QMathMethods[] = {
-    {"cos", (PyCFunction) _cos, METH_VARARGS, "cos"},
+    {"_cos", (PyCFunction) _cos, METH_VARARGS, "cos"},
     {NULL, NULL, 0, NULL}
 };
 
 
 PyModuleDef QMathModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquad.qmath",
+    .m_name = "pyquad.qmathc",
     .m_doc = "Quad precision math library.",
     .m_size = -1,
     .m_methods = QMathMethods,
 };
 
 PyMODINIT_FUNC
-PyInit_qmath(void)
+PyInit_qmathc(void)
 {
 
     PyObject *m;

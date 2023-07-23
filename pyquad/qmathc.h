@@ -7,5 +7,3 @@
 
 #include "qfloat.h"
 
-// PyObject* qfloat_m;
-// PyObject* qfloat_type;

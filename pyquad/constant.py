@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 
 from qfloat import _qfloat as qfloat
-import ctypes
+import ctypes as _ctypes
 
 # libquadmath constants
 
@@ -42,11 +42,12 @@ nan = qfloat("nan")
 
 
 # Ctype data
-c_qfloat = ctypes.c_byte * 16
+c_qfloat = _ctypes.c_byte * 16
 
 
-class c_qcmplx(ctypes.Structure):
+class c_qcmplx(_ctypes.Structure):
     _fields_ = [
         ("real", c_qfloat),
         ("imag", c_qfloat),
     ]
+
