@@ -45,7 +45,7 @@ class TestQMathFloat:
     
     @given(floats(allow_infinity=False,allow_nan=False))
     def test_cbrtq(self, x):
-        assert float(qm.cbrtq(x)) == pytest.approx(math.cbrt(x))
+        assert float(qm.cbrtq(x)) == pytest.approx(np.cbrt(x))
     
     @given(floats(allow_infinity=False,allow_nan=False))
     def test_ceilq(self, x):
@@ -321,7 +321,7 @@ class TestQMathPy:
     
     @given(floats(allow_infinity=False,allow_nan=False))
     def test_cbrt(self, x):
-        assert float(qm.cbrt(x)) == pytest.approx(math.cbrt(x))
+        assert float(qm.cbrt(x)) == pytest.approx(np.cbrt(x))
     
     @given(floats(allow_infinity=False,allow_nan=False))
     def test_ceil(self, x):
