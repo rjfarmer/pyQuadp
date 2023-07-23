@@ -9,6 +9,21 @@
 
 #pragma once
 
+#ifndef Py_QFLOAT_H
+#define Py_QFLOAT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* C API functions */
+#define PyQfloat_q2py_NUM 0
+#define PyQfloat_py2q_NUM 1
+
+/* Total number of C API pointers */
+#define PyQfloat_API_pointers 2
+
+#ifdef QFLOAT_MODULE
+
 #define OP_add 1
 #define OP_sub 2
 #define OP_mult 3
@@ -50,12 +65,61 @@
 
 #define QUAD_BUF 128
 
+
+// exported
 typedef struct {
     PyObject_HEAD
     __float128 value;
 } QuadObject;
 
-PyObject* QuadObject_to_PyObject(QuadObject out);
-bool PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc);
+static PyObject* QuadObject_to_PyObject(QuadObject out);
+static bool PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc);
+
+
+#else
+
+typedef struct {
+    PyObject_HEAD
+    __float128 value;
+} QuadObject;
+
+static void **PyQfloat_API;
+
+#define QuadObject_to_PyObject \
+ (*(PyObject * (*)(QuadObject)) PyQfloat_API[PyQfloat_q2py_NUM])
+
+#define PyObject_to_QuadObject \
+ (*(bool (*)(PyObject *, QuadObject *, const bool)) PyQfloat_API[PyQfloat_py2q_NUM])
+
+
+/* Return -1 on error, 0 on success.
+ * PyCapsule_Import will set an exception if there's an error.
+ */
+static int
+import_qfloat(void)
+{
+    PyQfloat_API = (void **)PyCapsule_Import("qfloat._C_API", 0);
+    return (PyQfloat_API != NULL) ? 0 : -1;
+}
+
+
+
+#endif
+
+
+
+// end exported
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+
+
+// Debugging
 void qprintf(QuadObject * out);
+
+// Allocation
 void alloc_QuadType(QuadObject * result);

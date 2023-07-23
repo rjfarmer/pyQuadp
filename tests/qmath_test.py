@@ -8,8 +8,6 @@ import pytest
 
 import pyquad as pq
 
-
-@pytest.mark.skip
 class TestQFloat:
     def test_cos(self):
         q = pq.qfloat(0.0)

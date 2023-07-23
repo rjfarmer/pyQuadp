@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define QFLOAT_MODULE
 #include "qfloat.h"
 
 
-// Examples https://github.com/Zuzu-Typ/Python-C-API-extension-template/blob/master/template.cpp
 
 static PyObject *
 QuadObject_repr(QuadObject * obj)
@@ -483,28 +483,6 @@ static PyModuleDef QuadModule = {
     .m_size = -1,
 };
 
-PyMODINIT_FUNC
-PyInit_qfloat(void)
-{
-    PyObject *m;
-    if (PyType_Ready(&QuadType) < 0)
-        return NULL;
-
-    m = PyModule_Create(&QuadModule);
-    if (m == NULL)
-        return NULL;
-
-    Py_INCREF(&QuadType);
-    if (PyModule_AddObject(m, "_qfloat", (PyObject *) &QuadType) < 0) {
-        Py_DECREF(&QuadType);
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    return m;
-}
-
-
 PyObject* 
 QuadObject_to_PyObject(QuadObject out) {
 	QuadObject* ret = (QuadObject*)QuadType.tp_alloc(&QuadType, 0);
@@ -602,4 +580,44 @@ void qprintf(QuadObject * out){
 
 void alloc_QuadType(QuadObject * result){
 	result = (QuadObject*)QuadType.tp_alloc(&QuadType, 0);
+}
+
+PyMODINIT_FUNC
+PyInit_qfloat(void)
+{
+    PyObject *m;
+    static void *PyQfloat_API[PyQfloat_API_pointers];
+    PyObject *c_api_object;
+
+
+    if (PyType_Ready(&QuadType) < 0)
+        return NULL;
+
+    m = PyModule_Create(&QuadModule);
+    if (m == NULL)
+        return NULL;
+
+    /* Initialize the C API pointer array */
+    PyQfloat_API[PyQfloat_q2py_NUM] = (void *)QuadObject_to_PyObject;
+    PyQfloat_API[PyQfloat_py2q_NUM] = (void *)PyObject_to_QuadObject;
+
+    Py_INCREF(&QuadType);
+    if (PyModule_AddObject(m, "_qfloat", (PyObject *) &QuadType) < 0) {
+        Py_DECREF(&QuadType);
+        Py_DECREF(m);
+        return NULL;
+    }
+
+
+    /* Create a Capsule containing the API pointer array's address */
+    c_api_object = PyCapsule_New((void *)PyQfloat_API, "qfloat._C_API", NULL);
+
+    if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
+        Py_XDECREF(c_api_object);
+        Py_DECREF(m);
+        return NULL;
+    }
+
+
+    return m;
 }

@@ -53,9 +53,8 @@ PyInit_qmath(void)
     if (m == NULL)
         return NULL;
 
-
-    //qfloat_m = PyImport_ImportModule("qfloat" );
-    //qfloat_type = PyObject_GetAttrString(qfloat_m, "_qfloat" );
+    if (import_qfloat() < 0)
+        return NULL;
 
     return m;
 }
