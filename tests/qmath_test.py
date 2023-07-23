@@ -35,7 +35,7 @@ class TestQMathFloat:
     def test_atanq(self, x):
         assert float(qm.atanq(x)) == pytest.approx(math.atan(x))
     
-    @given(floats(allow_infinity=False,allow_nan=False,min_value=-1,max_value=1))
+    @given(floats(allow_infinity=False,allow_nan=False,min_value=-1,max_value=1,exclude_min=True,exclude_max=True))
     def test_atanhq(self, x):
         assert float(qm.atanhq(x)) == pytest.approx(math.atanh(x))
     
@@ -311,7 +311,7 @@ class TestQMathPy:
     def test_atan(self, x):
         assert float(qm.atan(x)) == pytest.approx(math.atan(x))
     
-    @given(floats(allow_infinity=False,allow_nan=False,min_value=-1,max_value=1))
+    @given(floats(allow_infinity=False,allow_nan=False,min_value=-1,max_value=1,exclude_min=True,exclude_max=True))
     def test_atanh(self, x):
         assert float(qm.atanh(x)) == pytest.approx(math.atanh(x))
     
