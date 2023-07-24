@@ -16,7 +16,7 @@ jobs:
           - python-version: '3.11'
             fortran-compiler: '10'
           - python-version: '3.7'
-            fortran-compilier: '8'
+            fortran-compiler: '8'
       fail-fast: false
     env:
       FC: gfortran
