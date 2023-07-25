@@ -105,9 +105,16 @@ class TestQMathFloat:
     def test_fabsq(self, x):
         assert float(qm.fabsq(x)) == pytest.approx(math.fabs(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_fdimq(self, x, y):
-    #     assert float(qm.fdimq(x,y)) == pytest.approx(math.fdim(x, y))
+    @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_fdimq(self, x, y):
+        z = float(qm.fdimq(x, y))
+        if x <= y:
+            assert z == 0
+        else:
+            z == pytest.approx(x - y)
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_finiteq(self, x):
@@ -117,9 +124,14 @@ class TestQMathFloat:
     def test_floorq(self, x):
         assert float(qm.floorq(x)) == pytest.approx(math.floor(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_fmaq(self, x, y):
-    #     assert float(qm.fmaq(x,y)) == pytest.approx(math.fma(x,y))
+    @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_fmaq(self, x, y, z):
+        a = x * y + z
+        assert float(qm.fmaq(x, y, z)) == pytest.approx(a)
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_fmaxq(self, x, y):

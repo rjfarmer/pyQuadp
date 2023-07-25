@@ -174,8 +174,8 @@ def fma(x, y, z):
     return _qmathc._fma(x, y, z)
 
 
-def fmaq(x, y):
-    return _qmathc._fma(x, y)
+def fmaq(x, y, z):
+    return _qmathc._fma(x, y, z)
 
 
 def fmax(x, y):
