@@ -163,6 +163,9 @@ class TestQMathFloat:
     # def test_frexpq(self, x):
     #     assert float(qm.frexpq(x)) == pytest.approx(math.frexp(x))
 
+    @pytest.mark.skipif(
+        sys.version_info < (3, 8), reason="Python 3.7 math version is broken"
+    )
     @given(
         floats(allow_infinity=False, allow_nan=False),
         floats(allow_infinity=False, allow_nan=False),
