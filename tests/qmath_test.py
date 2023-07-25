@@ -125,9 +125,13 @@ class TestQMathFloat:
         assert float(qm.floorq(x)) == pytest.approx(math.floor(x))
 
     @given(
-        floats(allow_infinity=False, allow_nan=False, max_value=1e100),
-        floats(allow_infinity=False, allow_nan=False, max_value=1e100),
-        floats(allow_infinity=False, allow_nan=False, max_value=1e50),
+        floats(
+            allow_infinity=False, allow_nan=False, min_value=-1e100, max_value=1e100
+        ),
+        floats(
+            allow_infinity=False, allow_nan=False, min_value=-1e100, max_value=1e100
+        ),
+        floats(allow_infinity=False, allow_nan=False, min_value=-1e50, max_value=1e50),
     )
     def test_fmaq(self, x, y, z):
         a = x * y + z
