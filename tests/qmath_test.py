@@ -86,6 +86,9 @@ class TestQMathFloat:
     def test_erfcq(self, x):
         assert float(qm.erfcq(x)) == pytest.approx(math.erfc(x))
 
+    @pytest.mark.skipif(
+        sys.version_info < (3, 11), reason="requires python3.11 or higher"
+    )
     @given(floats(allow_infinity=False, allow_nan=False, max_value=100))
     def test_exp2q(self, x):
         assert float(qm.exp2q(x)) == pytest.approx(math.exp2(x))
