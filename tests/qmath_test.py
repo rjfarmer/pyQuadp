@@ -125,21 +125,35 @@ class TestQMathFloat:
         assert float(qm.floorq(x)) == pytest.approx(math.floor(x))
 
     @given(
-        floats(allow_infinity=False, allow_nan=False),
-        floats(allow_infinity=False, allow_nan=False),
-        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False, max_value=1e100),
+        floats(allow_infinity=False, allow_nan=False, max_value=1e100),
+        floats(allow_infinity=False, allow_nan=False, max_value=1e50),
     )
     def test_fmaq(self, x, y, z):
         a = x * y + z
         assert float(qm.fmaq(x, y, z)) == pytest.approx(a)
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_fmaxq(self, x, y):
-    #     assert float(qm.fmaxq(x,y)) == pytest.approx(math.fmax(x, y))
+    @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_fmaxq(self, x, y):
+        z = float(qm.fmaxq(x, y))
+        if x >= y:
+            assert z == x
+        else:
+            assert z == y
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_fminq(self, x, y):
-    #     assert float(qm.fminq(x,y)) == pytest.approx(math.fmin(x, y))
+    @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_fminq(self, x, y):
+        z = float(qm.fminq(x, y))
+        if x <= y:
+            assert z == x
+        else:
+            assert z == y
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_fmodq(self, x, y):
@@ -149,9 +163,12 @@ class TestQMathFloat:
     # def test_frexpq(self, x):
     #     assert float(qm.frexpq(x)) == pytest.approx(math.frexp(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_hypotq(self, x, y):
-    #     assert float(qm.hypotq(x,y)) == pytest.approx(math.hypot(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_hypotq(self, x, y):
+        assert float(qm.hypotq(x, y)) == pytest.approx(math.hypot(x, y))
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_ilogbq(self, x):

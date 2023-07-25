@@ -214,8 +214,8 @@ def hypot(x, y):
     return _qmathc._hypot(x, y)
 
 
-def hypotq(x):
-    return _qmathc._hypot(x)
+def hypotq(x, y):
+    return _qmathc._hypot(x, y)
 
 
 def ilogb(x):
