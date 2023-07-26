@@ -138,60 +138,60 @@ regarding behaviour of exceptional values. While routines from ``libquadmath`` (
 | nan | :x: |  |  
 
 
-### Routines from Python's ``math`` library
+### Routines from gcc's ``libquadthmath`` library
 
 | Name     | Implemented |
 |----------|-------------|
-|acosq | :x: | arc cosine function |
-|acoshq | :x: | inverse hyperbolic cosine function |
-|asinq | :x: | arc sine function |
-|asinhq | :x: | inverse hyperbolic sine function |
-|atanq | :x: | arc tangent function |
-|atanhq | :x: | inverse hyperbolic tangent function |
-|atan2q | :x: | arc tangent function |
-|cbrtq | :x: | cube root function |
-|ceilq | :x: | ceiling value function |
-|copysignq | :x: | copy sign of a number
-|coshq | :x: | hyperbolic cosine function |
-|cosq | :x: | cosine function |
-|erfq | :x: | error function |
-|erfcq | :x: | complementary error function |
-|exp2q | :x: | base 2 exponential function |
-|expq | :x: | exponential function |
-|expm1q | :x: | exponential minus 1 function |
-|fabsq | :x: | absolute value function |
-|fdimq | :x: | positive difference function |
-|finiteq | :x: | check finiteness of value
-|floorq | :x: | floor value function |
-|fmaq | :x: | fused multiply and add |
-|fmaxq | :x: | determine maximum of two values |
-|fminq | :x: | determine minimum of two values |
-|fmodq | :x: | remainder value function |
-|frexpq | :x: | extract mantissa and exponent |
-|hypotq | :x: | Eucledian distance function |
+|acosq | :heavy_check_mark: | arc cosine function |
+|acoshq | :heavy_check_mark: | inverse hyperbolic cosine function |
+|asinq | :heavy_check_mark: | arc sine function |
+|asinhq | :heavy_check_mark: | inverse hyperbolic sine function |
+|atanq | :heavy_check_mark: | arc tangent function |
+|atanhq | :heavy_check_mark: | inverse hyperbolic tangent function |
+|atan2q | :heavy_check_mark: | arc tangent function |
+|cbrtq | :heavy_check_mark: | cube root function |
+|ceilq | :heavy_check_mark: | ceiling value function |
+|copysignq |:heavy_check_mark: | copy sign of a number
+|coshq | :heavy_check_mark: | hyperbolic cosine function |
+|cosq | :heavy_check_mark: | cosine function |
+|erfq | :heavy_check_mark: | error function |
+|erfcq | :heavy_check_mark: | complementary error function |
+|exp2q | :heavy_check_mark: | base 2 exponential function |
+|expq | :heavy_check_mark: | exponential function |
+|expm1q | :heavy_check_mark: | exponential minus 1 function |
+|fabsq | :heavy_check_mark: | absolute value function |
+|fdimq | :heavy_check_mark: | positive difference function |
+|finiteq | :heavy_check_mark: | check finiteness of value
+|floorq | :heavy_check_mark: | floor value function |
+|fmaq | :heavy_check_mark: | fused multiply and add |
+|fmaxq | :heavy_check_mark: | determine maximum of two values |
+|fminq | :heavy_check_mark: | determine minimum of two values |
+|fmodq | :heavy_check_mark: | remainder value function |
+|frexpq | :heavy_check_mark: | extract mantissa and exponent |
+|hypotq | :heavy_check_mark: | Eucledian distance function |
 |ilogbq | :x: | get exponent of the value |
-|isinfq | :x: | check for infinity |
-|isnanq | :x: | check for not a number |
+|isinfq | :heavy_check_mark: | check for infinity |
+|isnanq | :heavy_check_mark: | check for not a number |
 |issignalingq | :x: | check for signaling not a number |
-|j0q | :x: | Bessel function of the first kind, first order |
-|j1q | :x: | Bessel function of the first kind, second order |
-|jnq | :x: | Bessel function of the first kind, n-th order |
+|j0q | :heavy_check_mark: | Bessel function of the first kind, first order |
+|j1q | :heavy_check_mark: | Bessel function of the first kind, second order |
+|jnq | :heavy_check_mark: | Bessel function of the first kind, n-th order |
 |ldexpq | :x: | load exponent of the value |
 |lgammaq | :x: | logarithmic gamma function |
 |llrintq | :x: | round to nearest integer value |
 |llroundq | :x: | round to nearest integer value away from zero |
 |logbq | :x: | get exponent of the value |
-|logq | :x: | natural logarithm function |
-|log10q | :x: | base 10 logarithm function |
-|log1pq | :x: | compute natural logarithm of the value plus one |
-|log2q | :x: | base 2 logarithm function |
+|logq | :heavy_check_mark: | natural logarithm function |
+|log10q | :heavy_check_mark: | base 10 logarithm function |
+|log1pq | :heavy_check_mark: | compute natural logarithm of the value plus one |
+|log2q | :heavy_check_mark: | base 2 logarithm function |
 |lrintq | :x: | round to nearest integer value |
 |lroundq | :x: | round to nearest integer value away from zero |
 |modfq | :x: | decompose the floating-point number |
 |nanq | :x: | return quiet NaN |
 |nearbyintq | :x: | round to nearest integer |
 |nextafterq | :x: | next representable floating-point number |
-|powq | :x: | power function |
+|powq | :heavy_check_mark: | power function |
 |remainderq | :x: | remainder function |
 |remquoq | :x: | remainder and part of quotient |
 |rintq | :x: | round-to-nearest integral value |
@@ -201,15 +201,15 @@ regarding behaviour of exceptional values. While routines from ``libquadmath`` (
 |signbitq | :x: | return sign bit |
 |sincosq | :x: | calculate sine and cosine simultaneously |
 |sinhq | :x: | hyperbolic sine function |
-|sinq | :x: | sine function |
-|sqrtq | :x: | square root function |
-|tanq | :x: | tangent function |
-|tanhq | :x: | hyperbolic tangent function |
+|sinq | :heavy_check_mark: | sine function |
+|sqrtq | :heavy_check_mark: | square root function |
+|tanq | :heavy_check_mark: | tangent function |
+|tanhq | :heavy_check_mark: | hyperbolic tangent function |
 |tgammaq | :x: | true gamma function |
-|truncq | :x: | round to integer, towards zero |
-|y0q | :x: | Bessel function of the second kind, first order |
-|y1q | :x: | Bessel function of the second kind, second order |
-|ynq | :x: | Bessel function of the second kind, n-th order |
+|truncq | :heavy_check_mark: | round to integer, towards zero |
+|y0q | :heavy_check_mark: | Bessel function of the second kind, first order |
+|y1q | :heavy_check_mark: | Bessel function of the second kind, second order |
+|ynq | :heavy_check_mark: | Bessel function of the second kind, n-th order |
 
 
 
