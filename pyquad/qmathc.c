@@ -10,7 +10,9 @@
 #include "qfloat.h"
 #include "qmathc.h"
 
-
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
 
 
 static PyObject * QuadObject_qmath_op1(const int op, PyObject * self, PyObject * args){
@@ -65,7 +67,11 @@ static PyObject * QuadObject_qmath_op1(const int op, PyObject * self, PyObject *
             result.value = erfcq(result.value);
             break;
         case OP_exp2q:
+            #if __GNUC__ > 90000
             result.value = exp2q(result.value);
+            #else
+            result.value = powq(2.0,result.value);
+            #endif
             break;
         case OP_expq:
             result.value = expq(result.value);
