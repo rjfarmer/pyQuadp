@@ -320,9 +320,9 @@ class TestQMathFloat:
     # def test_sincosq(self, x):
     #     assert float(qm.sincosq(x)) == pytest.approx(math.sincos(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_sinhq(self, x):
-    #     assert float(qm.sinhq(x)) == pytest.approx(math.sinh(x))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10))
+    def test_sinhq(self, x):
+        assert float(qm.sinhq(x)) == pytest.approx(math.sinh(x))
 
     @given(floats(allow_infinity=False, allow_nan=False))
     def test_sinq(self, x):

@@ -200,7 +200,7 @@ regarding behaviour of exceptional values. While routines from ``libquadmath`` (
 |scalbnq | :x: | compute exponent using FLT_RADIX |
 |signbitq | :x: | return sign bit |
 |sincosq | :x: | calculate sine and cosine simultaneously |
-|sinhq | :x: | hyperbolic sine function |
+|sinhq | :heavy_check_mark: | hyperbolic sine function |
 |sinq | :heavy_check_mark: | sine function |
 |sqrtq | :heavy_check_mark: | square root function |
 |tanq | :heavy_check_mark: | tangent function |
