@@ -540,9 +540,9 @@ def y1q(x):
     return _qmathc._y1(x)
 
 
-def yn(x):
-    return _qmathc._yn(x)
+def yn(n, x):
+    return _qmathc._yn(n, x)
 
 
-def ynq(x):
-    return _qmathc._yn(x)
+def ynq(n, x):
+    return _qmathc._yn(n, x)

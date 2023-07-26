@@ -486,7 +486,7 @@ static PyObject * _jn(PyObject *self, PyObject *args){
         return NULL;
     }
 
-    result.value = jn(n, result.value);
+    result.value = jnq(n, result.value);
 
     return QuadObject_to_PyObject(result);
 };
@@ -623,9 +623,36 @@ static PyObject * _y1(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_y1q, self, args);
 };
 
-// static PyObject * _yn(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_ynq, self, args);
-// };
+static PyObject * _yn(PyObject *self, PyObject *args){
+    QuadObject result;
+    PyObject * obj1 = NULL,* obj2 = NULL;
+    long n;
+
+    if (!PyArg_ParseTuple(args, "OO:", &obj1, &obj2)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyLong_Check(obj1)){
+        PyErr_SetString(PyExc_TypeError, "First argument must be a int");
+        return NULL;
+    }
+
+    n = PyLong_AsLong(obj1);
+    if(PyErr_Occurred()){
+        PyErr_SetString(PyExc_TypeError, "First argument must be a int");
+        return NULL; 
+    }
+
+    if(!PyObject_to_QuadObject(obj2, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    result.value = ynq(n, result.value);
+
+    return QuadObject_to_PyObject(result);
+};
 
 
 static PyMethodDef QMathMethods[] = {
@@ -696,7 +723,7 @@ static PyMethodDef QMathMethods[] = {
     {"_trunc", (PyCFunction) _trunc, METH_VARARGS, "trunc"},
     {"_y0", (PyCFunction) _y0, METH_VARARGS, "y0"},
     {"_y1", (PyCFunction) _y1, METH_VARARGS, "y1"},
-    // {"_yn", (PyCFunction) _yn, METH_VARARGS, "yn"},
+    {"_yn", (PyCFunction) _yn, METH_VARARGS, "yn"},
     {NULL, NULL, 0, NULL}
 };
 

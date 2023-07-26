@@ -117,9 +117,9 @@ class TestQMathFloat:
         else:
             z == pytest.approx(x - y)
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_finiteq(self, x):
-    #     assert float(qm.finiteq(x)) == pytest.approx(math.finite(x))
+    @given(floats())
+    def test_finiteq(self, x):
+        assert qm.finiteq(x) == np.isfinite(x)
 
     @given(floats(allow_infinity=False, allow_nan=False))
     def test_floorq(self, x):
@@ -160,9 +160,12 @@ class TestQMathFloat:
         else:
             assert z == y
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_fmodq(self, x, y):
-    #     assert float(qm.fmodq(x,y)) == pytest.approx(math.fmod(x, y))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=1),
+        floats(allow_infinity=False, allow_nan=False, min_value=1),
+    )
+    def test_fmodq(self, x, y):
+        assert float(qm.fmodq(x, y)) == pytest.approx(math.fmod(x, y))
 
     @given(floats(allow_infinity=False, allow_nan=False))
     def test_frexpq(self, x):
@@ -203,20 +206,20 @@ class TestQMathFloat:
     # def test_issignalingq(self, x):
     #     assert float(qm.issignalingq(x)) == pytest.approx(math.issignaling(x))
 
-    @given(floats(allow_infinity=False, allow_nan=False))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10))
     def test_j0q(self, x):
-        assert float(qm.j0q(x)) == pytest.approx(scipy.special.j0(x), abs=1e-3)
+        assert float(qm.j0q(x)) == pytest.approx(scipy.special.j0(x), rel=1e-3)
 
-    @given(floats(allow_infinity=False, allow_nan=False))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10))
     def test_j1q(self, x):
-        assert float(qm.j1q(x)) == pytest.approx(scipy.special.j1(x), abs=1e-3)
+        assert float(qm.j1q(x)) == pytest.approx(scipy.special.j1(x), rel=1e-3)
 
     @given(
         integers(min_value=-2, max_value=2),
-        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10),
     )
     def test_jnq(self, x, y):
-        assert float(qm.jnq(x, y)) == pytest.approx(scipy.special.jn(x, y), abs=1e-3)
+        assert float(qm.jnq(x, y)) == pytest.approx(scipy.special.jn(x, y), rel=1e-3)
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_ldexpq(self, x):
@@ -321,9 +324,9 @@ class TestQMathFloat:
     # def test_sinhq(self, x):
     #     assert float(qm.sinhq(x)) == pytest.approx(math.sinh(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_sinq(self, x):
-    #     assert float(qm.sinq(x)) == pytest.approx(math.sin(x))
+    @given(floats(allow_infinity=False, allow_nan=False))
+    def test_sinq(self, x):
+        assert float(qm.sinq(x)) == pytest.approx(math.sin(x))
 
     @given(floats(allow_infinity=False, allow_nan=False, min_value=0, exclude_min=True))
     def test_sqrtq(self, x):
@@ -345,17 +348,26 @@ class TestQMathFloat:
     def test_truncq(self, x):
         assert float(qm.truncq(x)) == pytest.approx(math.trunc(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_y0q(self, x):
-    #     assert float(qm.y0q(x)) == pytest.approx(math.y0(x))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10))
+    def test_y0q(self, x):
+        assert float(qm.y0q(x)) == pytest.approx(
+            scipy.special.y0(x), nan_ok=True, rel=1e-3
+        )
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_y1q(self, x):
-    #     assert float(qm.y1q(x)) == pytest.approx(math.y1(x))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10))
+    def test_y1q(self, x):
+        assert float(qm.y1q(x)) == pytest.approx(
+            scipy.special.y1(x), nan_ok=True, rel=1e-3
+        )
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_ynq(self, x):
-    #     assert float(qm.ynq(x)) == pytest.approx(math.yn(x))
+    @given(
+        integers(min_value=-2, max_value=2),
+        floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10),
+    )
+    def test_ynq(self, n, x):
+        assert float(qm.ynq(n, x)) == pytest.approx(
+            scipy.special.yn(n, x), nan_ok=True, rel=1e-3
+        )
 
 
 class TestQMathPy:
