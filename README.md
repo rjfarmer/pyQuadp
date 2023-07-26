@@ -205,7 +205,7 @@ regarding behaviour of exceptional values. While routines from ``libquadmath`` (
 |sqrtq | :heavy_check_mark: | square root function |
 |tanq | :heavy_check_mark: | tangent function |
 |tanhq | :heavy_check_mark: | hyperbolic tangent function |
-|tgammaq | :x: | true gamma function |
+|tgammaq | :heavy_check_mark: | true gamma function |
 |truncq | :heavy_check_mark: | round to integer, towards zero |
 |y0q | :heavy_check_mark: | Bessel function of the second kind, first order |
 |y1q | :heavy_check_mark: | Bessel function of the second kind, second order |

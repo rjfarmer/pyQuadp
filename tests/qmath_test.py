@@ -340,9 +340,17 @@ class TestQMathFloat:
     def test_tanhq(self, x):
         assert float(qm.tanhq(x)) == pytest.approx(math.tanh(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_tgammaq(self, x):
-    #     assert float(qm.tgammaq(x)) == pytest.approx(math.tgamma(x))
+    @given(
+        floats(
+            allow_infinity=False,
+            allow_nan=False,
+            min_value=1,
+            exclude_min=True,
+            max_value=100,
+        )
+    )
+    def test_tgammaq(self, x):
+        assert float(qm.tgammaq(x)) == pytest.approx(math.gamma(x))
 
     @given(floats(allow_infinity=False, allow_nan=False))
     def test_truncq(self, x):
