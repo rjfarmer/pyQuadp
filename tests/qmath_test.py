@@ -163,9 +163,18 @@ class TestQMathFloat:
     # def test_fmodq(self, x, y):
     #     assert float(qm.fmodq(x,y)) == pytest.approx(math.fmod(x, y))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_frexpq(self, x):
-    #     assert float(qm.frexpq(x)) == pytest.approx(math.frexp(x))
+    @given(floats(allow_infinity=False, allow_nan=False))
+    def test_frexpq(self, x):
+        y = qm.frexpq(x)
+        y1 = float(y[0])
+        y2 = y[1]
+
+        z = math.frexp(x)
+        z1 = z[0]
+        z2 = z[1]
+
+        assert float(y1) == pytest.approx(z1)
+        assert y2 == z2
 
     @pytest.mark.skipif(
         sys.version_info < (3, 8), reason="Python 3.7 math version is broken"

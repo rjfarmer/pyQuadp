@@ -402,9 +402,29 @@ static PyObject * _fmod(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_fmodq, self, args);
 };
 
-// static PyObject * _frexp(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_frexpq, self, args);
-// };
+static PyObject * _frexp(PyObject *self, PyObject *args){
+    QuadObject result;
+    PyObject * obj1 = NULL;
+    int eptr;
+
+    if (!PyArg_ParseTuple(args, "O:", &obj1)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    result.value = frexpq(result.value, &eptr);
+
+    return Py_BuildValue("(OO)", \
+           QuadObject_to_PyObject(result),
+           PyLong_FromLong(eptr)
+    ); 
+
+};
 
 static PyObject * _hypot(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_hypotq, self, args);
@@ -601,7 +621,7 @@ static PyMethodDef QMathMethods[] = {
     {"_fmax", (PyCFunction) _fmax, METH_VARARGS, "fmax"},
     {"_fmin", (PyCFunction) _fmin, METH_VARARGS, "fmin"},
     {"_fmod", (PyCFunction) _fmod, METH_VARARGS, "fmod"},
-    //{"_frexp", (PyCFunction) _frexp, METH_VARARGS, "frexp"},
+    {"_frexp", (PyCFunction) _frexp, METH_VARARGS, "frexp"},
     {"_hypot", (PyCFunction) _hypot, METH_VARARGS, "hypot"},
     {"_ilogb", (PyCFunction) _ilogb, METH_VARARGS, "ilogb"},
     {"_isinf", (PyCFunction) _isinf, METH_VARARGS, "isinf"},
