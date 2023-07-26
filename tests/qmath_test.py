@@ -278,9 +278,12 @@ class TestQMathFloat:
     # def test_nextafterq(self, x, y):
     #     assert float(qm.nextafterq(x,y)) == pytest.approx(math.nextafter(x, y))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_powq(self, x, y):
-    #     assert float(qm.powq(x,y)) == pytest.approx(math.pow(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=0, max_value=100),
+        floats(allow_infinity=False, allow_nan=False, min_value=0, max_value=100),
+    )
+    def test_powq(self, x, y):
+        assert float(qm.powq(x, y)) == pytest.approx(math.pow(x, y))
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_remainderq(self, x, y):
