@@ -4,11 +4,12 @@ import os, sys
 from pprint import pprint
 
 import numpy as np
+import scipy.special
 import pytest
 import math
 
 from hypothesis import given
-from hypothesis.strategies import floats
+from hypothesis.strategies import floats, integers
 
 import pyquad as pq
 import pyquad.qmath as qm
@@ -202,17 +203,20 @@ class TestQMathFloat:
     # def test_issignalingq(self, x):
     #     assert float(qm.issignalingq(x)) == pytest.approx(math.issignaling(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_j0q(self, x):
-    #     assert float(qm.j0q(x)) == pytest.approx(math.j0(x))
+    @given(floats(allow_infinity=False, allow_nan=False))
+    def test_j0q(self, x):
+        assert float(qm.j0q(x)) == pytest.approx(scipy.special.j0(x), abs=1e-3)
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_j1q(self, x):
-    #     assert float(qm.j1q(x)) == pytest.approx(math.j1(x))
+    @given(floats(allow_infinity=False, allow_nan=False))
+    def test_j1q(self, x):
+        assert float(qm.j1q(x)) == pytest.approx(scipy.special.j1(x), abs=1e-3)
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_jnq(self, x):
-    #     assert float(qm.jnq(x)) == pytest.approx(math.jn(x))
+    @given(
+        integers(min_value=-2, max_value=2),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_jnq(self, x, y):
+        assert float(qm.jnq(x, y)) == pytest.approx(scipy.special.jn(x, y), abs=1e-3)
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_ldexpq(self, x):

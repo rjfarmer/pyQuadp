@@ -266,12 +266,12 @@ def j1q(x):
     return _qmathc._j1(x)
 
 
-def jn(x):
-    return _qmathc._jn(x)
+def jn(n, x):
+    return _qmathc._jn(n, x)
 
 
-def jnq(x):
-    return _qmathc._jn(x)
+def jnq(n, x):
+    return _qmathc._jn(n, x)
 
 
 def ldexp(x):
