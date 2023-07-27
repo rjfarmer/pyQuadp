@@ -417,12 +417,12 @@ def remainderq(x, y):
     return _qmathc._remainder(x, y)
 
 
-def remquo(x):
-    return _qmathc._remquo(x)
+def remquo(x, y):
+    return _qmathc._remquo(x, y)
 
 
-def remquoq(x):
-    return _qmathc._remquo(x)
+def remquoq(x, y):
+    return _qmathc._remquo(x, y)
 
 
 def rint(x):
@@ -441,20 +441,20 @@ def roundq(x):
     return _qmathc._round(x)
 
 
-def scalbln(x):
-    return _qmathc._scalbln(x)
+def scalbln(x, n):
+    return _qmathc._scalbln(x, n)
 
 
-def scalblnq(x):
-    return _qmathc._scalbln(x)
+def scalblnq(x, n):
+    return _qmathc._scalbln(x, n)
 
 
-def scalbn(x):
-    return _qmathc._scalbn(x)
+def scalbn(x, n):
+    return _qmathc._scalbn(x, n)
 
 
-def scalbnq(x):
-    return _qmathc._scalbn(x)
+def scalbnq(x, n):
+    return _qmathc._scalbn(x, n)
 
 
 def signbit(x):

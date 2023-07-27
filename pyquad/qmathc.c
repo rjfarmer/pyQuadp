@@ -602,9 +602,34 @@ static PyObject * _remainder(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_remainderq, self, args);
 };
 
-// static PyObject * _remquo(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_remquoq, self, args);
-// };
+static PyObject * _remquo(PyObject *self, PyObject *args){
+    QuadObject result, q1;
+    PyObject * obj1 = NULL, * obj2 = NULL;
+    int quo;
+
+    if (!PyArg_ParseTuple(args, "OO:", &obj1, &obj2)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj2, &q1, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert second value to quad precision.");
+        return NULL;
+    }
+
+    result.value = remquoq(result.value, q1.value, &quo);
+
+    return Py_BuildValue("(OO)", \
+           QuadObject_to_PyObject(result),
+           PyLong_FromLong(quo)
+    ); 
+};
+
 
 static PyObject * _rint(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_rintq, self, args);
@@ -614,21 +639,94 @@ static PyObject * _round(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_roundq, self, args);
 };
 
-// static PyObject * _scalbln(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_scalblnq, self, args);
-// };
+static PyObject * _scalbln(PyObject *self, PyObject *args){
+    QuadObject result;
+    PyObject * obj1 = NULL,* obj2 = NULL;
+    long n;
 
-// static PyObject * _scalbn(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_scalbnq, self, args);
-// };
+    if (!PyArg_ParseTuple(args, "OO:", &obj1, &obj2)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyLong_Check(obj2)){
+        PyErr_SetString(PyExc_TypeError, "Second argument must be a int");
+        return NULL;
+    }
+
+    n = PyLong_AsLong(obj2);
+    if(PyErr_Occurred()){
+        PyErr_SetString(PyExc_TypeError, "Second argument must be a int");
+        return NULL; 
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    result.value = scalbln(result.value, n);
+
+    return QuadObject_to_PyObject(result);};
+
+static PyObject * _scalbn(PyObject *self, PyObject *args){
+    QuadObject result;
+    PyObject * obj1 = NULL,* obj2 = NULL;
+    long n;
+
+    if (!PyArg_ParseTuple(args, "OO:", &obj1, &obj2)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyLong_Check(obj2)){
+        PyErr_SetString(PyExc_TypeError, "Second argument must be a int");
+        return NULL;
+    }
+
+    n = PyLong_AsLong(obj2);
+    if(PyErr_Occurred()){
+        PyErr_SetString(PyExc_TypeError, "Second argument must be a int");
+        return NULL; 
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    result.value = scalbn(result.value, n);
+
+    return QuadObject_to_PyObject(result);};
 
 static PyObject * _signbit(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_signbitq, self, args);
 };
 
-// static PyObject * _sincos(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_sincosq, self, args);
-// };
+static PyObject * _sincos(PyObject *self, PyObject *args){
+    QuadObject result, q1, q2;
+    PyObject * obj1 = NULL;
+
+    if (!PyArg_ParseTuple(args, "O:", &obj1)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert argument to quad precision.");
+        return NULL;
+    }
+
+    alloc_QuadType(&q1);
+    alloc_QuadType(&q2);
+
+    sincosq(result.value, &q1.value, &q2.value);
+
+    return Py_BuildValue("(OO)", \
+           QuadObject_to_PyObject(q1),
+           QuadObject_to_PyObject(q2)
+    ); 
+};
 
 static PyObject * _sinh(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_sinhq, self, args);
@@ -750,13 +848,13 @@ static PyMethodDef QMathMethods[] = {
     {"_nextafter", (PyCFunction) _nextafter, METH_VARARGS, "nextafter"},
     {"_pow", (PyCFunction) _pow, METH_VARARGS, "pow"},
     {"_remainder", (PyCFunction) _remainder, METH_VARARGS, "remainder"},
-    //{"_remquo", (PyCFunction) _remquo, METH_VARARGS, "remquo"},
+    {"_remquo", (PyCFunction) _remquo, METH_VARARGS, "remquo"},
     {"_rint", (PyCFunction) _rint, METH_VARARGS, "rint"},
     {"_round", (PyCFunction) _round, METH_VARARGS, "round"},
-    //{"_scalbln", (PyCFunction) _scalbln, METH_VARARGS, "scalbln"},
-    //{"_scalbn", (PyCFunction) _scalbn, METH_VARARGS, "scalbn"},
+    {"_scalbln", (PyCFunction) _scalbln, METH_VARARGS, "scalbln"},
+    {"_scalbn", (PyCFunction) _scalbn, METH_VARARGS, "scalbn"},
     {"_signbit", (PyCFunction) _signbit, METH_VARARGS, "signbit"},
-    // {"_sincos", (PyCFunction) _sincos, METH_VARARGS, "sincos"},
+    {"_sincos", (PyCFunction) _sincos, METH_VARARGS, "sincos"},
     {"_sinh", (PyCFunction) _sinh, METH_VARARGS, "sinh"},
     {"_sin", (PyCFunction) _sin, METH_VARARGS, "sin"},
     {"_sqrt", (PyCFunction) _sqrt, METH_VARARGS, "sqrt"},

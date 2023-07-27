@@ -169,37 +169,37 @@ regarding behaviour of exceptional values. While routines from ``libquadmath`` (
 |fmodq | :heavy_check_mark: | remainder value function |
 |frexpq | :heavy_check_mark: | extract mantissa and exponent |
 |hypotq | :heavy_check_mark: | Eucledian distance function |
-|ilogbq | :x: | get exponent of the value |
+|ilogbq | :heavy_check_mark: | get exponent of the value |
 |isinfq | :heavy_check_mark: | check for infinity |
 |isnanq | :heavy_check_mark: | check for not a number |
-|issignalingq | :x: | check for signaling not a number |
+|issignalingq | :heavy_check_mark: | check for signaling not a number |
 |j0q | :heavy_check_mark: | Bessel function of the first kind, first order |
 |j1q | :heavy_check_mark: | Bessel function of the first kind, second order |
 |jnq | :heavy_check_mark: | Bessel function of the first kind, n-th order |
-|ldexpq | :x: | load exponent of the value |
-|lgammaq | :x: | logarithmic gamma function |
-|llrintq | :x: | round to nearest integer value |
-|llroundq | :x: | round to nearest integer value away from zero |
-|logbq | :x: | get exponent of the value |
+|ldexpq | :heavy_check_mark: | load exponent of the value |
+|lgammaq | :heavy_check_mark: | logarithmic gamma function |
+|llrintq | :heavy_check_mark: | round to nearest integer value |
+|llroundq |:heavy_check_mark: | round to nearest integer value away from zero |
+|logbq | :heavy_check_mark: | get exponent of the value |
 |logq | :heavy_check_mark: | natural logarithm function |
 |log10q | :heavy_check_mark: | base 10 logarithm function |
 |log1pq | :heavy_check_mark: | compute natural logarithm of the value plus one |
 |log2q | :heavy_check_mark: | base 2 logarithm function |
-|lrintq | :x: | round to nearest integer value |
-|lroundq | :x: | round to nearest integer value away from zero |
-|modfq | :x: | decompose the floating-point number |
-|nanq | :x: | return quiet NaN |
-|nearbyintq | :x: | round to nearest integer |
-|nextafterq | :x: | next representable floating-point number |
+|lrintq | :heavy_check_mark: | round to nearest integer value |
+|lroundq | :heavy_check_mark: | round to nearest integer value away from zero |
+|modfq | :heavy_check_mark: | decompose the floating-point number |
+|nanq | :heavy_check_mark: | return quiet NaN |
+|nearbyintq | :heavy_check_mark: | round to nearest integer |
+|nextafterq | ::heavy_check_mark: | next representable floating-point number |
 |powq | :heavy_check_mark: | power function |
-|remainderq | :x: | remainder function |
-|remquoq | :x: | remainder and part of quotient |
-|rintq | :x: | round-to-nearest integral value |
-|roundq | :x: | round-to-nearest integral value, return __float128 |
-|scalblnq | :x: | compute exponent using FLT_RADIX |
-|scalbnq | :x: | compute exponent using FLT_RADIX |
-|signbitq | :x: | return sign bit |
-|sincosq | :x: | calculate sine and cosine simultaneously |
+|remainderq | :heavy_check_mark: | remainder function |
+|remquoq | :heavy_check_mark: | remainder and part of quotient |
+|rintq | :heavy_check_mark: | round-to-nearest integral value |
+|roundq | :heavy_check_mark: | round-to-nearest integral value, return __float128 |
+|scalblnq | :heavy_check_mark: | compute exponent using FLT_RADIX |
+|scalbnq | :heavy_check_mark: | compute exponent using FLT_RADIX |
+|signbitq | :heavy_check_mark: | return sign bit |
+|sincosq | :heavy_check_mark: | calculate sine and cosine simultaneously |
 |sinhq | :heavy_check_mark: | hyperbolic sine function |
 |sinq | :heavy_check_mark: | sine function |
 |sqrtq | :heavy_check_mark: | square root function |

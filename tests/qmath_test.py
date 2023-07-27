@@ -203,9 +203,9 @@ class TestQMathFloat:
     def test_isnanq(self, x):
         assert float(qm.isnanq(x)) == pytest.approx(math.isnan(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_issignalingq(self, x):
-    #     assert float(qm.issignalingq(x)) == pytest.approx(math.issignaling(x))
+    def test_issignalingq(self):
+        assert not qm.issignaling("nan")
+        assert not qm.issignaling("0")
 
     @given(floats(allow_infinity=False, allow_nan=False, min_value=1, max_value=10))
     def test_j0q(self, x):
@@ -322,37 +322,81 @@ class TestQMathFloat:
     def test_powq(self, x, y):
         assert float(qm.powq(x, y)) == pytest.approx(math.pow(x, y))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_remainderq(self, x, y):
-    #     assert float(qm.remainderq(x,y)) == pytest.approx(math.remainder(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=1),
+        floats(allow_infinity=False, allow_nan=False, min_value=1),
+    )
+    def test_remainderq(self, x, y):
+        assert float(qm.remainderq(x, y)) == pytest.approx(math.remainder(x, y))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_remquoq(self, x):
-    #     assert float(qm.remquoq(x)) == pytest.approx(math.remquo(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=0.1),
+        floats(allow_infinity=False, allow_nan=False, min_value=0.1),
+    )
+    def test_remquoq(self, x, y):
+        assert float(qm.remquoq(x, y)[0]) == pytest.approx(math.remainder(x, y))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_rintq(self, x):
-    #     assert float(qm.rintq(x)) == pytest.approx(math.rint(x))
+    @given(integers(min_value=-1e10, max_value=1e10))
+    def test_rintq(self, x):
+        xd = decimal.Decimal(x)
+        assert float(qm.rintq(x)) == pytest.approx(
+            float(xd.quantize(decimal.Decimal("1"), rounding=decimal.ROUND_HALF_DOWN))
+        )
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_roundq(self, x):
-    #     assert float(qm.roundq(x)) == pytest.approx(math.round(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=-1e10, max_value=1e10)
+    )
+    def test_roundq(self, x):
+        xd = decimal.Decimal(x)
+        assert float(qm.roundq(x)) == pytest.approx(
+            float(xd.quantize(decimal.Decimal("1"), rounding=decimal.ROUND_HALF_UP))
+        )
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_scalblnq(self, x):
-    #     assert float(qm.scalblnq(x)) == pytest.approx(math.scalbln(x))
+    @given(
+        floats(
+            allow_infinity=False, allow_nan=False, max_value=1e100, min_value=-1e100
+        ),
+        integers(min_value=-100, max_value=100),
+    )
+    def test_scalblnq(self, x, n):
+        assert float(qm.scalblnq(x, n)) == pytest.approx(math.ldexp(x, n))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_scalbnq(self, x):
-    #     assert float(qm.scalbnq(x)) == pytest.approx(math.scalbn(x))
+    @given(
+        floats(
+            allow_infinity=False, allow_nan=False, max_value=1e100, min_value=-1e100
+        ),
+        integers(min_value=-100, max_value=100),
+    )
+    def test_scalbnq(self, x, n):
+        assert float(qm.scalbnq(x, n)) == pytest.approx(math.ldexp(x, n))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_signbitq(self, x):
-    #     assert float(qm.signbitq(x)) == pytest.approx(math.signbit(x))
+    @given(floats(allow_infinity=False, allow_nan=False))
+    def test_signbitq(self, x):
+        sb = qm.signbitq(x)
+        if x == 0:
+            if math.copysign(1, x) > 0:
+                # +0
+                assert sb == 0
+            else:
+                # -0
+                assert sb != 0
+        else:
+            if x > 0:
+                assert sb == 0
+            else:
+                assert sb != 0
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_sincosq(self, x):
-    #     assert float(qm.sincosq(x)) == pytest.approx(math.sincos(x))
+    @given(floats(allow_infinity=False, allow_nan=False))
+    def test_sincosq(self, x):
+        y = qm.sincosq(x)
+        y1 = float(y[0])
+        y2 = float(y[1])
+
+        z1 = math.sin(x)
+        z2 = math.cos(x)
+
+        assert y1 == pytest.approx(z1)
+        assert y2 == pytest.approx(z2)
 
     @given(floats(allow_infinity=False, allow_nan=False, min_value=-10, max_value=10))
     def test_sinhq(self, x):
