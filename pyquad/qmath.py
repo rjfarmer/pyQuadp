@@ -381,14 +381,8 @@ def modfq(x):
     return _qmathc._modf(x)
 
 
-@property
-def nan(x=None):
-    return _qmathc._nan()
-
-
-@property
 def nanq(x=None):
-    return _qmathc._nan()
+    return nan
 
 
 def nearbyint(x):

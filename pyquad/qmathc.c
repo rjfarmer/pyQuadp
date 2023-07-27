@@ -109,9 +109,6 @@ static PyObject * QuadObject_qmath_op1(const int op, PyObject * self, PyObject *
         case OP_log2q:
             result.value = log2q(result.value);
             break;
-        case OP_nearbyintq:
-            result.value = nearbyintq(result.value);
-            break;
         case OP_rintq:
             result.value = rintq(result.value);
             break;
@@ -297,6 +294,9 @@ static PyObject * QuadObject_qmath_op1_int(const int op, PyObject * self, PyObje
             break;
         case OP_signbitq:
             result =  PyLong_FromLong(signbitq(q1.value));
+            break;
+        case OP_nearbyintq:
+            result = PyLong_FromLong(nearbyintq(q1.value));
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -586,12 +586,8 @@ static PyObject * _modf(PyObject *self, PyObject *args){
     ); 
 };
 
-// static PyObject * _nan(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_nanq, self, args);
-// };
-
 static PyObject * _nearbyint(PyObject *self, PyObject *args){
-    return QuadObject_qmath_op1(OP_nearbyintq, self, args);
+    return QuadObject_qmath_op1_int(OP_nearbyintq, self, args);
 };
 
 static PyObject * _nextafter(PyObject *self, PyObject *args){

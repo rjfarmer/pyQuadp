@@ -299,17 +299,21 @@ class TestQMathFloat:
         assert y1 == z1
         assert y2 == z2
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_nanq(self, x):
-    #     assert float(qm.nanq(x)) == pytest.approx(math.nan(x))
+    def test_nanq(self):
+        assert np.isnan(float(qm.nanq()))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_nearbyintq(self, x):
-    #     assert float(qm.nearbyintq(x)) == pytest.approx(math.nearbyint(x))
+    @given(integers(min_value=-1e10, max_value=1e10))
+    def test_nearbyintq(self, x):
+        xd = decimal.Decimal(x)
+        assert qm.nearbyintq(x) == x
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_nextafterq(self, x, y):
-    #     assert float(qm.nextafterq(x,y)) == pytest.approx(math.nextafter(x, y))
+    @pytest.mark.skipif(sys.version_info < (3, 9), reason="Requires at least python3.9")
+    @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_nextafterq(self, x, y):
+        assert float(qm.nextafterq(x, y)) == pytest.approx(math.nextafter(x, y))
 
     @given(
         floats(allow_infinity=False, allow_nan=False, min_value=0, max_value=100),
@@ -406,6 +410,9 @@ class TestQMathFloat:
         assert float(qm.ynq(n, x)) == pytest.approx(
             scipy.special.yn(n, x), nan_ok=True, rel=1e-3
         )
+
+
+######################################################################################
 
 
 class TestQMathPy:
