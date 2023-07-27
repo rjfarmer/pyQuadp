@@ -18,9 +18,10 @@ extern "C" {
 /* C API functions */
 #define PyQfloat_q2py_NUM 0
 #define PyQfloat_py2q_NUM 1
+#define PyQfloat_alloc_NUM 2
 
 /* Total number of C API pointers */
-#define PyQfloat_API_pointers 2
+#define PyQfloat_API_pointers 3
 
 #ifdef QFLOAT_MODULE
 
@@ -74,7 +75,7 @@ typedef struct {
 
 static PyObject* QuadObject_to_PyObject(QuadObject out);
 static bool PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc);
-
+static void alloc_QuadType(QuadObject * result);
 
 #else
 
@@ -91,6 +92,8 @@ static void **PyQfloat_API;
 #define PyObject_to_QuadObject \
  (*(bool (*)(PyObject *, QuadObject *, const bool)) PyQfloat_API[PyQfloat_py2q_NUM])
 
+#define alloc_QuadType \
+(*(void (*)(QuadObject *)) PyQfloat_API[PyQfloat_alloc_NUM])
 
 /* Return -1 on error, 0 on success.
  * PyCapsule_Import will set an exception if there's an error.
@@ -119,7 +122,7 @@ import_qfloat(void)
 
 
 // Debugging
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 void qprintf(QuadObject * out);
-
-// Allocation
-void alloc_QuadType(QuadObject * result);
+#pragma GCC diagnostic pop

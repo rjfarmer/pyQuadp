@@ -562,9 +562,29 @@ static PyObject * _lround(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_lroundq, self, args);
 };
 
-// static PyObject * _modf(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_modfq, self, args);
-// };
+static PyObject * _modf(PyObject *self, PyObject *args){
+    QuadObject result, q1;
+    PyObject * obj1 = NULL;
+
+    if (!PyArg_ParseTuple(args, "O:", &obj1)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    alloc_QuadType(&q1);
+
+    result.value = modfq(result.value, &q1.value);
+
+    return Py_BuildValue("(OO)", \
+           QuadObject_to_PyObject(result),
+           QuadObject_to_PyObject(q1)
+    ); 
+};
 
 // static PyObject * _nan(PyObject *self, PyObject *args){
 //     return QuadObject_qmath_op1(OP_nanq, self, args);
@@ -728,7 +748,7 @@ static PyMethodDef QMathMethods[] = {
     {"_log2", (PyCFunction) _log2, METH_VARARGS, "log2"},
     {"_lrint", (PyCFunction) _lrint, METH_VARARGS, "lrint"},
     {"_lround", (PyCFunction) _lround, METH_VARARGS, "lround"},
-    //{"_modf", (PyCFunction) _modf, METH_VARARGS, "modf"},
+    {"_modf", (PyCFunction) _modf, METH_VARARGS, "modf"},
     //{"_nan", (PyCFunction) _nan, METH_VARARGS, "nan"},
     {"_nearbyint", (PyCFunction) _nearbyint, METH_VARARGS, "nearbyint"},
     {"_nextafter", (PyCFunction) _nextafter, METH_VARARGS, "nextafter"},

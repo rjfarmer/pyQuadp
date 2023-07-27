@@ -506,8 +506,6 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
     if(alloc)
         alloc_QuadType(out);
 
-    Py_INCREF(out);
-
     //printf("%d\n",PyObject_TypeCheck(in, &QuadType));
 
     if(PyObject_TypeCheck(in, &QuadType)){
@@ -572,14 +570,18 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
 
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 void qprintf(QuadObject * out){
     char output[QUAD_BUF];
     quadmath_snprintf(output, sizeof output, "%.36Qg", 35, out->value);
     printf("%s\n", output);
 }
+#pragma GCC diagnostic pop
 
-void alloc_QuadType(QuadObject * result){
+static void alloc_QuadType(QuadObject * result){
 	result = (QuadObject*)QuadType.tp_alloc(&QuadType, 0);
+    Py_INCREF(result);
 }
 
 PyMODINIT_FUNC
@@ -600,6 +602,7 @@ PyInit_qfloat(void)
     /* Initialize the C API pointer array */
     PyQfloat_API[PyQfloat_q2py_NUM] = (void *)QuadObject_to_PyObject;
     PyQfloat_API[PyQfloat_py2q_NUM] = (void *)PyObject_to_QuadObject;
+    PyQfloat_API[PyQfloat_alloc_NUM] = (void *)alloc_QuadType;
 
     Py_INCREF(&QuadType);
     if (PyModule_AddObject(m, "_qfloat", (PyObject *) &QuadType) < 0) {

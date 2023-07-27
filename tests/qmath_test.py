@@ -286,9 +286,18 @@ class TestQMathFloat:
             xd.quantize(decimal.Decimal("1"), rounding=decimal.ROUND_HALF_UP)
         )
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_modfq(self, x):
-    #     assert float(qm.modfq(x)) == pytest.approx(math.modf(x))
+    @given(floats(allow_infinity=False, allow_nan=False))
+    def test_modfq(self, x):
+        y = qm.modfq(x)
+        y1 = float(y[0])
+        y2 = y[1]
+
+        z = math.modf(x)
+        z1 = z[0]
+        z2 = z[1]
+
+        assert y1 == z1
+        assert y2 == z2
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_nanq(self, x):
