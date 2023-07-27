@@ -7,6 +7,7 @@ import numpy as np
 import scipy.special
 import pytest
 import math
+import decimal
 
 from hypothesis import given, assume
 from hypothesis.strategies import floats, integers
@@ -235,17 +236,24 @@ class TestQMathFloat:
         assume(x != 0)
         assert float(qm.lgammaq(x)) == pytest.approx(math.lgamma(math.fabs(x)))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_llrintq(self, x):
-    #     assert float(qm.llrintq(x)) == pytest.approx(math.llrint(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=-1e10, max_value=1e10)
+    )
+    def test_llrintq(self, x):
+        assert qm.llrintq(x) == int(round(x, 0))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_llroundq(self, x):
-    #     assert float(qm.llroundq(x)) == pytest.approx(math.llround(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=-1e10, max_value=1e10)
+    )
+    def test_llroundq(self, x):
+        xd = decimal.Decimal(x)
+        assert qm.llroundq(x) == int(
+            xd.quantize(decimal.Decimal("1"), rounding=decimal.ROUND_HALF_UP)
+        )
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_logbq(self, x):
-    #     assert float(qm.logbq(x)) == pytest.approx(math.logb(x))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=1, max_value=1e10))
+    def test_logbq(self, x):
+        assert float(qm.logbq(x)) == int(math.log2(math.fabs(x)))
 
     @given(floats(allow_infinity=False, allow_nan=False, min_value=0, exclude_min=True))
     def test_logq(self, x):
@@ -263,13 +271,20 @@ class TestQMathFloat:
     def test_log2q(self, x):
         assert float(qm.log2q(x)) == pytest.approx(math.log2(x))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_lrintq(self, x):
-    #     assert float(qm.lrintq(x)) == pytest.approx(math.lrint(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=-1e10, max_value=1e10)
+    )
+    def test_lrintq(self, x):
+        assert qm.lrintq(x) == int(round(x, 0))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_lroundq(self, x):
-    #     assert float(qm.lroundq(x)) == pytest.approx(math.lround(x))
+    @given(
+        floats(allow_infinity=False, allow_nan=False, min_value=-1e10, max_value=1e10)
+    )
+    def test_lroundq(self, x):
+        xd = decimal.Decimal(x)
+        assert qm.lroundq(x) == int(
+            xd.quantize(decimal.Decimal("1"), rounding=decimal.ROUND_HALF_UP)
+        )
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_modfq(self, x):
