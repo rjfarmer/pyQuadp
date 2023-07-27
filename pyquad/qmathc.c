@@ -278,7 +278,12 @@ static PyObject * QuadObject_qmath_op1_int(const int op, PyObject * self, PyObje
             result =  PyLong_FromLong(isnanq(q1.value));
             break;
         case OP_issignalingq:
+            #if __GNUC__ > 90000
             result =  PyLong_FromLong(issignalingq(q1.value));
+            #else
+            PyErr_SetString(PyExc_NotImplementedError,"issignalingq not supported on gcc <=8");
+            return NULL;
+            #endif
             break;
         case OP_llrintq:
             result =  PyLong_FromLong(llrintq(q1.value));
