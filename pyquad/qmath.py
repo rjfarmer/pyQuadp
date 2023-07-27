@@ -283,10 +283,21 @@ def ldexpq(x, i):
 
 
 def lgamma(x):
+    if x < 0.0:
+        raise ValueError("math domain error")
+
     return _qmathc._lgamma(x)
 
 
 def lgammaq(x):
+    """_summary_
+
+    Args:
+        x (quad-like): _description_
+
+    Returns:
+        lgamma (qfloat): base e logarithm of the abs value of the gamma function of x
+    """
     return _qmathc._lgamma(x)
 
 

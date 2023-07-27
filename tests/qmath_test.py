@@ -230,9 +230,10 @@ class TestQMathFloat:
     def test_ldexpq(self, x, n):
         assert float(qm.ldexpq(x, n)) == pytest.approx(math.ldexp(x, n))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_lgammaq(self, x):
-    #     assert float(qm.lgammaq(x)) == pytest.approx(math.lgamma(x))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=1, max_value=1e100))
+    def test_lgammaq(self, x):
+        assume(x != 0)
+        assert float(qm.lgammaq(x)) == pytest.approx(math.lgamma(math.fabs(x)))
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_llrintq(self, x):
