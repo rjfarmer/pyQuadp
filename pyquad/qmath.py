@@ -274,12 +274,12 @@ def jnq(n, x):
     return _qmathc._jn(n, x)
 
 
-def ldexp(x):
-    return _qmathc._ldexp(x)
+def ldexp(x, i):
+    return _qmathc._ldexp(x, i)
 
 
-def ldexpq(x):
-    return _qmathc._ldexp(x)
+def ldexpq(x, i):
+    return _qmathc._ldexp(x, i)
 
 
 def lgamma(x):

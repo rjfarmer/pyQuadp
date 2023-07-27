@@ -8,7 +8,7 @@ import scipy.special
 import pytest
 import math
 
-from hypothesis import given
+from hypothesis import given, assume
 from hypothesis.strategies import floats, integers
 
 import pyquad as pq
@@ -190,9 +190,9 @@ class TestQMathFloat:
     def test_hypotq(self, x, y):
         assert float(qm.hypotq(x, y)) == pytest.approx(math.hypot(x, y))
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_ilogbq(self, x):
-    #     assert float(qm.ilogbq(x)) == pytest.approx(math.ilogb(x))
+    @given(floats(allow_infinity=False, allow_nan=False, min_value=1, max_value=1e10))
+    def test_ilogbq(self, x):
+        assert qm.ilogbq(x) == int(math.log2(math.fabs(x)))
 
     @given(floats(allow_infinity=False, allow_nan=False))
     def test_isinfq(self, x):
@@ -221,9 +221,14 @@ class TestQMathFloat:
     def test_jnq(self, x, y):
         assert float(qm.jnq(x, y)) == pytest.approx(scipy.special.jn(x, y), rel=1e-3)
 
-    # @given(floats(allow_infinity=False,allow_nan=False))
-    # def test_ldexpq(self, x):
-    #     assert float(qm.ldexpq(x)) == pytest.approx(math.ldexp(x))
+    @given(
+        floats(
+            allow_infinity=False, allow_nan=False, max_value=1e100, min_value=-1e100
+        ),
+        integers(min_value=-100, max_value=100),
+    )
+    def test_ldexpq(self, x, n):
+        assert float(qm.ldexpq(x, n)) == pytest.approx(math.ldexp(x, n))
 
     # @given(floats(allow_infinity=False,allow_nan=False))
     # def test_lgammaq(self, x):

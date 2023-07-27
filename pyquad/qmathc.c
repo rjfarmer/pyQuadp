@@ -491,9 +491,36 @@ static PyObject * _jn(PyObject *self, PyObject *args){
     return QuadObject_to_PyObject(result);
 };
 
-// static PyObject * _ldexp(PyObject *self, PyObject *args){
-//     return QuadObject_qmath_op1(OP_ldexpq, self, args);
-// };
+static PyObject * _ldexp(PyObject *self, PyObject *args){
+    QuadObject result;
+    PyObject * obj1 = NULL,* obj2 = NULL;
+    long n;
+
+    if (!PyArg_ParseTuple(args, "OO:", &obj1, &obj2)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyLong_Check(obj2)){
+        PyErr_SetString(PyExc_TypeError, "Second argument must be a int");
+        return NULL;
+    }
+
+    n = PyLong_AsLong(obj2);
+    if(PyErr_Occurred()){
+        PyErr_SetString(PyExc_TypeError, "Second argument must be a int");
+        return NULL; 
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    result.value = ldexpq(result.value, n);
+
+    return QuadObject_to_PyObject(result);
+};
 
 static PyObject * _lgamma(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_lgammaq, self, args);
@@ -690,7 +717,7 @@ static PyMethodDef QMathMethods[] = {
     {"_j0", (PyCFunction) _j0, METH_VARARGS, "j0"},
     {"_j1", (PyCFunction) _j1, METH_VARARGS, "j1"},
     {"_jn", (PyCFunction) _jn, METH_VARARGS, "jn"},
-    //{"_ldexp", (PyCFunction) _ldexp, METH_VARARGS, "ldexp"},
+    {"_ldexp", (PyCFunction) _ldexp, METH_VARARGS, "ldexp"},
     {"_lgamma", (PyCFunction) _lgamma, METH_VARARGS, "lgamma"},
     {"_llrint", (PyCFunction) _llrint, METH_VARARGS, "llrint"},
     {"_llround", (PyCFunction) _llround, METH_VARARGS, "llround"},
