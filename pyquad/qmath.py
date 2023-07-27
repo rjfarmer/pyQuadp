@@ -443,3 +443,64 @@ def y1q(x):
 
 def ynq(n, x):
     return _qmathc._yn(n, x)
+
+
+#################################
+# Python math library functions #
+#################################
+
+
+def comb(n, k):
+    raise NotImplementedError
+
+
+def factorial(n):
+    raise NotImplementedError
+
+
+def fsum(iterable):
+    raise NotImplementedError
+
+
+def gcd(integers):
+    raise NotImplementedError
+
+
+def isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0):
+    raise NotImplementedError
+
+
+def isfinite(x):
+    raise NotImplementedError
+
+
+def isqrt(n):
+    raise NotImplementedError
+
+
+def lcm(integers):
+    raise NotImplementedError
+
+
+def perm(iterable, *, start=1):
+    raise NotImplementedError
+
+
+def prod(iterable, *, start=1):
+    raise NotImplementedError
+
+
+def ulp(x):
+    raise NotImplementedError
+
+
+def dist(p, q):
+    raise NotImplementedError
+
+
+def degrees(x):
+    raise NotImplementedError
+
+
+def radians(x):
+    raise NotImplementedError
