@@ -205,8 +205,8 @@ class TestQMathFloat:
 
     def test_issignalingq(self):
         try:
-            assert not qm.issignaling("nan")
-            assert not qm.issignaling("0")
+            assert not qm.issignalingq("nan")
+            assert not qm.issignalingq("0")
         except NotImplementedError:
             pass
 

@@ -146,16 +146,8 @@ def fabsq(x):
     return _qmathc._fabs(x)
 
 
-def fdim(x, y):
-    return _qmathc._fdim(x, y)
-
-
 def fdimq(x, y):
     return _qmathc._fdim(x, y)
-
-
-def finite(x):
-    return _qmathc._finite(x)
 
 
 def finiteq(x):
@@ -170,24 +162,12 @@ def floorq(x):
     return _qmathc._floor(x)
 
 
-def fma(x, y, z):
-    return _qmathc._fma(x, y, z)
-
-
 def fmaq(x, y, z):
     return _qmathc._fma(x, y, z)
 
 
-def fmax(x, y):
-    return _qmathc._fmax(x, y)
-
-
 def fmaxq(x, y):
     return _qmathc._fmax(x, y)
-
-
-def fmin(x, y):
-    return _qmathc._fmin(x, y)
 
 
 def fminq(x, y):
@@ -218,10 +198,6 @@ def hypotq(x, y):
     return _qmathc._hypot(x, y)
 
 
-def ilogb(x):
-    return _qmathc._ilogb(x)
-
-
 def ilogbq(x):
     return _qmathc._ilogb(x)
 
@@ -242,32 +218,16 @@ def isnanq(x):
     return _qmathc._isnan(x)
 
 
-def issignaling(x):
-    return _qmathc._issignaling(x)
-
-
 def issignalingq(x):
     return _qmathc._issignaling(x)
-
-
-def j0(x):
-    return _qmathc._j0(x)
 
 
 def j0q(x):
     return _qmathc._j0(x)
 
 
-def j1(x):
-    return _qmathc._j1(x)
-
-
 def j1q(x):
     return _qmathc._j1(x)
-
-
-def jn(n, x):
-    return _qmathc._jn(n, x)
 
 
 def jnq(n, x):
@@ -301,31 +261,19 @@ def lgammaq(x):
     return _qmathc._lgamma(x)
 
 
-def llrint(x):
-    return _qmathc._llrint(x)
-
-
 def llrintq(x):
     return _qmathc._llrint(x)
-
-
-def llround(x):
-    return _qmathc._llround(x)
 
 
 def llroundq(x):
     return _qmathc._llround(x)
 
 
-def logb(x):
-    return _qmathc._logb(x)
-
-
 def logbq(x):
     return _qmathc._logb(x)
 
 
-def log(x):
+def log(x, base=None):
     return _qmathc._log(x)
 
 
@@ -357,16 +305,8 @@ def log2q(x):
     return _qmathc._log2(x)
 
 
-def lrint(x):
-    return _qmathc._lrint(x)
-
-
 def lrintq(x):
     return _qmathc._lrint(x)
-
-
-def lround(x):
-    return _qmathc._lround(x)
 
 
 def lroundq(x):
@@ -383,10 +323,6 @@ def modfq(x):
 
 def nanq(x=None):
     return nan
-
-
-def nearbyint(x):
-    return _qmathc._nearbyint(x)
 
 
 def nearbyintq(x):
@@ -417,56 +353,28 @@ def remainderq(x, y):
     return _qmathc._remainder(x, y)
 
 
-def remquo(x, y):
-    return _qmathc._remquo(x, y)
-
-
 def remquoq(x, y):
     return _qmathc._remquo(x, y)
-
-
-def rint(x):
-    return _qmathc._rint(x)
 
 
 def rintq(x):
     return _qmathc._rint(x)
 
 
-def round(x):
-    return _qmathc._round(x)
-
-
 def roundq(x):
     return _qmathc._round(x)
-
-
-def scalbln(x, n):
-    return _qmathc._scalbln(x, n)
-
-
-def scalblnq(x, n):
-    return _qmathc._scalbln(x, n)
-
-
-def scalbn(x, n):
-    return _qmathc._scalbn(x, n)
 
 
 def scalbnq(x, n):
     return _qmathc._scalbn(x, n)
 
 
-def signbit(x):
-    return _qmathc._signbit(x)
+def scalblnq(x, n):
+    return _qmathc._scalbln(x, n)
 
 
 def signbitq(x):
     return _qmathc._signbit(x)
-
-
-def sincos(x):
-    return _qmathc._sincos(x)
 
 
 def sincosq(x):
@@ -513,10 +421,6 @@ def tanhq(x):
     return _qmathc._tanh(x)
 
 
-def tgamma(x):
-    return _qmathc._tgamma(x)
-
-
 def tgammaq(x):
     return _qmathc._tgamma(x)
 
@@ -529,24 +433,12 @@ def truncq(x):
     return _qmathc._trunc(x)
 
 
-def y0(x):
-    return _qmathc._y0(x)
-
-
 def y0q(x):
     return _qmathc._y0(x)
 
 
-def y1(x):
-    return _qmathc._y1(x)
-
-
 def y1q(x):
     return _qmathc._y1(x)
-
-
-def yn(n, x):
-    return _qmathc._yn(n, x)
 
 
 def ynq(n, x):
