@@ -42,50 +42,302 @@ QuadCObject_str(QuadCObject * obj)
 
 }
 
+static PyObject *
+QuadCObject_binary_op1(const int op, PyObject * o1){
+
+    QuadCObject q1, result;
+
+    if(!PyObject_to_QuadCObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    alloc_QuadCType(&result);
+
+    switch(op){
+        case OP_negative:
+            result.real = -1*(q1.real);
+            result.imag = -1*(q1.imag);
+            break;
+        case OP_positive:
+            result.real = 1*(q1.real);
+            result.imag = 1*(q1.imag);
+            break;
+        case OP_absolute:
+            result.real = fabsq(q1.real);
+            result.imag = fabsq(q1.imag);
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    return QuadCObject_to_PyObject(result);
+}
+
+
+static PyObject *
+QuadCObject_binary_op2(const int op, PyObject * o1, PyObject * o2 ){
+
+    QuadCObject q1, q2, result;
+    __float128 num;
+
+    if(!PyObject_to_QuadCObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(!PyObject_to_QuadCObject(o2, &q2, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    alloc_QuadCType(&result);
+
+    switch(op){
+        case OP_add:
+            result.real = q1.real + q2.real;
+            result.imag = q1.imag + q2.imag;
+            break;
+        case OP_sub:
+            result.real = q1.real - q2.real;
+            result.imag = q1.imag - q2.imag;
+            break;
+        case OP_mult:
+            result.real = q1.real * q2.real - q1.imag * q2.imag;
+            result.imag = q1.imag * q2.imag - q1.real * q2.real;
+            break;
+        case OP_true_divide:
+            num = powq(q1.real,2) + powq(q1.imag,2);
+            result.real = (q1.real*q2.real + q1.imag*q2.imag)/num;
+            result.imag = (q1.imag*q2.real - q1.real*q2.imag)/num;
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    return QuadCObject_to_PyObject(result);
+}
+
+
+static PyObject *
+QuadCObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
+
+    QuadCObject q1, q2;
+    __float128 num, real, imag;
+
+    if(!PyObject_to_QuadCObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(!PyObject_to_QuadCObject(o2, &q2, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    switch(op){
+        case OP_add:
+            q1.real = q1.real + q2.real;
+            q1.imag = q1.imag + q2.imag;
+            break;
+        case OP_sub:
+            q1.real = q1.real - q2.real;
+            q1.imag = q1.imag - q2.imag;
+            break;
+        case OP_mult:
+            real = q1.real;
+            imag = q1.imag;
+
+            q1.real = real * q2.real - imag * q2.imag;
+            q1.imag = imag * q2.imag - real * q2.real;
+            break;
+        case OP_true_divide:
+            real = q1.real;
+            imag = q1.imag;
+
+            num = powq(real,2) + powq(imag,2);
+            q1.real = (real*q2.real + imag*q2.imag)/num;
+            q1.imag = (imag*q2.real - real*q2.imag)/num;
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    return QuadCObject_to_PyObject(q1);
+}
+
+
+
+static PyObject *
+QuadCObject_add(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_op2(OP_add, o1, o2);
+}
+
+
+static PyObject *
+QuadCObject_subtract(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_op2(OP_sub, o1, o2);
+}
+
+
+static PyObject *
+QuadCObject_mult(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_op2(OP_mult, o1, o2);
+}
+
+static PyObject *
+QuadCObject_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
+    // QuadCObject q1, q2, q3, result;
+
+    // if(!PyObject_to_QuadObject(o1, &q1, true)){
+    //     Py_RETURN_NOTIMPLEMENTED;
+    // }
+
+    // if(!PyObject_to_QuadObject(o2, &q2, true)){
+    //     Py_RETURN_NOTIMPLEMENTED;
+    // }
+
+    // alloc_QuadType(&result);
+
+    // result.value = powq(q1.value, q2.value);
+
+    // if(o3 != Py_None) {
+    //     if(!PyObject_to_QuadObject(o2, &q3, true))
+    //         Py_RETURN_NOTIMPLEMENTED;
+
+    //     result.value = fmodq(result.value, q3.value);
+    // }
+
+    // return QuadCObject_to_PyObject(result);
+    Py_RETURN_NOTIMPLEMENTED;
+}
+
+static PyObject *
+QuadCObject_neg(PyObject * o1){
+    return QuadCObject_binary_op1(OP_negative, o1);
+}
+
+static PyObject *
+QuadCObject_pos(PyObject * o1){
+    return QuadCObject_binary_op1(OP_positive, o1);
+}
+
+static PyObject *
+QuadCObject_abs(PyObject * o1){
+    return QuadCObject_binary_op1(OP_absolute, o1);
+}
+
+static int QuadCObject_bool(PyObject * o1){
+
+    QuadCObject q1;
+
+    if(!PyObject_to_QuadCObject(o1, &q1, true)){
+        return 0;
+    }
+
+    if(q1.real==0 && q1.imag==0)
+        return 0;
+
+    return 1;
+
+}
+
+static PyObject *
+QuadCObject_inplace_add(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_self_op2(OP_add, o1, o2);
+}
+
+
+static PyObject *
+QuadCObject_inplace_subtract(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_self_op2(OP_sub, o1, o2);
+}
+
+
+static PyObject *
+QuadCObject_inplace_mult(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_self_op2(OP_mult, o1, o2);
+}
+
+static PyObject *
+QuadCObject_inplace_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
+    // QuadCObject q1, q2, q3;
+
+    // if(!PyObject_to_QuadObject(o1, &q1,true)){
+    //     Py_RETURN_NOTIMPLEMENTED;
+    // }
+
+    // if(!PyObject_to_QuadObject(o2, &q2,true)){
+    //     Py_RETURN_NOTIMPLEMENTED;
+    // }
+
+
+    // q1.value = powq(q1.value, q2.value);
+
+    // if(o3 != Py_None) {
+    //     if(!PyObject_to_QuadObject(o2, &q3,true))
+    //         Py_RETURN_NOTIMPLEMENTED;
+
+    //     q1.value = fmodq(q1.value, q3.value);
+    // }
+
+    // return QuadCObject_to_PyObject(q1);
+
+    Py_RETURN_NOTIMPLEMENTED;
+
+}
+
+
+static PyObject *
+QuadCObject_true_divide(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_op2(OP_true_divide, o1, o2);
+}
+
+static PyObject *
+QuadCObject_inplace_true_divide(PyObject * o1, PyObject * o2 ){
+    return QuadCObject_binary_self_op2(OP_true_divide, o1, o2);
+}
+
+
 
 // Header data
 
 static PyNumberMethods Quad_cmath_methods = {
-    // (binaryfunc) QuadCObject_add,
-    // (binaryfunc) QuadCObject_subtract,
-    // (binaryfunc) QuadCObject_mult,
-    // (binaryfunc) QuadCObject_remainder,
-    // (binaryfunc) QuadCObject_divmod,
-    // (ternaryfunc) QuadCObject_pow,
-    // (unaryfunc) QuadCObject_neg,
-    // (unaryfunc) QuadCObject_pos,
-    // (unaryfunc) QuadCObject_abs,
-    // (inquiry) QuadCObject_bool,
-    // 0,//  unaryfunc nb_invert;
-    // 0,//  binaryfunc nb_lshift;
-    // 0,//  binaryfunc nb_rshift;
-    // 0,//  binaryfunc nb_and;
-    // 0,//  binaryfunc nb_xor;
-    // 0,//  binaryfunc nb_or;
-    // (unaryfunc) QuadCObject_int,
-    // 0,//  void *nb_reserved;
-    // (unaryfunc) QuadCObject_float,
+    (binaryfunc) QuadCObject_add,
+    (binaryfunc) QuadCObject_subtract,
+    (binaryfunc) QuadCObject_mult,
+    0, //(binaryfunc) QuadCObject_remainder,
+    0, // QuadCObject_divmod,
+    (ternaryfunc) QuadCObject_pow,
+    (unaryfunc) QuadCObject_neg,
+    (unaryfunc) QuadCObject_pos,
+    (unaryfunc) QuadCObject_abs,
+    (inquiry) QuadCObject_bool,
+    0,//  unaryfunc nb_invert;
+    0,//  binaryfunc nb_lshift;
+    0,//  binaryfunc nb_rshift;
+    0,//  binaryfunc nb_and;
+    0,//  binaryfunc nb_xor;
+    0,//  binaryfunc nb_or;
+    0,//  binaryfunc nb_int;
+    0,//  void *nb_reserved;
+    0,//  binaryfunc nb_float;
 
-    // (binaryfunc) QuadCObject_inplace_add,
-    // (binaryfunc) QuadCObject_inplace_subtract,
-    // (binaryfunc) QuadCObject_inplace_mult,
-    // (binaryfunc) QuadCObject_inplace_remainder,
-    // (ternaryfunc) QuadCObject_inplace_pow,
-    // 0,//  binaryfunc nb_inplace_lshift;
-    // 0,//  binaryfunc nb_inplace_rshift;
-    // 0,//  binaryfunc nb_inplace_and;
-    // 0,//  binaryfunc nb_inplace_xor;
-    // 0,//  binaryfunc nb_inplace_or;
+    (binaryfunc) QuadCObject_inplace_add,
+    (binaryfunc) QuadCObject_inplace_subtract,
+    (binaryfunc) QuadCObject_inplace_mult,
+    0,//(binaryfunc) QuadCObject_inplace_remainder,
+    (ternaryfunc) QuadCObject_inplace_pow,
+    0,//  binaryfunc nb_inplace_lshift;
+    0,//  binaryfunc nb_inplace_rshift;
+    0,//  binaryfunc nb_inplace_and;
+    0,//  binaryfunc nb_inplace_xor;
+    0,//  binaryfunc nb_inplace_or;
 
-    // (binaryfunc) QuadCObject_floor_divide,//  binaryfunc nb_floor_divide;
-    // (binaryfunc) QuadCObject_true_divide,//  binaryfunc nb_true_divide;
-    // (binaryfunc) QuadCObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
-    // (binaryfunc) QuadCObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
+    0, //(binaryfunc) QuadCObject_floor_divide,//  binaryfunc nb_floor_divide;
+    (binaryfunc) QuadCObject_true_divide,//  binaryfunc nb_true_divide;
+    0, //(binaryfunc) QuadCObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
+    (binaryfunc) QuadCObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
 
-    // (unaryfunc) QuadCObject_int,//  unaryfunc nb_index;
+    0,//(unaryfunc) QuadCObject_int,//  unaryfunc nb_index;
 
-    // 0,//  binaryfunc nb_matrix_multiply;
-    // 0,//  binaryfunc nb_inplace_matrix_multiply;
+    0,//  binaryfunc nb_matrix_multiply;
+    0,//  binaryfunc nb_inplace_matrix_multiply;
 };
 
 
