@@ -114,7 +114,7 @@ QuadObject_binary_op2(const int op, PyObject * o1, PyObject * o2 ){
 static PyObject *
 QuadObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
 
-    QuadObject q1, q2, result;
+    QuadObject q1, q2;
 
     if(!PyObject_to_QuadObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
@@ -147,7 +147,7 @@ QuadObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
             Py_RETURN_NOTIMPLEMENTED;
     }
 
-    return QuadObject_to_PyObject(result);
+    return QuadObject_to_PyObject(q1);
 }
 
 

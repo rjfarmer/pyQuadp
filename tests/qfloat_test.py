@@ -153,3 +153,70 @@ class TestQFloat:
         q3 = pq.qfloat(5.5)
 
         assert abs(q1) == q3
+
+    def test_inp_add(self):
+        q1 = pq.qfloat(1)
+        q2 = pq.qfloat(2)
+
+        q1 += q1
+
+        assert str(q1) == str(q2)
+
+    def test_inp_sub(self):
+        q1 = pq.qfloat(1)
+        q2 = pq.qfloat(2)
+
+        q2 -= q1
+
+        assert q2 == q1
+
+    def test_bool(self):
+        q1 = pq.qfloat(1.0)
+
+        assert bool(q1)
+
+        q1 = pq.qfloat(0.0)
+
+        assert not bool(q1)
+
+    def test_inp_mult(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q2 *= q1
+
+        assert q2 == q1 * pq.qfloat(2)
+
+    def test_inp_true_div(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q1 /= q2
+
+        assert q1 == pq.qfloat(5.5) / pq.qfloat(2)
+
+    def test_floor_inp_div(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q1 //= q2
+
+        assert q1 == pq.qfloat(5.5) // pq.qfloat(2)
+
+    def test_inp_remainder(self):
+        q1 = pq.qfloat(4.4)
+        q2 = pq.qfloat(2)
+
+        q3 = pq.qfloat(4.4 % 2)
+
+        q1 %= q2
+
+        assert q1 == q3
+
+    def test_inp_pow(self):
+        q1 = pq.qfloat(5.5)
+        q2 = pq.qfloat(2)
+
+        q1 **= q2
+
+        assert pq.qfloat(5.5) ** pq.qfloat(2) == q1
