@@ -108,8 +108,12 @@ class TestQMathFloat:
         assert float(qm.fabsq(x)) == pytest.approx(math.fabs(x))
 
     @given(
-        floats(allow_infinity=False, allow_nan=False),
-        floats(allow_infinity=False, allow_nan=False),
+        floats(
+            allow_infinity=False, allow_nan=False, min_value=-1e300, max_value=1e300
+        ),
+        floats(
+            allow_infinity=False, allow_nan=False, min_value=-1e300, max_value=1e300
+        ),
     )
     def test_fdimq(self, x, y):
         z = float(qm.fdimq(x, y))

@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <float.h>
+#include <limits.h>
 
 #define QFLOAT_MODULE
 #include "qfloat.h"
@@ -248,8 +250,10 @@ QuadObject_int(PyObject * o1){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    // TODO: Add error checking and switch to fromstring
-   result = PyLong_FromLong((long long int) q1.value);
+
+   result = PyLong_FromLongLong(q1.value);
+   if(PyErr_Occurred())
+       return NULL;
 
    return result;
 }
@@ -263,7 +267,11 @@ QuadObject_float(PyObject * o1){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    // TODO: Add error checking and switch to fromstring
+    if(fabsq(q1.value)> DBL_MAX){
+        PyErr_SetString(PyExc_ValueError, "Value to large for double");
+        return NULL;
+    }
+
    result = PyFloat_FromDouble((double) q1.value);
 
    return result;

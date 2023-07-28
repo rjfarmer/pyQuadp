@@ -55,8 +55,6 @@ class TestQFloat:
 
         assert float(pq.qfloat("1e300")) == 1e300
 
-        assert not np.isfinite(float(pq.qfloat("1e400")))
-
     def test_int(self):
         q1 = pq.qfloat(1.0)
         assert int(q1) == 1
