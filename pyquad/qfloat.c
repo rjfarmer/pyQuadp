@@ -506,14 +506,11 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
     if(alloc)
         alloc_QuadType(out);
 
-    //printf("%d\n",PyObject_TypeCheck(in, &QuadType));
-
-    if(PyObject_TypeCheck(in, &QuadType)){
+    if(QuadObject_Check(in)){
         // Is a quad
         out->value = QuadObject_float128((QuadObject *) in);
         return true;
     }
-
 
     if(PyUnicode_Check(in)){
         // Is a string
@@ -550,7 +547,6 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
 
     if(PyNumber_Check(in)) {
         // Is a number
-        
         if(PyLong_Check(in)){
             // int
             out->value = (__float128) PyLong_AsLong(in);
@@ -565,10 +561,17 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
         return false;
     }
 
-
     return false;
 
 }
+
+static bool QuadObject_Check(PyObject * obj){
+    if(PyObject_TypeCheck(obj, &QuadType))
+        return true;
+    return false;
+}
+
+
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -603,6 +606,9 @@ PyInit_qfloat(void)
     PyQfloat_API[PyQfloat_q2py_NUM] = (void *)QuadObject_to_PyObject;
     PyQfloat_API[PyQfloat_py2q_NUM] = (void *)PyObject_to_QuadObject;
     PyQfloat_API[PyQfloat_alloc_NUM] = (void *)alloc_QuadType;
+    PyQfloat_API[PyQfloat_float128_NUM] = (void *)QuadObject_float128;
+    PyQfloat_API[PyQfloat_check_NUM] = (void *)QuadObject_Check;
+
 
     Py_INCREF(&QuadType);
     if (PyModule_AddObject(m, "_qfloat", (PyObject *) &QuadType) < 0) {

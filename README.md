@@ -16,7 +16,7 @@ python -m pip install .
 
 Package is not yet available on pypi.
 
-This package requires ``quadmath.h`` and ``libquadmath.so``. This might come installed with your installation of gcc/gfortran from your package manager. Or it might require a separate installation. This should be installed before trying to install the python package.
+This package requires ``quadmath.h`` and ``libquadmath.so``. This might come installed with your installation of gcc/gfortran from your package manager. Or it might require a separate installation. This should be installed before trying to install the Python package.
 
 ### Fedora
 
@@ -58,15 +58,44 @@ str(q) # "1.000000000000000000000000000000000000e+00"
 
 ### qcmplx
 
+A quad precision number is created by passing either a complex variable or two ints, floats, strs, or qfloats to ``qcmplx``:
 
+````python
+import pyquad
+
+q = pyquad.qcmplx(complex(1,1))
+q = pyquad.qcmplx(1,1.0)
+q = pyquad.qcmplx('1',1.0)
+q = pyquad.qcmplx('1','1')
+q = pyquad.qcmplx(pyquad.qfloat(1), pyquad.qfloat('1'))
+````
+
+Note that strings must be split into two components. There is no support for ``1+1j`` (unless passed via complex('1+1j'))
+
+
+<!-- A ``qcmplx`` implements Python's NumberProtocol, thus it can be used like any other number, either with basic math operations or in rich comparisons:
+
+````python
+
+q1 = pyquad.qfloat(1)
+q2 = pyquad.qfloat(2)
+
+q1+q2 # pyquad.qfloat(3)
+q1*q2  # pyquad.qfloat(2)
+q1+=q2 # pyquad.qfloat(3)
+
+q1 <= q2 # True
+q1 == q2 # False
+
+str(q) # "1.000000000000000000000000000000000000e+00"
+```` -->
 
 ## Math libraries
 
-The ``qmath`` provides the union of math operations from Python's ``math`` library and the routines provided in ``libquadmath``. ``qmath`` provides routines for both ``qint``
-and ``qfloat``. Complex numbers are handled by ``qcmath`` verions.
+The ``qmath`` provides the union of math operations from Python's ``math`` library and the routines provided in ``libquadmath``. ``qmath`` provides routines for ``qfloat``, while complex numbers are handled by ``qcmath`` versions.
 
 Where possible functions accessed via the Python name follows Python's conventions
-regarding behaviour of exceptional values. While routines from ``libquadmath`` (those ending in ``q``) follows ``libquadmath``'s conventions.
+regarding behavior of exceptional values. While routines from ``libquadmath`` (those ending in ``q``) follows ``libquadmath``'s conventions.
 
 
 ### Routines from Python's ``math`` library
@@ -77,7 +106,7 @@ regarding behaviour of exceptional values. While routines from ``libquadmath`` (
 | comb | :x: |  |
 | copysign | :x: |  |
 | fabs | :x: |  |
-| facorial | :x: |  |
+| factorial | :x: |  |
 | floor | :x: |  |
 | fmod | :x: |  |
 | frexp | :x: |  |

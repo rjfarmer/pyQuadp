@@ -24,7 +24,7 @@ qfloat = Extension(
 
 qcmplx = Extension(
     "qcmplx",
-    sources=["pyquad/qcmplx.c"],
+    sources=["pyquad/qfloat.c", "pyquad/qcmplx.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )

@@ -19,9 +19,11 @@ extern "C" {
 #define PyQfloat_q2py_NUM 0
 #define PyQfloat_py2q_NUM 1
 #define PyQfloat_alloc_NUM 2
+#define PyQfloat_float128_NUM 3
+#define PyQfloat_check_NUM 4
 
 /* Total number of C API pointers */
-#define PyQfloat_API_pointers 3
+#define PyQfloat_API_pointers PyQfloat_check_NUM+1
 
 #ifdef QFLOAT_MODULE
 
@@ -76,6 +78,8 @@ typedef struct {
 static PyObject* QuadObject_to_PyObject(QuadObject out);
 static bool PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc);
 static void alloc_QuadType(QuadObject * result);
+static __float128 QuadObject_float128(QuadObject * out);
+static bool QuadObject_Check(PyObject * obj);
 
 #else
 
@@ -94,6 +98,12 @@ static void **PyQfloat_API;
 
 #define alloc_QuadType \
 (*(void (*)(QuadObject *)) PyQfloat_API[PyQfloat_alloc_NUM])
+
+#define QuadObject_float128 \
+(*(__float128 (*)(QuadObject *)) PyQfloat_API[PyQfloat_float128_NUM])
+
+#define QuadObject_Check \
+(*(bool (*)(PyObject *)) PyQfloat_API[PyQfloat_check_NUM])
 
 /* Return -1 on error, 0 on success.
  * PyCapsule_Import will set an exception if there's an error.

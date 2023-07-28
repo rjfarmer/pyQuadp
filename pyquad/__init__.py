@@ -2,4 +2,4 @@
 
 from qfloat import _qfloat as qfloat
 
-# from qcmplx import _qcmplx as qcmplx
+from qcmplx import _qcmplx as qcmplx
