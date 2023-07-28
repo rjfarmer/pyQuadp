@@ -89,7 +89,7 @@ static PyNumberMethods Quad_cmath_methods = {
 };
 
 
-PyObject* get_real(PyObject * x, void *){
+PyObject* get_real(PyObject * x, void * y){
     QuadCObject val;
     QuadObject q1;
 
@@ -105,7 +105,7 @@ PyObject* get_real(PyObject * x, void *){
 
 }
 
-PyObject* get_imag(PyObject * x, void *){
+PyObject* get_imag(PyObject * x, void * y){
     QuadCObject val;
     QuadObject q1;
 
