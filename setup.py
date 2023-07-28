@@ -1,13 +1,5 @@
 from setuptools import setup, Extension
 
-
-qimath = Extension(
-    "qimath",
-    sources=["pyquad/qimath.c"],
-    libraries=["quadmath"],
-    extra_compile_args=["-ggdb"],
-)
-
 qmath = Extension(
     "qmathc",
     sources=["pyquad/qfloat.c", "pyquad/qmathc.c"],
@@ -29,12 +21,6 @@ qfloat = Extension(
     extra_compile_args=["-ggdb"],
 )
 
-qint = Extension(
-    "qint",
-    sources=["pyquad/qint.c"],
-    libraries=["quadmath"],
-    extra_compile_args=["-ggdb"],
-)
 
 qcmplx = Extension(
     "qcmplx",
@@ -45,5 +31,5 @@ qcmplx = Extension(
 
 
 setup(
-    ext_modules=[qmath, qimath, qcmath, qfloat, qint, qcmplx],
+    ext_modules=[qmath, qcmath, qfloat, qcmplx],
 )
