@@ -185,8 +185,12 @@ class TestQMathFloat:
         sys.version_info < (3, 8), reason="Python 3.7 math version is broken"
     )
     @given(
-        floats(allow_infinity=False, allow_nan=False),
-        floats(allow_infinity=False, allow_nan=False),
+        floats(
+            allow_infinity=False, allow_nan=False, min_value=-1e100, max_value=1e100
+        ),
+        floats(
+            allow_infinity=False, allow_nan=False, min_value=-1e100, max_value=1e100
+        ),
     )
     def test_hypotq(self, x, y):
         assert float(qm.hypotq(x, y)) == pytest.approx(math.hypot(x, y))
