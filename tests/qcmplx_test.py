@@ -75,6 +75,16 @@ class TestQFloat:
             == "(6.500000000000000000000000000000000000e+00+1.500000000000000000000000000000000000e+00j)"
         )
 
+    def test_get_cmplx(self):
+        q = pq.qcmplx(pq.qfloat(5), 5)
+
+        assert complex(q) == complex(5, 5)
+
+        q = pq.qcmplx("1e400", "1e400")
+
+        with pytest.raises(ValueError) as cm:
+            complex(q)
+
     # def test_add(self):
     #     q1 = pq.qfloat(1)
     #     q2 = pq.qfloat(2)

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <complex.h> 
+#include <float.h>
 
 #define QCMPLX_MODULE
 #include "qcmplx.h"
@@ -376,12 +377,34 @@ PyObject* get_imag(PyObject * x, void * y){
     
 }
 
+
+PyObject* QuadCObject_to_pycmplx(PyObject * self, PyObject * args){
+    QuadCObject val;
+
+    if(!PyObject_to_QuadCObject(self, &val, true)){
+        return NULL;
+    }
+
+    if(fabsq(val.real)> DBL_MAX){
+        PyErr_SetString(PyExc_ValueError, "Real component to large for double");
+        return NULL;
+    }
+
+    if(fabsq(val.imag)> DBL_MAX){
+        PyErr_SetString(PyExc_ValueError, "Imaginary component to large for double");
+        return NULL;
+    }
+
+    return  PyComplex_FromDoubles(val.real,val.imag);    
+}
+
 static PyMemberDef Quad_cmembers[] = {
     {NULL}  /* Sentinel */
 };
 
 
 static PyMethodDef Quad_cmethods[] = {
+    {"__complex__",(PyCFunction) QuadCObject_to_pycmplx, METH_VARARGS, "Complex number"},
     {NULL}  /* Sentinel */
 };
 
