@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <complex.h> 
 
 #define QCMPLX_MODULE
 #include "qcmplx.h"
@@ -182,29 +183,30 @@ QuadCObject_mult(PyObject * o1, PyObject * o2 ){
 
 static PyObject *
 QuadCObject_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
-    // QuadCObject q1, q2, q3, result;
+    QuadCObject q1, q2, result;
+    __complex128 res;
 
-    // if(!PyObject_to_QuadObject(o1, &q1, true)){
-    //     Py_RETURN_NOTIMPLEMENTED;
-    // }
+    if(!PyObject_to_QuadCObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
 
-    // if(!PyObject_to_QuadObject(o2, &q2, true)){
-    //     Py_RETURN_NOTIMPLEMENTED;
-    // }
+    if(!PyObject_to_QuadCObject(o2, &q2, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
 
-    // alloc_QuadType(&result);
+    alloc_QuadCType(&result);
 
-    // result.value = powq(q1.value, q2.value);
+    res = cpowq(QuadCObject_complex128(&q1),QuadCObject_complex128(&q2));
 
-    // if(o3 != Py_None) {
-    //     if(!PyObject_to_QuadObject(o2, &q3, true))
-    //         Py_RETURN_NOTIMPLEMENTED;
+    result.real = crealq(res);
+    result.imag = cimagq(res);
 
-    //     result.value = fmodq(result.value, q3.value);
-    // }
+    if(o3 != Py_None) {
+        PyErr_SetString(PyExc_ValueError, "complex modulo");
+        return NULL;
+    }
 
-    // return QuadCObject_to_PyObject(result);
-    Py_RETURN_NOTIMPLEMENTED;
+    return QuadCObject_to_PyObject(result);
 }
 
 static PyObject *
@@ -256,29 +258,30 @@ QuadCObject_inplace_mult(PyObject * o1, PyObject * o2 ){
 
 static PyObject *
 QuadCObject_inplace_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
-    // QuadCObject q1, q2, q3;
+    QuadCObject q1, q2, result;
+    __complex128 res;
 
-    // if(!PyObject_to_QuadObject(o1, &q1,true)){
-    //     Py_RETURN_NOTIMPLEMENTED;
-    // }
+    if(!PyObject_to_QuadCObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
 
-    // if(!PyObject_to_QuadObject(o2, &q2,true)){
-    //     Py_RETURN_NOTIMPLEMENTED;
-    // }
+    if(!PyObject_to_QuadCObject(o2, &q2, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
 
+    alloc_QuadCType(&result);
 
-    // q1.value = powq(q1.value, q2.value);
+    res = cpowq(QuadCObject_complex128(&q1),QuadCObject_complex128(&q2));
 
-    // if(o3 != Py_None) {
-    //     if(!PyObject_to_QuadObject(o2, &q3,true))
-    //         Py_RETURN_NOTIMPLEMENTED;
+    q1.real = crealq(res);
+    q1.imag = cimagq(res);
 
-    //     q1.value = fmodq(q1.value, q3.value);
-    // }
+    if(o3 != Py_None) {
+        PyErr_SetString(PyExc_ValueError, "complex modulo");
+        return NULL;
+    }
 
-    // return QuadCObject_to_PyObject(q1);
-
-    Py_RETURN_NOTIMPLEMENTED;
+    return QuadCObject_to_PyObject(q1);
 
 }
 
@@ -465,6 +468,10 @@ static __float128 QuadCObject_float128_real(QuadCObject * out) {
 
 static __float128 QuadCObject_float128_imag(QuadCObject * out) {
     return out->imag;
+}
+
+static __complex128 QuadCObject_complex128(QuadCObject * out) {
+    return out->real + out->imag * I;
 }
 
 

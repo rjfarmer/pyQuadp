@@ -79,6 +79,7 @@ static PyObject* QuadCObject_to_PyObject(QuadCObject out);
 static bool PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc);
 static bool PyObject_to_QuadCObject2(PyObject * in1,PyObject * in2, QuadCObject * out, const bool alloc);
 static void alloc_QuadCType(QuadCObject * result);
+static __complex128 QuadCObject_complex128(QuadCObject * out);
 
 #else
 
