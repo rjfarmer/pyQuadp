@@ -538,6 +538,10 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
 
         if(strcmp(buf,"nan")==0) {
             out->value = nanq("");
+        } else if (strcmp(buf,"inf")==0){
+            out->value = INFINITY;
+        } else if (strcmp(buf,"-inf")==0){
+            out->value = -INFINITY;
         } else {
             char *sp=NULL;
 

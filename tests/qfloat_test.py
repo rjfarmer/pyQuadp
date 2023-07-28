@@ -70,6 +70,9 @@ class TestQFloat:
 
         assert not q == q
 
+        q = pq.qfloat("inf")
+        q = pq.qfloat("-inf")
+
     def test_mult(self):
         q1 = pq.qfloat(5.5)
         q2 = pq.qfloat(2)

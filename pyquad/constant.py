@@ -37,7 +37,7 @@ FLT128_MAX_10_EXP = 4932
 pi = M_PIq
 e = M_Eq
 tau = 2 * pi
-inf = qfloat("1e900")
+inf = qfloat("inf")
 nan = qfloat("nan")
 
 
@@ -50,4 +50,3 @@ class c_qcmplx(_ctypes.Structure):
         ("real", c_qfloat),
         ("imag", c_qfloat),
     ]
-

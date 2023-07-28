@@ -157,11 +157,11 @@ regarding behavior of exceptional values. While routines from ``libquadmath`` (t
 | erfc| :x: |  |
 | gamma| :x: |  |
 | lgamma| :x: |  |
-| pi | :x: |  |  
-| e | :x: |  |  
-| tau | :x: |  |  
-| inf | :x: |  |
-| nan | :x: |  |  
+| pi | :heavy_check_mark: |  |  
+| e | :heavy_check_mark: |  |  
+| tau | :heavy_check_mark: |  |  
+| inf | :heavy_check_mark: |  |
+| nan | :heavy_check_mark: |  |  
 
 
 ### Routines from gcc's ``libquadthmath`` library
@@ -268,13 +268,13 @@ These are available from ``qcmath``
 | isinf | :x: | |
 | isnan | :x: | |
 | isclose | :x: | |
-| pi | :x: | |
-| e | :x: | |
-| tau | :x: | |
-| inf | :x: | |
-| infj | :x: | |
-| nan | :x: | |
-| nanj | :x: | |
+| pi | :heavy_check_mark: | |
+| e | :heavy_check_mark: | |
+| tau | :heavy_check_mark: | |
+| inf | :heavy_check_mark: | |
+| infj | :heavy_check_mark: | |
+| nan | :heavy_check_mark: | |
+| nanj | :heavy_check_mark: | |
 
 
 ### Routines from complex math ``libquadthmath`` library
@@ -315,26 +315,26 @@ The following constants are availbe both in ``qmath`` and ``qcmath``
 
 | Name     | Implemented | Descritpion |
 |----------|-------------|-------------|
-| FLT128_MAX | :x: | largest finite number | 
-| FLT128_MIN| :x: | smallest positive number with full precision |
-| FLT128_EPSILON | :x: |  difference between 1 and the next larger representable number | 
-| FLT128_DENORM_MIN | :x: | smallest positive denormalized number |
-| FLT128_MANT_DIG | :x: |  number of digits in the mantissa (bit precision) |
-| FLT128_MIN_EXP | :x: |  maximal negative exponent |
-| FLT128_MAX_EXP | :x: |  maximal positive exponent |
-| FLT128_DIG | :x: |  number of decimal digits in the mantissa |
-| FLT128_MIN_10_EXP | :x: |  maximal negative decimal exponent |
-| FLT128_MAX_10_EXP | :x: |  maximal positive decimal exponent |
-| M_Eq | :x: | the constant e (Euler’s number) |
-| M_LOG2Eq | :x: | binary logarithm of 2 |
-| M_LOG10Eq | :x: | common, decimal logarithm of 2 |
-| M_LN2q | :x: | natural logarithm of 2 |
-| M_LN10q | :x: | natural logarithm of 10 |
-| M_PIq | :x: | pi |
-| M_PI_2q | :x: | pi divided by two |
-| M_PI_4q | :x: | pi divided by four |
-| M_1_PIq | :x: | one over pi |
-| M_2_PIq | :x: | one over two pi |
-| M_2_SQRTPIq | :x: | two over square root of pi |
-| M_SQRT2q | :x: | square root of 2 |
-| M_SQRT1_2q | :x: | one over square root of 2 |
+| FLT128_MAX | :heavy_check_mark: | largest finite number | 
+| FLT128_MIN| :heavy_check_mark: | smallest positive number with full precision |
+| FLT128_EPSILON | :heavy_check_mark: |  difference between 1 and the next larger representable number | 
+| FLT128_DENORM_MIN | :heavy_check_mark: | smallest positive denormalized number |
+| FLT128_MANT_DIG | :heavy_check_mark: |  number of digits in the mantissa (bit precision) |
+| FLT128_MIN_EXP | :heavy_check_mark: |  maximal negative exponent |
+| FLT128_MAX_EXP | :heavy_check_mark: |  maximal positive exponent |
+| FLT128_DIG | :heavy_check_mark: |  number of decimal digits in the mantissa |
+| FLT128_MIN_10_EXP | :heavy_check_mark: |  maximal negative decimal exponent |
+| FLT128_MAX_10_EXP | :heavy_check_mark: |  maximal positive decimal exponent |
+| M_Eq | :heavy_check_mark: | the constant e (Euler’s number) |
+| M_LOG2Eq | :heavy_check_mark: | binary logarithm of 2 |
+| M_LOG10Eq | :heavy_check_mark: | common, decimal logarithm of 2 |
+| M_LN2q | :heavy_check_mark: | natural logarithm of 2 |
+| M_LN10q | :heavy_check_mark: | natural logarithm of 10 |
+| M_PIq | :heavy_check_mark: | pi |
+| M_PI_2q | :heavy_check_mark: | pi divided by two |
+| M_PI_4q | :heavy_check_mark: | pi divided by four |
+| M_1_PIq | :heavy_check_mark: | one over pi |
+| M_2_PIq | :heavy_check_mark: | one over two pi |
+| M_2_SQRTPIq | :heavy_check_mark: | two over square root of pi |
+| M_SQRT2q | :heavy_check_mark: | square root of 2 |
+| M_SQRT1_2q | :heavy_check_mark: | one over square root of 2 |
