@@ -1,3 +1,6 @@
 pytest
 hypothesis
 scipy
+wheel
+build
+tox
