@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 
 from qfloat import _qfloat as qfloat
+from qcmplx import _qcmplx as qcmplx
 import ctypes as _ctypes
 
 # libquadmath constants
@@ -39,6 +40,9 @@ e = M_Eq
 tau = 2 * pi
 inf = qfloat("inf")
 nan = qfloat("nan")
+
+infj = qcmplx(0.0,qfloat("inf"))
+nanj = qcmplx(0.0,qfloat("nan"))
 
 
 # Ctype data
