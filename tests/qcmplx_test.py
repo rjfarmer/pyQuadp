@@ -54,7 +54,7 @@ class TestQFloat:
         q = pq.qcmplx(5.0, 5.0)
         assert (
             str(q)
-            == "(5.000000000000000000000000000000000000e+00+5.000000000000000000000000000000000000e+00j)"
+            == '(5.000000000000000000000000000000000000e+00+5.000000000000000000000000000000000000e+00j)'
         )
 
         q = pq.qcmplx(pq.qfloat(5), pq.qfloat(5))
@@ -87,9 +87,9 @@ class TestQFloat:
 
     def test_add(self):
         q = pq.qcmplx(pq.qfloat(5), 5)
-        assert str(q + q) == pq.qcmplx(pq.qfloat(10), 10)
+        assert str(q + q) == str(pq.qcmplx(pq.qfloat(10), 10))
 
     def test_sub(self):
         q = pq.qcmplx(pq.qfloat(5), 5)
-        assert str(q - q) == pq.qcmplx(pq.qfloat(0), 0)
+        assert str(q - q) == str(pq.qcmplx(pq.qfloat(0), 0))
 

@@ -21,9 +21,10 @@ extern "C" {
 #define PyQcmplx_q2py_NUM 0
 #define PyQcmplx_py2q_NUM 1
 #define PyQcmplx_alloc_NUM 2
+#define PyQcmplx_to_c128_NUM 3
 
 /* Total number of C API pointers */
-#define PyQcmplx_API_pointers 3
+#define PyQcmplx_API_pointers 4
 
 #ifdef QCMPLX_MODULE
 
@@ -72,7 +73,7 @@ extern "C" {
 // exported
 typedef struct {
     PyObject_HEAD
-    __float128 real, imag;
+    __complex128 value;
 } QuadCObject;
 
 static PyObject* QuadCObject_to_PyObject(QuadCObject out);
@@ -85,7 +86,7 @@ static __complex128 QuadCObject_complex128(QuadCObject * out);
 
 typedef struct {
     PyObject_HEAD
-    __float128 real, imag
+    __complex128 value;
 } QuadCObject;
 
 static void **PyQcmplx_API;
@@ -98,6 +99,9 @@ static void **PyQcmplx_API;
 
 #define alloc_QuadCType \
 (*(void (*)(QuadCObject *)) PyQcmplx_API[PyQcmplx_alloc_NUM])
+
+#define QuadCObject_complex128 \
+(*( __complex128 (*)(QuadCObject *)) PyQcmplx_API[PyQcmplx_to_c128_NUM])
 
 /* Return -1 on error, 0 on success.
  * PyCapsule_Import will set an exception if there's an error.

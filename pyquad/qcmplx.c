@@ -19,8 +19,8 @@ QuadCObject_repr(QuadCObject * obj)
 {
     char buf1[QUAD_BUF],buf2[QUAD_BUF];
 
-    int n1 = quadmath_snprintf (buf1, sizeof buf1, "%.36Qe", obj->real);
-    int n2 = quadmath_snprintf (buf2, sizeof buf2, "%.36Qe", obj->imag);
+    int n1 = quadmath_snprintf (buf1, sizeof buf1, "%.36Qe", crealq(obj->value));
+    int n2 = quadmath_snprintf (buf2, sizeof buf2, "%.36Qe", cimagq(obj->value));
     if ((size_t) n1 < sizeof buf1 && (size_t) n2 < sizeof buf2 )
         return PyUnicode_FromFormat("qcmplx('%s+%sj')",
                                 buf1,buf2);
@@ -35,8 +35,8 @@ QuadCObject_str(QuadCObject * obj)
 {
     char buf1[QUAD_BUF],buf2[QUAD_BUF];
 
-    int n1 = quadmath_snprintf (buf1, sizeof buf1, "%.36Qe", obj->real);
-    int n2 = quadmath_snprintf (buf2, sizeof buf2, "%.36Qe", obj->imag);
+    int n1 = quadmath_snprintf (buf1, sizeof buf1, "%.36Qe", crealq(obj->value));
+    int n2 = quadmath_snprintf (buf2, sizeof buf2, "%.36Qe", cimagq(obj->value));
     if ((size_t) n1 < sizeof buf1 && (size_t) n2 < sizeof buf2 )
         return PyUnicode_FromFormat("(%s+%sj)",buf1,buf2);
     else
@@ -57,16 +57,13 @@ QuadCObject_binary_op1(const int op, PyObject * o1){
 
     switch(op){
         case OP_negative:
-            result.real = -1*(q1.real);
-            result.imag = -1*(q1.imag);
+            result.value = -1 * q1.value;
             break;
         case OP_positive:
-            result.real = 1*(q1.real);
-            result.imag = 1*(q1.imag);
+            result.value = 1*q1.value;
             break;
         case OP_absolute:
-            result.real = fabsq(q1.real);
-            result.imag = fabsq(q1.imag);
+            result.value = fabsq(q1.value);
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -80,7 +77,6 @@ static PyObject *
 QuadCObject_binary_op2(const int op, PyObject * o1, PyObject * o2 ){
 
     QuadCObject q1, q2, result;
-    __float128 num;
 
     if(!PyObject_to_QuadCObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
@@ -94,21 +90,16 @@ QuadCObject_binary_op2(const int op, PyObject * o1, PyObject * o2 ){
 
     switch(op){
         case OP_add:
-            result.real = q1.real + q2.real;
-            result.imag = q1.imag + q2.imag;
+            result.value = q1.value + q2.value;
             break;
         case OP_sub:
-            result.real = q1.real - q2.real;
-            result.imag = q1.imag - q2.imag;
+            result.value = q1.value - q2.value;
             break;
         case OP_mult:
-            result.real = q1.real * q2.real - q1.imag * q2.imag;
-            result.imag = q1.imag * q2.imag - q1.real * q2.real;
+            result.value = q1.value * q2.value;
             break;
         case OP_true_divide:
-            num = powq(q1.real,2) + powq(q1.imag,2);
-            result.real = (q1.real*q2.real + q1.imag*q2.imag)/num;
-            result.imag = (q1.imag*q2.real - q1.real*q2.imag)/num;
+            result.value = q1.value/q2.value;
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -122,7 +113,6 @@ static PyObject *
 QuadCObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
 
     QuadCObject q1, q2;
-    __float128 num, real, imag;
 
     if(!PyObject_to_QuadCObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
@@ -134,27 +124,16 @@ QuadCObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
 
     switch(op){
         case OP_add:
-            q1.real = q1.real + q2.real;
-            q1.imag = q1.imag + q2.imag;
+            q1.value = q1.value + q2.value;
             break;
         case OP_sub:
-            q1.real = q1.real - q2.real;
-            q1.imag = q1.imag - q2.imag;
+            q1.value = q1.value - q2.value;
             break;
         case OP_mult:
-            real = q1.real;
-            imag = q1.imag;
-
-            q1.real = real * q2.real - imag * q2.imag;
-            q1.imag = imag * q2.imag - real * q2.real;
+            q1.value = q1.value * q2.value;
             break;
         case OP_true_divide:
-            real = q1.real;
-            imag = q1.imag;
-
-            num = powq(real,2) + powq(imag,2);
-            q1.real = (real*q2.real + imag*q2.imag)/num;
-            q1.imag = (imag*q2.real - real*q2.imag)/num;
+            q1.value = q1.value/q2.value;
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -185,7 +164,6 @@ QuadCObject_mult(PyObject * o1, PyObject * o2 ){
 static PyObject *
 QuadCObject_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
     QuadCObject q1, q2, result;
-    __complex128 res;
 
     if(!PyObject_to_QuadCObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
@@ -197,10 +175,7 @@ QuadCObject_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
 
     alloc_QuadCType(&result);
 
-    res = cpowq(QuadCObject_complex128(&q1),QuadCObject_complex128(&q2));
-
-    result.real = crealq(res);
-    result.imag = cimagq(res);
+    result.value = cpowq(QuadCObject_complex128(&q1),QuadCObject_complex128(&q2));
 
     if(o3 != Py_None) {
         PyErr_SetString(PyExc_ValueError, "complex modulo");
@@ -233,7 +208,7 @@ static int QuadCObject_bool(PyObject * o1){
         return 0;
     }
 
-    if(q1.real==0 && q1.imag==0)
+    if(crealq(q1.value)==0 && cimagq(q1.value))
         return 0;
 
     return 1;
@@ -260,7 +235,6 @@ QuadCObject_inplace_mult(PyObject * o1, PyObject * o2 ){
 static PyObject *
 QuadCObject_inplace_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
     QuadCObject q1, q2, result;
-    __complex128 res;
 
     if(!PyObject_to_QuadCObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
@@ -272,10 +246,7 @@ QuadCObject_inplace_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
 
     alloc_QuadCType(&result);
 
-    res = cpowq(QuadCObject_complex128(&q1),QuadCObject_complex128(&q2));
-
-    q1.real = crealq(res);
-    q1.imag = cimagq(res);
+    q1.value =  cpowq(QuadCObject_complex128(&q1),QuadCObject_complex128(&q2));
 
     if(o3 != Py_None) {
         PyErr_SetString(PyExc_ValueError, "complex modulo");
@@ -355,7 +326,7 @@ PyObject* get_real(PyObject * x, void * y){
 
     alloc_QuadType(&q1);
 
-    q1.value = val.real;
+    q1.value = crealq(val.value);
 
     return QuadObject_to_PyObject(q1);
 
@@ -371,7 +342,7 @@ PyObject* get_imag(PyObject * x, void * y){
 
     alloc_QuadType(&q1);
 
-    q1.value = val.imag;
+    q1.value = cimagq(val.value);
 
     return QuadObject_to_PyObject(q1);
     
@@ -385,17 +356,17 @@ PyObject* QuadCObject_to_pycmplx(PyObject * self, PyObject * args){
         return NULL;
     }
 
-    if(fabsq(val.real)> DBL_MAX){
+    if(fabsq(crealq(val.value))> DBL_MAX){
         PyErr_SetString(PyExc_ValueError, "Real component to large for double");
         return NULL;
     }
 
-    if(fabsq(val.imag)> DBL_MAX){
+    if(fabsq(cimagq(val.value))> DBL_MAX){
         PyErr_SetString(PyExc_ValueError, "Imaginary component to large for double");
         return NULL;
     }
 
-    return  PyComplex_FromDoubles(val.real,val.imag);    
+    return  PyComplex_FromDoubles(crealq(val.value),cimagq(val.value));    
 }
 
 static PyMemberDef Quad_cmembers[] = {
@@ -477,24 +448,14 @@ QuadCObject_to_PyObject(QuadCObject out) {
 	QuadCObject* ret = (QuadCObject*) PyType_GenericAlloc(&QuadCType, 0);
 
 	if (ret != NULL) {
-		ret->real = out.real;
-        ret->imag = out.imag;
+		ret->value = crealq(out.value) + cimagq(out.value)*I;
 	}
 
 	return (PyObject*) ret;
 }
 
-
-static __float128 QuadCObject_float128_real(QuadCObject * out) {
-    return out->real;
-}
-
-static __float128 QuadCObject_float128_imag(QuadCObject * out) {
-    return out->imag;
-}
-
 static __complex128 QuadCObject_complex128(QuadCObject * out) {
-    return out->real + out->imag * I;
+    return crealq(out->value) + cimagq(out->value) * I;
 }
 
 
@@ -508,21 +469,18 @@ PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
 
     if(PyObject_TypeCheck(in, &QuadCType)){
         // Is a complex quad
-        out->real = QuadCObject_float128_real((QuadCObject *) in);
-        out->imag = QuadCObject_float128_imag((QuadCObject *) in);
+        out->value = QuadCObject_complex128((QuadCObject *)in);
         return true;
     }
 
     if(QuadObject_Check(in)){
         // Is a quad
-        out->real = QuadObject_float128((QuadObject *) in);
-        out->imag = 0;
+        out->value = QuadObject_float128((QuadObject *) in) + 0*I;
         return true;
     }
 
     if(PyComplex_Check(in)){
-        out->real = (__float128) PyComplex_RealAsDouble(in);
-        out->imag = (__float128) PyComplex_ImagAsDouble(in);
+        out->value = (__float128) PyComplex_RealAsDouble(in) + (__float128) PyComplex_ImagAsDouble(in) * I;
         return true;
     }
 
@@ -540,31 +498,29 @@ PyObject_to_QuadCObject2(PyObject * in1,PyObject * in2, QuadCObject * out, const
     if(alloc)
         alloc_QuadCType(out);
 
-    out->real = 0;
-    out->imag = 0;
-
     if(QuadObject_Check(in1)){
         // Is a quad
-        out->real = QuadObject_float128((QuadObject *) in1);
+        out->value = QuadObject_float128((QuadObject *) in1) + 0*I;
         set1 = true;
     }
 
     if(!set1){
         if(PyObject_to_QuadObject(in1, &q1,true)){
-            out->real = QuadObject_float128(&q1);
+            out->value = QuadObject_float128(&q1)+ 0*I;
             set1=true;
         }
     }
     
     if(QuadObject_Check(in2)){
         // Is a quad
-        out->imag = QuadObject_float128((QuadObject *) in2);
+        out->value += QuadObject_float128((QuadObject *) in2)*I;
         set2 = true;
     }
 
+    
     if(!set2){
         if(PyObject_to_QuadObject(in2, &q2,true)){
-            out->imag = QuadObject_float128(&q2);
+            out->value +=  QuadObject_float128(&q2)*I;
             set2=true;
         }
     }
@@ -586,8 +542,8 @@ PyObject_to_QuadCObject2(PyObject * in1,PyObject * in2, QuadCObject * out, const
 #pragma GCC diagnostic ignored "-Wunused-function"
 void qcprintf(QuadCObject * out){
     char output1[QUAD_BUF], output2[QUAD_BUF];
-    quadmath_snprintf(output1, sizeof output1, "%.36Qg", 35, out->real);
-    quadmath_snprintf(output2, sizeof output2, "%.36Qg", 35, out->imag);
+    quadmath_snprintf(output1, sizeof output1, "%.36Qg", 35, crealq(out->value));
+    quadmath_snprintf(output2, sizeof output2, "%.36Qg", 35, cimagq(out->value));
     printf("%s %s\n", output1,output2);
 }
 #pragma GCC diagnostic pop

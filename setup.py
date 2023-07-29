@@ -8,8 +8,8 @@ qmath = Extension(
 )
 
 qcmath = Extension(
-    "qcmath",
-    sources=["pyquad/qcmath.c"],
+    "qcmathc",
+    sources=["pyquad/qfloat.c", "pyquad/qcmplx.c","pyquad/qcmathc.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )
