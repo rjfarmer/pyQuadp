@@ -437,8 +437,6 @@ static PyNumberMethods Quad_math_methods = {
 };
 
 
-
-
 static PyMemberDef Quad_members[] = {
     {NULL}  /* Sentinel */
 };
@@ -493,8 +491,8 @@ static PyModuleDef QuadModule = {
 
 PyObject* 
 QuadObject_to_PyObject(QuadObject out) {
-	QuadObject* ret = (QuadObject*)QuadType.tp_alloc(&QuadType, 0);
-
+	QuadObject* ret = (QuadObject*) PyType_GenericAlloc(&QuadType, 0);
+    
 	if (ret != NULL) {
 		ret->value = out.value;
 	}
@@ -595,8 +593,7 @@ void qprintf(QuadObject * out){
 #pragma GCC diagnostic pop
 
 static void alloc_QuadType(QuadObject * result){
-	result = (QuadObject*)QuadType.tp_alloc(&QuadType, 0);
-    Py_INCREF(result);
+	result = (QuadObject*) PyType_GenericAlloc(&QuadType, 0);
 }
 
 PyMODINIT_FUNC

@@ -474,7 +474,7 @@ static PyModuleDef QuadCModule = {
 
 PyObject* 
 QuadCObject_to_PyObject(QuadCObject out) {
-	QuadCObject* ret = (QuadCObject*)QuadCType.tp_alloc(&QuadCType, 0);
+	QuadCObject* ret = (QuadCObject*) PyType_GenericAlloc(&QuadCType, 0);
 
 	if (ret != NULL) {
 		ret->real = out.real;
@@ -593,8 +593,7 @@ void qcprintf(QuadCObject * out){
 #pragma GCC diagnostic pop
 
 static void alloc_QuadCType(QuadCObject * result){
-	result = (QuadCObject*)QuadCType.tp_alloc(&QuadCType, 0);
-    Py_INCREF(result);
+	result = (QuadCObject*) PyType_GenericAlloc(&QuadCType, 0);
 }
 
 PyMODINIT_FUNC
