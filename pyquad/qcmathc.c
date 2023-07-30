@@ -20,7 +20,6 @@
 static PyObject * QuadCObject_qmath_op1_qfloat(const int op, PyObject * self, PyObject * args){
     QuadObject result;
     QuadCObject q1;
-    __complex128 c1;
     PyObject * obj = NULL;
 
     if (!PyArg_ParseTuple(args, "O:", &obj)){
@@ -33,22 +32,20 @@ static PyObject * QuadCObject_qmath_op1_qfloat(const int op, PyObject * self, Py
         return NULL;
     }
 
-    c1 = QuadCObject_complex128(&q1);
-
     alloc_QuadType(&result);
 
     switch(op){
         case OP_cabsq:
-            result.value = cabsq(c1);
+            result.value = cabsq(q1.value); // hypot underthehood
             break;
         case OP_cargq:
-            result.value = cargq(c1);
+            result.value = cargq(q1.value); // This is phase underthehood (or atan2)
             break;
         case OP_cimagq:
-            result.value = crealq(c1);
+            result.value = cimagq(q1.value);
             break;
         case OP_crealq:
-            result.value = crealq(c1);
+            result.value = crealq(q1.value);
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -133,7 +130,7 @@ QuadCObject_qmath_op1(const int op, PyObject * self, PyObject * args){
             result.value = ctanhq(result.value);
             break;
         case OP_phase:
-            result.value = atan2q(cimag(result.value),crealq(result.value));
+            result.value = cargq(result.value); // This is atan2 underthehood
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -207,7 +204,6 @@ static PyObject * QuadCObject_qcmath_op1_int(const int op, PyObject * self, PyOb
     return result;
 
 }
-
 
 static PyObject * _cabs(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_qfloat(OP_cabsq, self, args);
@@ -339,7 +335,7 @@ static PyObject * _polar(PyObject *self, PyObject *args){
 
     absx.value = cabsq(result.value);
 
-    phasex.value = atan2q(cimag(result.value),crealq(result.value));
+    phasex.value = cargq(result.value);
 
     return Py_BuildValue("(OO)", \
            QuadObject_to_PyObject(absx),
@@ -374,7 +370,6 @@ static PyObject * _rect(PyObject *self, PyObject *args){
     return QuadCObject_to_PyObject(result);
 
 };
-
 
 
 

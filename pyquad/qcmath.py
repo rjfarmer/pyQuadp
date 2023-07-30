@@ -2,32 +2,16 @@ from .constant import *
 import qcmathc as _qcmathc
 
 
-def cabs(x):
-    return _qcmathc._cabs(x)
-
-
 def cabsq(x):
     return _qcmathc._cabs(x)
-
-
-def carg(x):
-    return _qcmathc._carg(x)
 
 
 def cargq(x):
     return _qcmathc._carg(x)
 
 
-def cimag(x):
-    return _qcmathc._cimag(x)
-
-
 def cimagq(x):
     return _qcmathc._cimag(x)
-
-
-def creal(x):
-    return _qcmathc._creal(x)
 
 
 def crealq(x):
