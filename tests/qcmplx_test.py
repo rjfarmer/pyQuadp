@@ -108,3 +108,7 @@ class TestQFloat:
 
         with pytest.raises(TypeError) as cm:
             q1 > q1a
+
+    def test_abs(self):
+        q1 = complex(2, 3)
+        assert abs(q1) == abs(complex(q1))

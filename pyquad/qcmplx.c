@@ -361,12 +361,30 @@ PyObject* QuadCObject_to_pycmplx(PyObject * self, PyObject * args){
     return  PyComplex_FromDoubles(r,i);    
 }
 
+
+PyObject* QuadCObject_to_abs(PyObject * self, PyObject * args){
+    QuadCObject val;
+    QuadObject res;
+
+    if(!PyObject_to_QuadCObject(self, &val, true)){
+        return NULL;
+    }
+
+    alloc_QuadType(&res);
+    res.value = cabsq(val.value);
+
+    return  QuadObject_to_PyObject(res);
+}
+
+
+
 static PyMemberDef Quad_cmembers[] = {
     {NULL}  /* Sentinel */
 };
 
 
 static PyMethodDef Quad_cmethods[] = {
+    {"__abs__", (PyCFunction) QuadCObject_to_abs, METH_VARARGS, "Absolute value"},
     {"__complex__",(PyCFunction) QuadCObject_to_pycmplx, METH_VARARGS, "Complex number"},
     {NULL}  /* Sentinel */
 };
