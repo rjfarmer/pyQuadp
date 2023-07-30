@@ -13,6 +13,7 @@
 #define OP_cargq  1
 #define OP_cimagq  2
 #define OP_crealq  3
+
 #define OP_cacoshq  4
 #define OP_cacosq  5
 #define OP_casinhq  6
@@ -34,3 +35,6 @@
 #define OP_ctanq  22
 #define OP_ctanhq  23
 
+#define OP_finitecq 24
+#define OP_isinfcq 25
+#define OP_isnancq 26

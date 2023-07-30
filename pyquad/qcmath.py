@@ -2,9 +2,6 @@ from .constant import *
 import qcmathc as _qcmathc
 
 
-
-
-
 def cabs(x):
     return _qcmathc._cabs(x)
 
@@ -141,12 +138,12 @@ def conjq(x):
     return _qcmathc._conj(x)
 
 
-def cpow(x,y):
-    return _qcmathc._cpow(x,y)
+def cpow(x, y):
+    return _qcmathc._cpow(x, y)
 
 
-def cpowq(x,y):
-    return _qcmathc._cpow(x,y)
+def cpowq(x, y):
+    return _qcmathc._cpow(x, y)
 
 
 def cproj(x):
@@ -195,3 +192,15 @@ def ctanh(x):
 
 def ctanhq(x):
     return _qcmathc._ctanh(x)
+
+
+def isfinite(x):
+    return _qcmathc._finitecq(x)
+
+
+def isnan(x):
+    return _qcmathc._isnancq(x)
+
+
+def isinf(x):
+    return _qcmathc._isinfcq(x)

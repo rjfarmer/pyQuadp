@@ -171,6 +171,40 @@ QuadCObject_qmath_op2(const int op, PyObject * self, PyObject * args){
     return QuadCObject_to_PyObject(result);
 }
 
+static PyObject * QuadCObject_qcmath_op1_int(const int op, PyObject * self, PyObject * args){
+    PyObject *result = NULL;
+    PyObject * obj = NULL;
+    QuadObject q1;
+
+    if (!PyArg_ParseTuple(args, "O:", &obj)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse object");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj, &q1, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert value to quad precision.");
+        return NULL;
+    }
+
+    switch(op){
+        case OP_finitecq:
+            result =  PyLong_FromLong(finiteq(crealq(q1.value))&& (finiteq(cimagq(q1.value))));
+            break;
+        case OP_isinfcq:
+            result =  PyLong_FromLong(isinfq(crealq(q1.value))|| (isinfq(cimagq(q1.value))));
+            break;
+        case OP_isnancq:
+            result =  PyLong_FromLong(isnanq(crealq(q1.value)) || (isnanq(cimagq(q1.value))));
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+
+    return result;
+
+}
+
 
 static PyObject * _cabs(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_qfloat(OP_cabsq, self, args);
@@ -268,6 +302,18 @@ static PyObject * _ctanh(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_ctanhq, self, args);
 };
 
+static PyObject * _finitecq(PyObject *self, PyObject *args){
+    return QuadCObject_qcmath_op1_int(OP_finitecq, self, args);
+};
+
+static PyObject * _isnancq(PyObject *self, PyObject *args){
+    return QuadCObject_qcmath_op1_int(OP_isnancq, self, args);
+};
+
+static PyObject * _isinfcq(PyObject *self, PyObject *args){
+    return QuadCObject_qcmath_op1_int(OP_isinfcq, self, args);
+};
+
 
 
 static PyMethodDef QMathCMethods[] = {
@@ -295,6 +341,9 @@ static PyMethodDef QMathCMethods[] = {
     {"_csqrt", (PyCFunction) _csqrt, METH_VARARGS, "csqrt"},
     {"_ctan", (PyCFunction) _ctan, METH_VARARGS, "ctan"},
     {"_ctanh", (PyCFunction) _ctanh, METH_VARARGS, "ctanh"},
+    {"_finitecq", (PyCFunction) _finitecq, METH_VARARGS, "isfinite"},
+    {"_isnancq", (PyCFunction) _isnancq, METH_VARARGS, "isnan"},
+    {"_isinfcq", (PyCFunction) _isinfcq, METH_VARARGS, "isinf"},
     {NULL, NULL, 0, NULL}
 };
 
@@ -319,7 +368,6 @@ PyInit_qcmathc(void)
 
     if (import_qfloat() < 0)
         return NULL;
-
     if (import_qcmplx() < 0)
         return NULL;
 
