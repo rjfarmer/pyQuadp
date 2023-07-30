@@ -171,14 +171,14 @@ QuadCObject_qmath_op2(const int op, PyObject * self, PyObject * args){
 static PyObject * QuadCObject_qcmath_op1_int(const int op, PyObject * self, PyObject * args){
     PyObject *result = NULL;
     PyObject * obj = NULL;
-    QuadObject q1;
+    QuadCObject q1;
 
     if (!PyArg_ParseTuple(args, "O:", &obj)){
         PyErr_SetString(PyExc_ValueError, "Failed to parse object");
         return NULL;
     }
 
-    if(!PyObject_to_QuadObject(obj, &q1, true)){
+    if(!PyObject_to_QuadCObject(obj, &q1, true)){
         PyErr_SetString(PyExc_TypeError, "Can not convert value to quad precision.");
         return NULL;
     }
