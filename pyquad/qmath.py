@@ -421,29 +421,8 @@ def fabs(x):
     return res
 
 
-def fdim(x):
-    res = _qmathc._fdim(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def finite(x):
-    res = _qmathc._finite(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
 def floor(x):
     res = _qmathc._floor(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def fma(x):
-    res = _qmathc._fma(x)
     if not _qmathc._finite(res):
         raise ValueError("math domain error")
     return res
@@ -490,13 +469,6 @@ def hypot(*iterable):
     return res
 
 
-def ilogb(x):
-    res = _qmathc._ilogb(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
 def isinf(x):
     res = _qmathc._isinf(x)
     return res
@@ -504,32 +476,6 @@ def isinf(x):
 
 def isnan(x):
     res = _qmathc._isnan(x)
-    return res
-
-
-def issignaling(x):
-    res = _qmathc._issignaling(x)
-    return res
-
-
-def j0(x):
-    res = _qmathc._j0(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def j1(x):
-    res = _qmathc._j1(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def jn(x):
-    res = _qmathc._jn(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
     return res
 
 
@@ -542,27 +488,6 @@ def ldexp(x, y):
 
 def lgamma(x):
     res = _qmathc._lgamma(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def llrint(x):
-    res = _qmathc._llrint(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def llround(x):
-    res = _qmathc._llround(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def logb(x):
-    res = _qmathc._logb(x)
     if not _qmathc._finite(res):
         raise ValueError("math domain error")
     return res
@@ -603,37 +528,9 @@ def log2(x):
     return res
 
 
-def lrint(x):
-    res = _qmathc._lrint(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def lround(x):
-    res = _qmathc._lround(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
 def modf(x):
     res = _qmathc._modf(x)
     if not _qmathc._finite(res[0]):
-        raise ValueError("math domain error")
-    return res
-
-
-def nan(x):
-    res = _qmathc._nan(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def nearbyint(x):
-    res = _qmathc._nearbyint(x)
-    if not _qmathc._finite(res):
         raise ValueError("math domain error")
     return res
 
@@ -654,55 +551,6 @@ def pow(x, y):
 
 def remainder(x, y):
     res = _qmathc._remainder(x, y)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def remquo(x):
-    res = _qmathc._remquo(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def rint(x):
-    res = _qmathc._rint(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def round(x):
-    res = _qmathc._round(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def scalbln(x):
-    res = _qmathc._scalbln(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def scalbn(x):
-    res = _qmathc._scalbn(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def signbit(x):
-    res = _qmathc._signbit(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def sincos(x):
-    res = _qmathc._sincos(x)
     if not _qmathc._finite(res):
         raise ValueError("math domain error")
     return res
@@ -743,36 +591,8 @@ def tanh(x):
     return res
 
 
-def tgamma(x):
-    res = _qmathc._tgamma(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
 def trunc(x):
     res = _qmathc._trunc(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def y0(x):
-    res = _qmathc._y0(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def y1(x):
-    res = _qmathc._y1(x)
-    if not _qmathc._finite(res):
-        raise ValueError("math domain error")
-    return res
-
-
-def yn(x):
-    res = _qmathc._yn(x)
     if not _qmathc._finite(res):
         raise ValueError("math domain error")
     return res
