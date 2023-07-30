@@ -132,6 +132,9 @@ QuadCObject_qmath_op1(const int op, PyObject * self, PyObject * args){
         case OP_ctanhq:
             result.value = ctanhq(result.value);
             break;
+        case OP_phase:
+            result.value = atan2q(cimag(result.value),crealq(result.value));
+            break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
     }
@@ -315,6 +318,65 @@ static PyObject * _isinfcq(PyObject *self, PyObject *args){
 };
 
 
+static PyObject * _phase(PyObject *self, PyObject *args){
+    return QuadCObject_qmath_op1(OP_phase, self, args);
+};
+
+static PyObject * _polar(PyObject *self, PyObject *args){
+    QuadCObject result;
+    PyObject * obj1 = NULL;
+    QuadObject absx, phasex;
+
+    if (!PyArg_ParseTuple(args, "O:", &obj1)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadCObject(obj1, &result, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    absx.value = cabsq(result.value);
+
+    phasex.value = atan2q(cimag(result.value),crealq(result.value));
+
+    return Py_BuildValue("(OO)", \
+           QuadObject_to_PyObject(absx),
+           QuadObject_to_PyObject(phasex)
+    ); 
+};
+
+static PyObject * _rect(PyObject *self, PyObject *args){
+    QuadCObject result;
+    PyObject * obj1 = NULL, * obj2 = NULL;
+    QuadObject r, phi;
+
+    if (!PyArg_ParseTuple(args, "OO:", &obj1, &obj2)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj1, &r, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert first value to quad precision.");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj2, &phi, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert second value to quad precision.");
+        return NULL;
+    }
+
+    alloc_QuadCType(&result);
+
+    result.value = r.value*(cosq(phi.value) + sinq(phi.value)*I);
+
+    return QuadCObject_to_PyObject(result);
+
+};
+
+
+
 
 static PyMethodDef QMathCMethods[] = {
     {"_cabs", (PyCFunction) _cabs, METH_VARARGS, "cabs"},
@@ -344,6 +406,9 @@ static PyMethodDef QMathCMethods[] = {
     {"_finitecq", (PyCFunction) _finitecq, METH_VARARGS, "isfinite"},
     {"_isnancq", (PyCFunction) _isnancq, METH_VARARGS, "isnan"},
     {"_isinfcq", (PyCFunction) _isinfcq, METH_VARARGS, "isinf"},
+    {"_phase", (PyCFunction) _phase, METH_VARARGS, "phase"},
+    {"_polar", (PyCFunction) _polar, METH_VARARGS, "polar"},
+    {"_rect", (PyCFunction) _rect, METH_VARARGS, "rect"},
     {NULL, NULL, 0, NULL}
 };
 

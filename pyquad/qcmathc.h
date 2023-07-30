@@ -38,3 +38,5 @@
 #define OP_finitecq 24
 #define OP_isinfcq 25
 #define OP_isnancq 26
+
+#define OP_phase 27

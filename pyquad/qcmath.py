@@ -204,3 +204,15 @@ def isnan(x):
 
 def isinf(x):
     return _qcmathc._isinfcq(x)
+
+
+def phase(x):
+    return _qcmathc._phase(x)
+
+
+def polar(x):
+    return _qcmathc._polar(x)
+
+
+def rect(r, phi):
+    return _qcmathc._polar(r, phi)
