@@ -54,7 +54,7 @@ class TestQFloat:
         q = pq.qcmplx(5.0, 5.0)
         assert (
             str(q)
-            == '(5.000000000000000000000000000000000000e+00+5.000000000000000000000000000000000000e+00j)'
+            == "(5.000000000000000000000000000000000000e+00+5.000000000000000000000000000000000000e+00j)"
         )
 
         q = pq.qcmplx(pq.qfloat(5), pq.qfloat(5))
@@ -93,3 +93,23 @@ class TestQFloat:
         q = pq.qcmplx(pq.qfloat(5), 5)
         assert str(q - q) == str(pq.qcmplx(pq.qfloat(0), 0))
 
+    def test_mult(self):
+        c = complex(5, 5)
+        q = pq.qcmplx(c)
+        assert str(q * q) == str(pq.qcmplx(c * c))
+
+    def test_mult(self):
+        c = complex(5, 5)
+        q = pq.qcmplx(c)
+        assert str(q / q) == str(pq.qcmplx(c / c))
+
+    def test_cmp(self):
+        q1 = complex(2, 3)
+        q1a = pq.qcmplx(2, 3)
+        q2 = complex(3, 2)
+
+        assert pq.qcmplx(q1) == q1a
+        assert pq.qcmplx(q2) != q1a
+
+        with pytest.raises(TypeError) as cm:
+            q1 > q1a

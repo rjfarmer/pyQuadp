@@ -143,7 +143,6 @@ QuadCObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
 }
 
 
-
 static PyObject *
 QuadCObject_add(PyObject * o1, PyObject * o2 ){
     return QuadCObject_binary_op2(OP_add, o1, o2);
@@ -418,6 +417,41 @@ Quad_cinit(QuadCObject *self, PyObject *args, PyObject *kwds)
 }
 
 
+static PyObject *
+QuadCType_RichCompare(PyObject * o1, PyObject * o2, int opid){
+    QuadCObject q1, q2;
+    PyObject * res=NULL;
+    int real,imag;
+
+    if(!PyObject_to_QuadCObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(!PyObject_to_QuadCObject(o2, &q2, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    real = crealq(q1.value) == crealq(q2.value);
+    imag = cimagq(q1.value) == cimagq(q2.value);
+
+
+    switch (opid){
+        case Py_EQ:
+            res = real && imag ? Py_True : Py_False;
+            break;
+        case Py_NE:
+            res = !real || !imag ? Py_True : Py_False;
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    Py_INCREF(res);
+    return res;
+}
+
+
+
 static PyTypeObject QuadCType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "pyquad._qcmplx",
@@ -433,7 +467,7 @@ static PyTypeObject QuadCType = {
     .tp_init = (initproc) Quad_cinit,
     .tp_as_number = &Quad_cmath_methods,
     .tp_getset = Quad_cgetset,
-    //.tp_richcompare = (richcmpfunc) QuadCType_RichCompare,
+    .tp_richcompare = (richcmpfunc) QuadCType_RichCompare,
 };
 
 static PyModuleDef QuadCModule = {
