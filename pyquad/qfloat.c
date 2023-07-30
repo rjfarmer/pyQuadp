@@ -262,17 +262,15 @@ static PyObject *
 QuadObject_float(PyObject * o1){
     QuadObject q1;
     PyObject * result;
+    double d;
 
     if(!PyObject_to_QuadObject(o1, &q1,true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(fabsq(q1.value)> DBL_MAX){
-        PyErr_SetString(PyExc_ValueError, "Value to large for double");
-        return NULL;
-    }
+   d = QuadObject_to_double(&q1);
 
-   result = PyFloat_FromDouble((double) q1.value);
+   result = PyFloat_FromDouble(d);
 
    return result;
 }
@@ -582,6 +580,43 @@ static bool QuadObject_Check(PyObject * obj){
 }
 
 
+static double QuadObject_to_double(QuadObject * x){
+    double ret;
+    
+    if(fabsq(x->value)> DBL_MAX){
+        ret = INFINITY;
+    } else if (isinfq(x->value)) {
+        ret = INFINITY;
+    } else if (isnanq(x->value)) {
+        ret = NAN;
+    } else {
+        ret = x->value;
+    }
+
+    return ret;
+
+}
+
+static double __float128_to_double(__float128 x){
+    double ret;
+    
+    if(fabsq(x)> DBL_MAX){
+        ret = INFINITY;
+    } else if (isinfq(x)) {
+        ret = INFINITY;
+    } else if (isnanq(x)) {
+        ret = NAN;
+    } else {
+        ret = x;
+    }
+
+    return ret;
+
+}
+
+
+
+
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -617,6 +652,8 @@ PyInit_qfloat(void)
     PyQfloat_API[PyQfloat_alloc_NUM] = (void *)alloc_QuadType;
     PyQfloat_API[PyQfloat_float128_NUM] = (void *)QuadObject_float128;
     PyQfloat_API[PyQfloat_check_NUM] = (void *)QuadObject_Check;
+    PyQfloat_API[PyQfloat_dble_NUM] = (void *)QuadObject_to_double;
+    PyQfloat_API[PyQfloat_f_to_dble_NUM] = (void *) __float128_to_double;
 
 
     Py_INCREF(&QuadType);

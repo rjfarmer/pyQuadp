@@ -67,6 +67,7 @@ extern "C" {
 #define OP_matrix_multiply 35
 #define OP_inplace_matrix_multiply 36
 
+
 #define QUAD_BUF 128
 
 
@@ -81,6 +82,7 @@ static bool PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool
 static bool PyObject_to_QuadCObject2(PyObject * in1,PyObject * in2, QuadCObject * out, const bool alloc);
 static void alloc_QuadCType(QuadCObject * result);
 static __complex128 QuadCObject_complex128(QuadCObject * out);
+void QuadCObject_to_doubles(QuadCObject c, double *real, double *imag);
 
 #else
 

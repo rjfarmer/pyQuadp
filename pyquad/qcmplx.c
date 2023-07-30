@@ -350,22 +350,15 @@ PyObject* get_imag(PyObject * x, void * y){
 
 PyObject* QuadCObject_to_pycmplx(PyObject * self, PyObject * args){
     QuadCObject val;
+    double r,i;
 
     if(!PyObject_to_QuadCObject(self, &val, true)){
         return NULL;
     }
 
-    if(fabsq(crealq(val.value))> DBL_MAX){
-        PyErr_SetString(PyExc_ValueError, "Real component to large for double");
-        return NULL;
-    }
+    QuadCObject_to_doubles(val, &r, &i);
 
-    if(fabsq(cimagq(val.value))> DBL_MAX){
-        PyErr_SetString(PyExc_ValueError, "Imaginary component to large for double");
-        return NULL;
-    }
-
-    return  PyComplex_FromDoubles(crealq(val.value),cimagq(val.value));    
+    return  PyComplex_FromDoubles(r,i);    
 }
 
 static PyMemberDef Quad_cmembers[] = {
@@ -490,6 +483,15 @@ QuadCObject_to_PyObject(QuadCObject out) {
 
 static __complex128 QuadCObject_complex128(QuadCObject * out) {
     return crealq(out->value) + cimagq(out->value) * I;
+}
+
+void QuadCObject_to_doubles(QuadCObject c, double *real, double *imag){
+
+    __complex128 q = QuadCObject_complex128(&c);
+
+    *real = __float128_to_double(crealq(q));
+    *imag = __float128_to_double(cimagq(q));
+
 }
 
 

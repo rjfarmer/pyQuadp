@@ -99,9 +99,6 @@ QuadCObject_qmath_op1(const int op, PyObject * self, PyObject * args){
         case OP_cexpq:
             result.value = cexpq(result.value);
             break;
-        case OP_cexpiq:
-            result.value = cexpiq(result.value);
-            break;
         case OP_clogq:
             result.value = clogq(result.value);
             break;
@@ -205,6 +202,40 @@ static PyObject * QuadCObject_qcmath_op1_int(const int op, PyObject * self, PyOb
 
 }
 
+static PyObject *
+QuadCObject_qmath_op1_q_to_c(const int op, PyObject * self, PyObject * args){
+    QuadObject q1;
+    PyObject * obj = NULL;
+    QuadCObject result;
+
+    if (!PyArg_ParseTuple(args, "O:", &obj)){
+        PyErr_SetString(PyExc_ValueError, "Failed to parse object");
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadObject(obj, &q1, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert value to quad precision.");
+        return NULL;
+    }
+
+    alloc_QuadCType(&result);
+
+    switch(op){
+        case OP_cexpiq:
+            result.value =  cexpiq(q1.value);
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+
+    return QuadCObject_to_PyObject(result);
+
+}
+
+
+
+
 static PyObject * _cabs(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_qfloat(OP_cabsq, self, args);
 };
@@ -258,7 +289,7 @@ static PyObject * _cexp(PyObject *self, PyObject *args){
 };
 
 static PyObject * _cexpi(PyObject *self, PyObject *args){
-    return QuadCObject_qmath_op1(OP_cexpiq, self, args);
+    return QuadCObject_qmath_op1_q_to_c(OP_cexpiq, self, args);
 };
 
 static PyObject * _clog(PyObject *self, PyObject *args){

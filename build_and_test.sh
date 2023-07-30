@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python -m build && python -m pip install . && pytest && tox
+python -m build && python -m pip install . && pytest && tox -p

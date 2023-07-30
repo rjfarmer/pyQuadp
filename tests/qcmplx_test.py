@@ -80,11 +80,6 @@ class TestQFloat:
 
         assert complex(q) == complex(5, 5)
 
-        q = pq.qcmplx("1e400", "1e400")
-
-        with pytest.raises(ValueError) as cm:
-            complex(q)
-
     def test_add(self):
         q = pq.qcmplx(pq.qfloat(5), 5)
         assert str(q + q) == str(pq.qcmplx(pq.qfloat(10), 10))
