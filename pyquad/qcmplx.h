@@ -26,8 +26,6 @@ extern "C" {
 /* Total number of C API pointers */
 #define PyQcmplx_API_pointers 4
 
-#ifdef QCMPLX_MODULE
-
 #define OP_add 1
 #define OP_sub 2
 #define OP_mult 3
@@ -74,8 +72,16 @@ extern "C" {
 // exported
 typedef struct {
     PyObject_HEAD
+    union{
     __complex128 value;
+    char bytes[sizeof(__complex128)];
+    };
 } QuadCObject;
+
+
+
+
+#ifdef QCMPLX_MODULE
 
 static PyObject* QuadCObject_to_PyObject(QuadCObject out);
 static bool PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc);
@@ -85,11 +91,6 @@ static __complex128 QuadCObject_complex128(QuadCObject * out);
 void QuadCObject_to_doubles(QuadCObject c, double *real, double *imag);
 
 #else
-
-typedef struct {
-    PyObject_HEAD
-    __complex128 value;
-} QuadCObject;
 
 static void **PyQcmplx_API;
 

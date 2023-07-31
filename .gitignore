@@ -7,6 +7,11 @@ __pycache__/
 *.so
 *.s
 
+# Fortran
+*.mod
+*.original
+*.extract
+
 # Distribution / packaging
 .Python
 env/

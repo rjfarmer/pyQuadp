@@ -388,6 +388,29 @@ QuadType_RichCompare(PyObject * o1, PyObject * o2, int opid){
 }
 
 
+static PyObject * QuadObject_to_bytes(QuadObject * self, PyObject * args){
+    return PyBytes_FromStringAndSize(self->bytes, sizeof(__float128));
+}
+
+
+static PyObject * QuadObject_from_bytes(PyTypeObject *type, PyObject * arg){
+    // Gets the type object not an instance in type
+    // As its METH_O we dont need to unpack arg
+    QuadObject  res;
+
+    alloc_QuadType(&res);
+
+    if(PyBytes_Size(arg) == sizeof(res.bytes)){
+        memcpy(res.bytes, PyBytes_AsString(arg), PyBytes_Size(arg));
+    } else{
+        PyErr_SetString(PyExc_ValueError, "Byte array wrong size for a quad");
+        return NULL;
+    }
+
+    return QuadObject_to_PyObject(res);
+}
+
+
 
 // Header data
 
@@ -441,6 +464,8 @@ static PyMemberDef Quad_members[] = {
 
 
 static PyMethodDef Quad_methods[] = {
+    {"to_bytes", (PyCFunction) QuadObject_to_bytes, METH_NOARGS, "to_bytes"},
+    {"from_bytes", (PyCFunction) QuadObject_from_bytes, METH_CLASS|METH_O, "from_bytes"},
     {NULL}  /* Sentinel */
 };
 

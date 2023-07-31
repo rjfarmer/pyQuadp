@@ -221,3 +221,12 @@ class TestQFloat:
         q1 **= q2
 
         assert pq.qfloat(5.5) ** pq.qfloat(2) == q1
+
+    def test_bytes(self):
+        q1 = pq.qfloat("1.234567890")
+
+        b1 = q1.to_bytes()
+
+        q2 = pq.qfloat.from_bytes(b1)
+
+        assert q1 == q2

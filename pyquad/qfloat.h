@@ -27,7 +27,7 @@ extern "C" {
 /* Total number of C API pointers */
 #define PyQfloat_API_pointers 7
 
-#ifdef QFLOAT_MODULE
+
 
 #define OP_add 1
 #define OP_sub 2
@@ -71,11 +71,17 @@ extern "C" {
 #define QUAD_BUF 128
 
 
-// exported
 typedef struct {
     PyObject_HEAD
+    union{
     __float128 value;
+    char bytes[sizeof(__float128)];
+    };
 } QuadObject;
+
+#ifdef QFLOAT_MODULE
+
+// exported
 
 static PyObject* QuadObject_to_PyObject(QuadObject out);
 static bool PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc);
@@ -86,11 +92,6 @@ static double QuadObject_to_double(QuadObject * x);
 static double __float128_to_double(__float128 x);
 
 #else
-
-typedef struct {
-    PyObject_HEAD
-    __float128 value;
-} QuadObject;
 
 static void **PyQfloat_API;
 

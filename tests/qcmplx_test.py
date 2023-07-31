@@ -119,3 +119,12 @@ class TestQFloat:
 
         assert complex(pq.qcmplx(c1).conjugate()) == c2
         assert complex(pq.qcmplx(c2).conjugate()) == c1
+
+    def test_bytes(self):
+        q1 = pq.qcmplx("1.234567890", "9.87654321")
+
+        b1 = q1.to_bytes()
+
+        q2 = pq.qcmplx.from_bytes(b1)
+
+        assert q1 == q2

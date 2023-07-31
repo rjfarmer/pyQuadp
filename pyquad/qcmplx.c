@@ -388,6 +388,29 @@ PyObject* QuadCObject_conjugate(PyObject * self, PyObject * args){
     return  QuadCObject_to_PyObject(val);
 }
 
+static PyObject * QuadCObject_to_bytes(QuadCObject * self, PyObject * args){
+    return PyBytes_FromStringAndSize(self->bytes, sizeof(__complex128));
+}
+
+
+static PyObject * QuadCObject_from_bytes(PyTypeObject *type, PyObject * arg){
+    // Gets the type object not an instance in type
+    // As its METH_O we dont need to unpack arg
+    QuadCObject  res;
+
+    alloc_QuadCType(&res);
+
+    if(PyBytes_Size(arg) == sizeof(res.bytes)){
+        memcpy(res.bytes, PyBytes_AsString(arg), PyBytes_Size(arg));
+    } else{
+        PyErr_SetString(PyExc_ValueError, "Byte array wrong size for a complex quad");
+        return NULL;
+    }
+
+    return QuadCObject_to_PyObject(res);
+}
+
+
 
 
 static PyMemberDef Quad_cmembers[] = {
@@ -399,6 +422,8 @@ static PyMethodDef Quad_cmethods[] = {
     {"__abs__", (PyCFunction) QuadCObject_to_abs, METH_VARARGS, "Absolute value"},
     {"__complex__",(PyCFunction) QuadCObject_to_pycmplx, METH_VARARGS, "Complex number"},
     {"conjugate",(PyCFunction) QuadCObject_conjugate, METH_VARARGS, "conjugate"},
+    {"to_bytes", (PyCFunction) QuadCObject_to_bytes, METH_NOARGS, "to_bytes"},
+    {"from_bytes", (PyCFunction) QuadCObject_from_bytes, METH_CLASS|METH_O, "from_bytes"},
     {NULL}  /* Sentinel */
 };
 
