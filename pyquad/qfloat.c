@@ -411,6 +411,15 @@ static PyObject * QuadObject_from_bytes(PyTypeObject *type, PyObject * arg){
 }
 
 
+static PyObject* _as_parameter_(PyObject * self, void * y){
+    QuadObject val;
+
+    if(!PyObject_to_QuadObject(self, &val, true)){
+        return NULL;
+    }
+    return QuadObject_to_bytes(&val, NULL);    
+}
+
 
 // Header data
 
@@ -469,6 +478,11 @@ static PyMethodDef Quad_methods[] = {
     {NULL}  /* Sentinel */
 };
 
+static PyGetSetDef Quad_cgetset[] = {
+    {"_as_parameter_", _as_parameter_, NULL, "ctypes _as_parameter_" },
+    {NULL}  /* Sentinel */
+};
+
 int
 Quad_init(QuadObject *self, PyObject *args, PyObject *kwds)
 {
@@ -502,6 +516,7 @@ static PyTypeObject QuadType = {
     .tp_methods = Quad_methods,
     .tp_init = (initproc) Quad_init,
     .tp_as_number = &Quad_math_methods,
+    .tp_getset = Quad_cgetset,
     .tp_richcompare = (richcmpfunc) QuadType_RichCompare,
 };
 

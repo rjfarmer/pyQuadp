@@ -411,6 +411,16 @@ static PyObject * QuadCObject_from_bytes(PyTypeObject *type, PyObject * arg){
 }
 
 
+PyObject* _as_parameter_(PyObject * self, void * y){
+    QuadCObject val;
+
+    if(!PyObject_to_QuadCObject(self, &val, true)){
+        return NULL;
+    }
+    return QuadCObject_to_bytes(&val, NULL);    
+}
+
+
 
 
 static PyMemberDef Quad_cmembers[] = {
@@ -430,6 +440,7 @@ static PyMethodDef Quad_cmethods[] = {
 static PyGetSetDef Quad_cgetset[] = {
     {"real", get_real, NULL, "Real component" },
     {"imag", get_imag, NULL, "Imaginary component" },
+    {"_as_parameter_", _as_parameter_, NULL, "ctypes _as_parameter_" },
     {NULL}  /* Sentinel */
 };
 
