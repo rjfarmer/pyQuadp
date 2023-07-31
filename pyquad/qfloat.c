@@ -410,6 +410,19 @@ static PyObject * QuadObject_from_bytes(PyTypeObject *type, PyObject * arg){
     return QuadObject_to_PyObject(res);
 }
 
+static PyObject * QuadObject_from_param(PyTypeObject *type, PyObject * arg){
+    // Gets the type object not an instance in type
+    // As its METH_O we dont need to unpack arg
+    QuadObject  res;
+
+    if(!PyObject_to_QuadObject(arg, &res, true)){
+        return NULL;
+    }
+
+    return QuadObject_to_bytes(&res, NULL);
+}
+
+
 
 static PyObject* _as_parameter_(PyObject * self, void * y){
     QuadObject val;
@@ -466,18 +479,21 @@ static PyNumberMethods Quad_math_methods = {
     0,//  binaryfunc nb_inplace_matrix_multiply;
 };
 
-
+// attributes
 static PyMemberDef Quad_members[] = {
     {NULL}  /* Sentinel */
 };
 
 
+//Methods 
 static PyMethodDef Quad_methods[] = {
     {"to_bytes", (PyCFunction) QuadObject_to_bytes, METH_NOARGS, "to_bytes"},
     {"from_bytes", (PyCFunction) QuadObject_from_bytes, METH_CLASS|METH_O, "from_bytes"},
+    {"from_param", (PyCFunction) QuadObject_from_param, METH_CLASS|METH_O, "from_param"},
     {NULL}  /* Sentinel */
 };
 
+// Properties 
 static PyGetSetDef Quad_cgetset[] = {
     {"_as_parameter_", _as_parameter_, NULL, "ctypes _as_parameter_" },
     {NULL}  /* Sentinel */

@@ -86,6 +86,17 @@ class TestFortranPassing:
         cap = capfd.readouterr()
         assert pq.qfloat(cap.out.strip()) == q
 
+    def test_single_quad4(self, capfd):
+        func = getattr(lib, f"{mod_name}single_quad")
+        func.restype = None
+        func.argtypes = [pq.qfloat]
+
+        q = pq.qfloat("3.141592653590000061569753597723320127e+00")
+        with _captureStdOut() as cs:
+            func("3.141592653590000061569753597723320127e+00")
+        cap = capfd.readouterr()
+        assert pq.qfloat(cap.out.strip()) == q
+
     @pytest.mark.skip("No quad return support yet in ctypes")
     def test_ret_quad(self, capfd):
         func = getattr(lib, f"{mod_name}return_quad")
@@ -124,6 +135,21 @@ class TestFortranPassing:
         )
         with _captureStdOut() as cs:
             func(q)
+        cap = capfd.readouterr()
+
+        c = cap.out.strip().strip("()").split(",")
+        assert pq.qcmplx(*c) == q
+
+    def test_single_cmplx3(self, capfd):
+        func = getattr(lib, f"{mod_name}single_quadc")
+        func.restype = None
+        func.argtypes = [pq.qcmplx]
+
+        c = complex(3.14, 3.14)
+
+        q = pq.qcmplx(c)
+        with _captureStdOut() as cs:
+            func(c)
         cap = capfd.readouterr()
 
         c = cap.out.strip().strip("()").split(",")

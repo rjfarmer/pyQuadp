@@ -421,6 +421,19 @@ PyObject* _as_parameter_(PyObject * self, void * y){
 }
 
 
+static PyObject * QuadCObject_from_param(PyTypeObject *type, PyObject * arg){
+    // Gets the type object not an instance in type
+    // As its METH_O we dont need to unpack arg
+    QuadCObject  res;
+
+    if(!PyObject_to_QuadCObject(arg, &res, true)){
+        return NULL;
+    }
+
+    return QuadCObject_to_bytes(&res, NULL);
+}
+
+
 
 
 static PyMemberDef Quad_cmembers[] = {
@@ -434,6 +447,7 @@ static PyMethodDef Quad_cmethods[] = {
     {"conjugate",(PyCFunction) QuadCObject_conjugate, METH_VARARGS, "conjugate"},
     {"to_bytes", (PyCFunction) QuadCObject_to_bytes, METH_NOARGS, "to_bytes"},
     {"from_bytes", (PyCFunction) QuadCObject_from_bytes, METH_CLASS|METH_O, "from_bytes"},
+    {"from_param", (PyCFunction) QuadCObject_from_param, METH_CLASS|METH_O, "from_param"},
     {NULL}  /* Sentinel */
 };
 
