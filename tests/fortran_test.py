@@ -3,6 +3,7 @@ import os
 import select
 from pprint import pprint
 import time
+import platform
 
 import pytest
 
@@ -11,7 +12,17 @@ import pyquad.qmath as qm
 import pyquad.qcmath as qcm
 
 
-libname = "./tests/quad.so"
+def lib_ext():
+    os = platform.system()
+    if os == "Darwin":
+        return "dylib"
+    elif os == "Windows":
+        return "dll"
+    else:
+        return "so"
+
+
+libname = f"./tests/quad.{lib_ext()}"
 mod_name = "__testq_MOD_"
 lib = ctypes.CDLL(libname)
 
