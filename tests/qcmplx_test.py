@@ -112,3 +112,10 @@ class TestQFloat:
     def test_abs(self):
         q1 = complex(2, 3)
         assert abs(q1) == abs(complex(q1))
+
+    def test_conjugate(self):
+        c1 = complex(1, -1)
+        c2 = complex(1, 1)
+
+        assert complex(pq.qcmplx(c1).conjugate()) == c2
+        assert complex(pq.qcmplx(c2).conjugate()) == c1

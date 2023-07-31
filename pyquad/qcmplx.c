@@ -376,6 +376,18 @@ PyObject* QuadCObject_to_abs(PyObject * self, PyObject * args){
     return  QuadObject_to_PyObject(res);
 }
 
+PyObject* QuadCObject_conjugate(PyObject * self, PyObject * args){
+    QuadCObject val;
+
+    if(!PyObject_to_QuadCObject(self, &val, true)){
+        return NULL;
+    }
+
+    val.value = crealq(val.value) - cimagq(val.value)*I;
+
+    return  QuadCObject_to_PyObject(val);
+}
+
 
 
 static PyMemberDef Quad_cmembers[] = {
@@ -386,6 +398,7 @@ static PyMemberDef Quad_cmembers[] = {
 static PyMethodDef Quad_cmethods[] = {
     {"__abs__", (PyCFunction) QuadCObject_to_abs, METH_VARARGS, "Absolute value"},
     {"__complex__",(PyCFunction) QuadCObject_to_pycmplx, METH_VARARGS, "Complex number"},
+    {"conjugate",(PyCFunction) QuadCObject_conjugate, METH_VARARGS, "conjugate"},
     {NULL}  /* Sentinel */
 };
 
