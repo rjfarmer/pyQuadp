@@ -581,7 +581,7 @@ static PyNumberMethods Quad_math_methods = {
     (binaryfunc) QuadObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
     (binaryfunc) QuadObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
 
-    (unaryfunc) QuadObject_int,//  unaryfunc nb_index;
+    0,//(unaryfunc) QuadObject_int,//  unaryfunc nb_index;
 
     0,//  binaryfunc nb_matrix_multiply;
     0,//  binaryfunc nb_inplace_matrix_multiply;
