@@ -102,61 +102,61 @@ regarding behavior of exceptional values. While routines from ``libquadmath`` (t
 
 | Name     | Implemented | Descritpion |
 |----------|-------------|-------------|
-| ceil | :x: |  |
+| ceil | :heavy_check_mark: |  |
 | comb | :x: |  |
-| copysign | :x: |  |
-| fabs | :x: |  |
+| copysign | :heavy_check_mark: |  |
+| fabs |:heavy_check_mark: |  |
 | factorial | :x: |  |
-| floor | :x: |  |
-| fmod | :x: |  |
-| frexp | :x: |  |
+| floor | :heavy_check_mark: |  |
+| fmod | :heavy_check_mark: |  |
+| frexp | :heavy_check_mark: |  |
 | fsum | :x: |  |
 | gcd | :x: |  |
 | isclose | :x: |  |
 | isfinite | :x: |  |
-| isinf | :x: |  |
-| isnan | :x: |  |
+| isinf | :heavy_check_mark: |  |
+| isnan | :heavy_check_mark: |  |
 | isqrt | :x: |  |
 | lcm | :x: |  |
-| ldexp | :x: |  |
-| modf | :x: |  |
-| nextafter | :x: |  |
+| ldexp | :heavy_check_mark: |  |
+| modf | :heavy_check_mark: |  |
+| nextafter | :heavy_check_mark: |  |
 | perm | :x: |  |
 | prod | :x: |  |
-| remainder | :x: |  |
-| trunc | :x: |  |
+| remainder | :heavy_check_mark: |  |
+| trunc | :heavy_check_mark: |  |
 | ulp | :x: |  |
-| cbrt | :x: |  |
-| exp | :x: |  |
-| exp2 | :x: |  |
-| expm1 | :x: |  |
-| log | :x: |  |
-| log1p | :x: |  |
-| log2 | :x: |  |
-| log10 | :x: |  |
-| pow | :x: |  |
-| sqrt | :x: |  |
-| acos | :x: |  |
-| asin | :x: |  |
-| atan | :x: |  |
-| atan2 | :x: |  |
-| cos | :x: |  |
+| cbrt | :heavy_check_mark: |  |
+| exp | :heavy_check_mark: |  |
+| exp2 | :heavy_check_mark: |  |
+| expm1 | :heavy_check_mark: |  |
+| log | :heavy_check_mark: |  |
+| log1p | :heavy_check_mark: |  |
+| log2 | :heavy_check_mark: |  |
+| log10 | :heavy_check_mark: |  |
+| pow | :heavy_check_mark: |  |
+| sqrt | :heavy_check_mark: |  |
+| acos | :heavy_check_mark: |  |
+| asin | :heavy_check_mark: |  |
+| atan | :heavy_check_mark: |  |
+| atan2 | :heavy_check_mark: |  |
+| cos | :heavy_check_mark: |  |
 | dist | :x: |  |
-| hypot | :x: |  |
-| sin | :x: |  |
-| tan | :x: |  |
+| hypot | :heavy_check_mark: |  |
+| sin | :heavy_check_mark: |  |
+| tan | :heavy_check_mark: |  |
 | degress | :x: |  |
 | radians | :x: |  |
-| acosh | :x: |  |
-| asinh| :x: |  |
-| atanh| :x: |  |
-| cosh| :x: |  |
-| sinh| :x: |  |
-| tanh| :x: |  |
-| erf| :x: |  |
-| erfc| :x: |  |
-| gamma| :x: |  |
-| lgamma| :x: |  |
+| acosh | :heavy_check_mark: |  |
+| asinh| :heavy_check_mark: |  |
+| atanh| :heavy_check_mark: |  |
+| cosh| :heavy_check_mark: |  |
+| sinh| :heavy_check_mark: |  |
+| tanh| :heavy_check_mark: |  |
+| erf| :heavy_check_mark: |  |
+| erfc| :heavy_check_mark: |  |
+| gamma| :heavy_check_mark: |  |
+| lgamma| :heavy_check_mark: |  |
 | pi | :heavy_check_mark: |  |  
 | e | :heavy_check_mark: |  |  
 | tau | :heavy_check_mark: |  |  
@@ -245,28 +245,28 @@ These are available from ``qcmath``
 
 | Name     | Implemented | Descritpion |
 |----------|-------------|-------------|
-| phase | :x: | |
-| polar | :x: | |
-| rect | :x: | |
-| exp | :x: | |
-| log | :x: | |
-| log10 | :x: | |
-| sqrt | :x: | |
-| acos | :x: | |
-| asin | :x: | |
-| atan | :x: | |
-| cos | :x: | |
-| sin | :x: | |
-| tan | :x: | |
-| acosh | :x: | |
-| asinh | :x: | |
-| atanh | :x: | |
-| cosh | :x: | |
-| sinh | :x: | |
-| tanh | :x: | |
-| isfinite | :x: | |
-| isinf | :x: | |
-| isnan | :x: | |
+| phase | :heavy_check_mark: | |
+| polar | :heavy_check_mark: | |
+| rect | :heavy_check_mark: | |
+| exp | :heavy_check_mark: | |
+| log | :heavy_check_mark: | |
+| log10 | :heavy_check_mark: | |
+| sqrt | :heavy_check_mark: | |
+| acos | :heavy_check_mark: | |
+| asin | :heavy_check_mark: | |
+| atan | :heavy_check_mark: | |
+| cos | :heavy_check_mark: | |
+| sin | :heavy_check_mark: | |
+| tan | :heavy_check_mark: | |
+| acosh | :heavy_check_mark: | |
+| asinh | :heavy_check_mark: | |
+| atanh | :heavy_check_mark: | |
+| cosh | :heavy_check_mark: | |
+| sinh | :heavy_check_mark: | |
+| tanh | :heavy_check_mark: | |
+| isfinite | :heavy_check_mark: | |
+| isinf | :heavy_check_mark: | |
+| isnan | :heavy_check_mark: | |
 | isclose | :x: | |
 | pi | :heavy_check_mark: | |
 | e | :heavy_check_mark: | |
