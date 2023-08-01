@@ -688,17 +688,9 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
 
     if(PyUnicode_Check(in)){
         // Is a string
-
-        PyObject * obj_str = PyObject_Str(in);
-        if (obj_str==NULL){
-            PyErr_Print();
-            return false;
-        }
-
-        const char *buf = PyUnicode_AsUTF8(obj_str);
+        const char *buf = PyUnicode_AsUTF8(in);
         if (buf==NULL){
             PyErr_Print();
-            Py_DECREF(obj_str);
             return false;
         }
 
