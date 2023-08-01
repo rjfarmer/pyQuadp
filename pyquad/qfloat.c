@@ -489,6 +489,13 @@ QuadObject___setstate__(QuadObject *self, PyObject *state) {
 }
 
 
+Py_hash_t QuadObject_hash(QuadObject *self){
+    // Note this wont have the nice property that Python has with numeric values being equal 
+    // hash to the same value i.e hash(1) == hash(1.0)
+    return PyObject_Hash(QuadObject_to_bytes(self, NULL));
+}
+
+
 
 // Header data
 
@@ -592,6 +599,7 @@ static PyTypeObject QuadType = {
     .tp_as_number = &Quad_math_methods,
     .tp_getset = Quad_cgetset,
     .tp_richcompare = (richcmpfunc) QuadType_RichCompare,
+    .tp_hash = (hashfunc) QuadObject_hash,
 };
 
 static PyModuleDef QuadModule = {

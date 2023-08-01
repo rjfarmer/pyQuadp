@@ -238,3 +238,15 @@ class TestQFloat:
         result = pickle.loads(pickled_value)
 
         assert result == q1
+
+    def test_hash(self):
+        q1 = pq.qfloat("1.234567890")
+        q2 = pq.qfloat("1.234567899999")
+        h1 = hash(q1)
+        h2 = hash(q2)
+
+        assert not h1 == h2
+
+        # Check dict lookup
+        x = {q1: "abc"}
+        assert x[q1] == "abc"
