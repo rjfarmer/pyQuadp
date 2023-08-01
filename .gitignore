@@ -103,3 +103,7 @@ ENV/
 
 docs/build
 docs/source/_build
+
+#valgrind
+vgcore.*
+massif.*
