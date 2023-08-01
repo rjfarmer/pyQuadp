@@ -2,6 +2,7 @@
 
 import os, sys
 from pprint import pprint
+import pickle
 
 import numpy as np
 import pytest
@@ -128,3 +129,10 @@ class TestQFloat:
         q2 = pq.qcmplx.from_bytes(b1)
 
         assert q1 == q2
+
+    def test_pickle(self):
+        q1 = pq.qcmplx("1.234567890", "9.87654321")
+        pickled_value = pickle.dumps(q1)
+        result = pickle.loads(pickled_value)
+
+        assert result == q1

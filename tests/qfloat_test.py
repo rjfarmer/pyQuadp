@@ -5,6 +5,7 @@ from pprint import pprint
 
 import numpy as np
 import pytest
+import pickle
 
 import pyquad as pq
 
@@ -230,3 +231,10 @@ class TestQFloat:
         q2 = pq.qfloat.from_bytes(b1)
 
         assert q1 == q2
+
+    def test_pickle(self):
+        q1 = pq.qfloat("1.234567890")
+        pickled_value = pickle.dumps(q1)
+        result = pickle.loads(pickled_value)
+
+        assert result == q1

@@ -68,6 +68,8 @@ extern "C" {
 
 #define QUAD_BUF 128
 
+#define PICKLE_VERSION_KEY  "_pickle_version"
+#define PICKLE_VERSION 1
 
 // exported
 typedef struct {

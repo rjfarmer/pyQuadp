@@ -433,6 +433,62 @@ static PyObject* _as_parameter_(PyObject * self, void * y){
     return QuadObject_to_bytes(&val, NULL);    
 }
 
+//Pickling
+static PyObject *
+QuadObject___getstate__(QuadObject *self, PyObject *Py_UNUSED(ignored)) {
+    PyObject *ret = Py_BuildValue("{sisO}",
+                                  PICKLE_VERSION_KEY, PICKLE_VERSION,
+                                  "bytes", QuadObject_to_bytes(self, NULL));
+    return ret;
+}
+
+	
+
+/* Un-pickle the object */
+static PyObject *
+QuadObject___setstate__(QuadObject *self, PyObject *state) {
+
+    /* Error check. */
+    if (!PyDict_CheckExact(state)) {
+        PyErr_SetString(PyExc_ValueError, "Pickled object is not a dict.");
+        return NULL;
+    }
+    /* Version check. */
+    /* Borrowed reference but no need to increment as we create a C long
+     * from it. */
+    PyObject *temp = PyDict_GetItemString(state, PICKLE_VERSION_KEY);
+    if (temp == NULL) {
+        /* PyDict_GetItemString does not set any error state so we have to. */
+        PyErr_Format(PyExc_KeyError, "No \"%s\" in pickled dict.",
+                     PICKLE_VERSION_KEY);
+        return NULL;
+    }
+    int pickle_version = (int) PyLong_AsLong(temp);
+    if (pickle_version != PICKLE_VERSION) {
+        PyErr_Format(PyExc_ValueError,
+                     "Pickle version mismatch. Got version %d but expected version %d.",
+                     pickle_version, PICKLE_VERSION);
+        return NULL;
+    }
+
+    temp = PyDict_GetItemString(state, "bytes");
+
+    if (temp == NULL) {
+        PyErr_Format(PyExc_KeyError, "No bytes in pickled dict.");
+        return NULL;
+    }
+
+    if(PyBytes_Size(temp) == sizeof(self->bytes)){
+        memcpy(self->bytes, PyBytes_AsString(temp), PyBytes_Size(temp));
+    } else{
+        PyErr_SetString(PyExc_ValueError, "Byte array wrong size for a quad");
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+
 
 // Header data
 
@@ -490,6 +546,8 @@ static PyMethodDef Quad_methods[] = {
     {"to_bytes", (PyCFunction) QuadObject_to_bytes, METH_NOARGS, "to_bytes"},
     {"from_bytes", (PyCFunction) QuadObject_from_bytes, METH_CLASS|METH_O, "from_bytes"},
     {"from_param", (PyCFunction) QuadObject_from_param, METH_CLASS|METH_O, "from_param"},
+    {"__getstate__", (PyCFunction) QuadObject___getstate__, METH_NOARGS, "Pickle a quad object object" },
+    {"__setstate__", (PyCFunction) QuadObject___setstate__, METH_O,"Un-pickle a quad object object"},
     {NULL}  /* Sentinel */
 };
 
