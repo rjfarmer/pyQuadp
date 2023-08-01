@@ -250,3 +250,12 @@ class TestQFloat:
         # Check dict lookup
         x = {q1: "abc"}
         assert x[q1] == "abc"
+
+    def test_hex(self):
+        q = pq.qfloat("1.414213562373095048801688724209698079")
+
+        assert q.hex() == "0x1.6a09e667f3bcc908b2fb1366ea95p+0"
+
+        q2 = pq.qfloat.fromhex("0x1.6a09e667f3bcc908b2fb1366ea95p+0")
+
+        assert q2 == q

@@ -496,6 +496,51 @@ Py_hash_t QuadObject_hash(QuadObject *self){
 }
 
 
+static PyObject * QuadObject_to_hex(QuadObject * self, PyObject * args){
+    char buf[QUAD_BUF];
+
+    int n = quadmath_snprintf (buf, sizeof buf, "%Qa", self->value);
+    if ((size_t) n < sizeof buf){
+        return PyUnicode_FromFormat("%s",buf);
+    } else {
+        PyErr_SetString(PyExc_ValueError, "Can not convert value to hex");
+        return NULL;
+    }
+}
+
+
+static PyObject * QuadObject_from_hex(PyTypeObject *type, PyObject * arg){
+    // Gets the type object not an instance in type
+    // As its METH_O we dont need to unpack arg
+    QuadObject res;
+
+    alloc_QuadType(&res);
+
+    if(PyUnicode_Check(arg)){
+        // Is a string
+        const char *buf = PyUnicode_AsUTF8AndSize(arg, NULL);
+        if (buf==NULL){
+            PyErr_Print();
+            return NULL;
+        }
+
+        char *sp=NULL;
+        res.value = strtoflt128(buf, NULL);
+        if(sp!=NULL){
+            if(strcmp(sp,"")!=0){
+                PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+                return NULL;
+            }
+        }
+        return QuadObject_to_PyObject(res);
+    } else {
+        PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+        return NULL;
+    }
+
+}
+
+
 
 // Header data
 
@@ -555,6 +600,9 @@ static PyMethodDef Quad_methods[] = {
     {"from_param", (PyCFunction) QuadObject_from_param, METH_CLASS|METH_O, "from_param"},
     {"__getstate__", (PyCFunction) QuadObject___getstate__, METH_NOARGS, "Pickle a quad object object" },
     {"__setstate__", (PyCFunction) QuadObject___setstate__, METH_O,"Un-pickle a quad object object"},
+    {"hex", (PyCFunction) QuadObject_to_hex, METH_NOARGS, "to_hex"},
+    {"fromhex", (PyCFunction) QuadObject_from_hex, METH_CLASS|METH_O, "from_hex"},    
+    
     {NULL}  /* Sentinel */
 };
 
