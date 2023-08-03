@@ -9,7 +9,7 @@ qmath = Extension(
 
 qcmath = Extension(
     "qcmathc",
-    sources=["pyquad/qfloat.c", "pyquad/qcmplx.c","pyquad/qcmathc.c"],
+    sources=["pyquad/qfloat.c", "pyquad/qcmplx.c", "pyquad/qcmathc.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )
@@ -29,7 +29,14 @@ qcmplx = Extension(
     extra_compile_args=["-ggdb"],
 )
 
+qint = Extension(
+    "qint",
+    sources=["pyquad/qint.c"],
+    libraries=["quadmath"],
+    extra_compile_args=["-ggdb"],
+)
+
 
 setup(
-    ext_modules=[qmath, qcmath, qfloat, qcmplx],
+    ext_modules=[qfloat, qcmplx, qint, qmath, qcmath],
 )
