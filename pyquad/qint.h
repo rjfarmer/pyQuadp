@@ -66,6 +66,7 @@ extern "C" {
 #define OP_inplace_matrix_multiply 36
 
 #define QUAD_BUF 128
+#define QUAD_INT_STR_BUF QUAD_BUF+2 // +1 for sign bit and +1 for \0
 
 #define PICKLE_VERSION_KEY  "_pickle_version"
 #define PICKLE_VERSION 1

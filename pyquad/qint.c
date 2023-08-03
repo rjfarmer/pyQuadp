@@ -17,9 +17,9 @@
 static PyObject *
 QuadIObject_repr(QuadIObject * obj)
 {
-    char buf[QUAD_BUF+2];
+    char buf[QUAD_INT_STR_BUF];
 
-    if(int128_to_str(obj->value, buf, QUAD_BUF+2, 10)){
+    if(int128_to_str(obj->value, buf, QUAD_INT_STR_BUF, 10)){
         return PyUnicode_FromFormat("qint('%s')",buf);
     } else {
         return PyUnicode_FromFormat("Bad qint",buf);
@@ -30,9 +30,9 @@ QuadIObject_repr(QuadIObject * obj)
 static PyObject *
 QuadIObject_str(QuadIObject * obj)
 {
-    char buf[QUAD_BUF+2];
+    char buf[QUAD_INT_STR_BUF];
 
-    if(int128_to_str(obj->value, buf, QUAD_BUF+2, 10)){
+    if(int128_to_str(obj->value, buf, QUAD_INT_STR_BUF, 10)){
         return PyUnicode_FromFormat("%s",buf);
     } else {
         return PyUnicode_FromFormat("Bad qint",buf);
@@ -495,11 +495,10 @@ Py_hash_t QuadIObject_hash(QuadIObject *self){
 
 
 static PyObject * QuadIObject_to_hex(QuadIObject * self, PyObject * args){
-    char buf[QUAD_BUF];
+    char buf[QUAD_INT_STR_BUF];
 
-    int n = quadmath_snprintf (buf, sizeof buf, "%Qa", self->value);
-    if ((size_t) n < sizeof buf){
-        return PyUnicode_FromFormat("%s",buf);
+    if(int128_to_str(self->value,buf,QUAD_INT_STR_BUF,16)){
+        return PyUnicode_FromFormat("0x%s",buf);
     } else {
         PyErr_SetString(PyExc_ValueError, "Can not convert value to hex");
         return NULL;
@@ -796,23 +795,28 @@ bool str_to_int128(const char *str, Py_ssize_t length, __int128 *result){
             }
         }
 
+        if(isalpha(sym))
+            return false;
+
         if(isdigit(sym)){
+            // Compute result+= (sym - '0')*count;count*=10
+
+            // we are working from back of the string forwards
+            // so each time count increases by 10 we are shifting to the next
+            // digit in base 10
+
             if(__builtin_mul_overflow(sym - '0', count, &sum))
                 return false;
 
-            printf("%d %d\n",i,(int)sum);
             if(__builtin_add_overflow(sum, *result, &r))
                 return false;
             else
                 *result = r;
-            printf("%d %d\n",i,(int)*result);
 
             if(__builtin_mul_overflow(count, 10, &c))
                 return false;
             else
                 count = c;
-            printf("%d %d\n",i,(int)count);
-            printf("\n");
         }
 
     }
@@ -842,8 +846,6 @@ bool int128_to_str(__int128 num, char* str, int len, int base)
 			str[i++] = '0' + digit;
 		else
 			str[i++] = 'A' + digit - 0xA;
-
-        printf("%d %d %c\n",i,digit,str[i-1]);
 
 		sum /= base;
 	}while (sum && (i < (len - 1)));
