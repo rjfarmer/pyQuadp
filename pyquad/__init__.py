@@ -8,3 +8,5 @@ from qcmplx import _qcmplx as _qcmplx  # Need to make pickling work
 
 from qint import _qint as qint
 from qint import _qint as _qint  # Need to make pickling work
+
+from .constant import *

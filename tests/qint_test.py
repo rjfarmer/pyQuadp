@@ -9,9 +9,12 @@ import pickle
 
 import pyquad as pq
 
+from hypothesis import given, assume
+from hypothesis.strategies import floats, integers
+
 
 class Testqint:
-    def test_make(self):
+    def test_make_basic(self):
         q = pq.qint(1)
         assert str(q) == "1"
 
@@ -26,6 +29,14 @@ class Testqint:
 
         with pytest.raises(TypeError) as cm:
             q = pq.qint("abc")
+
+    @given(integers())
+    def test_make(self, x):
+        assume(x <= pq.INT128_MAX)
+        assume(x >= pq.INT128_MIN)
+
+        assert pq.qint(x) == x
+        assert str(pq.qint(str(x))) == str(x)
 
     def test_add(self):
         q1 = pq.qint(1)

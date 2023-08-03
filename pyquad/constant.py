@@ -2,6 +2,7 @@
 
 from qfloat import _qfloat as qfloat
 from qcmplx import _qcmplx as qcmplx
+from qint import _qint as qint
 import ctypes as _ctypes
 
 # libquadmath constants
@@ -32,6 +33,8 @@ FLT128_DIG = 33
 FLT128_MIN_10_EXP = -4931
 FLT128_MAX_10_EXP = 4932
 
+INT128_MAX = qint("170141183460469231731687303715884105727")
+INT128_MIN = -INT128_MAX - 1
 
 # Export python math library constant names
 
@@ -41,8 +44,8 @@ tau = 2 * pi
 inf = qfloat("inf")
 nan = qfloat("nan")
 
-infj = qcmplx(0.0,qfloat("inf"))
-nanj = qcmplx(0.0,qfloat("nan"))
+infj = qcmplx(0.0, qfloat("inf"))
+nanj = qcmplx(0.0, qfloat("nan"))
 
 
 # Ctype data

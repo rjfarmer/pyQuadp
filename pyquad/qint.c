@@ -248,10 +248,16 @@ QuadIObject_int(PyObject * o1){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-
-   result = PyLong_FromLongLong(q1.value);
-   if(PyErr_Occurred())
-       return NULL;
+    if(q1.value <= LLONG_MAX && q1.value >= LLONG_MIN){
+        result = PyLong_FromLongLong(q1.value);
+        if(PyErr_Occurred()){
+            printf("Could not convert to PyLong\n");
+            return NULL;
+        }
+    } else {
+        PyErr_SetString(PyExc_ValueError, "Value too large for a python int.");
+        return NULL;
+    }
 
    return result;
 }
@@ -704,7 +710,20 @@ PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
         // Is a number
         if(PyLong_Check(in)){
             // int
-            out->value = (__int128) PyLong_AsLong(in);
+            // Convert to string as we may be to big for PyLong
+            PyObject * str = PyUnicode_FromFormat("%S",in);
+            Py_ssize_t len;
+            const char *buf = PyUnicode_AsUTF8AndSize(str, &len);
+            if (buf==NULL){
+                PyErr_Print();
+                return false;
+            }
+
+            if(!str_to_int128(buf,len,&out->value)){
+                PyErr_SetString(PyExc_TypeError, "Could not convert int to integer quad precision.");
+                return false;
+            }
+
             return true;
         }
     }
@@ -766,7 +785,7 @@ PyInit_qint(void)
     return m;
 }
 
-
+// TODO: Handle hex values?
 bool str_to_int128(const char *str, Py_ssize_t length, __int128 *result){
     __int128 count=1;
     char sym;
@@ -795,15 +814,16 @@ bool str_to_int128(const char *str, Py_ssize_t length, __int128 *result){
             }
         }
 
-        if(isalpha(sym))
+        if(isalpha(sym)){
             return false;
+        }
 
         if(isdigit(sym)){
             // Compute result+= (sym - '0')*count;count*=10
 
             // we are working from back of the string forwards
-            // so each time count increases by 10 we are shifting to the next
-            // digit in base 10
+            // so each time count increases by a factor 10 we are 
+            // shifting to the next digit in base 10
 
             if(__builtin_mul_overflow(sym - '0', count, &sum))
                 return false;
@@ -813,17 +833,23 @@ bool str_to_int128(const char *str, Py_ssize_t length, __int128 *result){
             else
                 *result = r;
 
-            if(__builtin_mul_overflow(count, 10, &c))
-                return false;
-            else
-                count = c;
+            // Peak ahead to see if there is more still to process
+            // otherwise we may overflow and error even though we 
+            // dont need count again if we are close to max __int128
+            if(i>0){
+                if(isdigit(str[i-1])){
+                    if(__builtin_mul_overflow(count, 10, &c))
+                        return false;
+                    else
+                        count = c;
+                }
+            }
         }
 
     }
     *result *= sign;
     return true;
 }
-
 
 bool int128_to_str(__int128 num, char* str, int len, int base)
 {
@@ -836,7 +862,7 @@ bool int128_to_str(__int128 num, char* str, int len, int base)
 		return false;
 
     if(sum<0){
-        sum=abs(sum);
+        sum=-1*sum;
         neg=true;
     }
 	do
@@ -855,7 +881,6 @@ bool int128_to_str(__int128 num, char* str, int len, int base)
         str[i] = '-';
         i++;
     }
-	
     str[i] = '\0';
 
     if (strlen(str) == 0)
