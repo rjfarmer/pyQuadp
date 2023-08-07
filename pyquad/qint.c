@@ -150,6 +150,87 @@ QuadIObject_binary_self_op2(const int op, PyObject * o1, PyObject * o2 ){
     return QuadIObject_to_PyObject(q1);
 }
 
+static PyObject *
+QuadIObject_binary_op2_int(const int op, PyObject * o1, PyObject * o2 ){
+
+    QuadIObject q1, result;
+    long int i;
+
+    if(!PyObject_to_QuadIObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(!PyLong_Check(o2)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    alloc_QuadIType(&result);
+
+    i = PyLong_AsLong(o2);
+
+    switch(op){
+        case OP_lshift:
+            result.value = q1.value << i;
+            break;
+        case OP_rshift:
+            result.value = q1.value >> i;
+            break;
+        case OP_and:
+            result.value = q1.value & i;
+            break;
+        case OP_xor:
+            result.value = q1.value ^ i;
+            break;
+        case OP_or:
+            result.value = q1.value | i;
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    return QuadIObject_to_PyObject(result);
+}
+
+
+static PyObject *
+QuadIObject_binary_self_op2_int(const int op, PyObject * o1, PyObject * o2 ){
+
+    QuadIObject q1;
+    long int i;
+
+    if(!PyObject_to_QuadIObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(!PyLong_Check(o2)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    i = PyLong_AsLong(o2);
+
+    switch(op){
+        case OP_inplace_lshift:
+            q1.value <<= i;
+            break;
+        case OP_inplace_rshift:
+            q1.value >>= i;
+            break;
+        case OP_inplace_and:
+            q1.value &= i;
+            break;
+        case OP_inplace_xor:
+            q1.value ^= i;
+            break;
+        case OP_inplace_or:
+            q1.value |= i;
+            break;
+        default:
+            Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    return QuadIObject_to_PyObject(q1);
+}
+
 
 
 static PyObject *
@@ -239,6 +320,20 @@ static int QuadIObject_bool(PyObject * o1){
 
 }
 
+static PyObject * QuadIObject_invert(PyObject * o1){
+
+    QuadIObject q1;
+
+    if(!PyObject_to_QuadIObject(o1, &q1, true)){
+        PyErr_SetString(PyExc_TypeError, "Can not convert to quad int");
+        return NULL;
+    }
+
+    q1.value = ~q1.value;
+
+    return QuadIObject_to_PyObject(q1);
+}
+
 static PyObject *
 QuadIObject_int(PyObject * o1){
     QuadIObject q1;
@@ -251,7 +346,6 @@ QuadIObject_int(PyObject * o1){
     if(q1.value <= LLONG_MAX && q1.value >= LLONG_MIN){
         result = PyLong_FromLongLong(q1.value);
         if(PyErr_Occurred()){
-            printf("Could not convert to PyLong\n");
             return NULL;
         }
     } else {
@@ -515,34 +609,33 @@ static PyObject * QuadIObject_to_hex(QuadIObject * self, PyObject * args){
 static PyObject * QuadIObject_from_hex(PyTypeObject *type, PyObject * arg){
     // Gets the type object not an instance in type
     // As its METH_O we dont need to unpack arg
-    QuadIObject res;
+    // QuadIObject res;
 
-    alloc_QuadIType(&res);
+    // alloc_QuadIType(&res);
 
-    if(PyUnicode_Check(arg)){
-        // Is a string
-        const char *buf = PyUnicode_AsUTF8AndSize(arg, NULL);
-        if (buf==NULL){
-            PyErr_Print();
-            return NULL;
-        }
+    // if(PyUnicode_Check(arg)){
+    //     // Is a string
+    //     const char *buf = PyUnicode_AsUTF8AndSize(arg, NULL);
+    //     if (buf==NULL){
+    //         PyErr_Print();
+    //         return NULL;
+    //     }
 
-        char *sp=NULL;
-        res.value = strtoflt128(buf, NULL);
-        if(sp!=NULL){
-            if(strcmp(sp,"")!=0){
-                PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
-                return NULL;
-            }
-        }
-        return QuadIObject_to_PyObject(res);
-    } else {
-        PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
-        return NULL;
-    }
-
+    //     char *sp=NULL;
+    //     res.value = strtoflt128(buf, NULL);
+    //     if(sp!=NULL){
+    //         if(strcmp(sp,"")!=0){
+    //             PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+    //             return NULL;
+    //         }
+    //     }
+    //     return QuadIObject_to_PyObject(res);
+    // } else {
+    //     PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+    //     return NULL;
+    // }
+    Py_RETURN_NOTIMPLEMENTED;
 }
-
 
 
 // Header data
@@ -558,7 +651,7 @@ static PyNumberMethods QuadI_math_methods = {
     (unaryfunc) QuadIObject_pos,
     (unaryfunc) QuadIObject_abs,
     (inquiry) QuadIObject_bool,
-    0,//  unaryfunc nb_invert;
+    (unaryfunc) QuadIObject_invert,//  unaryfunc nb_invert;
     0,//  binaryfunc nb_lshift;
     0,//  binaryfunc nb_rshift;
     0,//  binaryfunc nb_and;
@@ -868,10 +961,10 @@ bool int128_to_str(__int128 num, char* str, int len, int base)
 	do
 	{
 		digit = (sum % base);
-		if (digit < 0xA)
+		if (digit < 10)
 			str[i++] = '0' + digit;
 		else
-			str[i++] = 'A' + digit - 0xA;
+			str[i++] = 'A' + digit - 10;
 
 		sum /= base;
 	}while (sum && (i < (len - 1)));
