@@ -1,5 +1,6 @@
 from .constant import *
 import qmathc as _qmathc
+import math as _math
 
 
 def acosq(x):
@@ -599,19 +600,19 @@ def trunc(x):
 
 
 def comb(n, k):
-    raise NotImplementedError
+    return _math.comb(n, k)
 
 
 def factorial(n):
-    raise NotImplementedError
+    return _math.comb(n)
 
 
-def fsum(iterable):
-    raise NotImplementedError
+def fsum(*iterable):
+    return _math.fsum(iterable)
 
 
-def gcd(integers):
-    raise NotImplementedError
+def gcd(*integers):
+    return _math.gcd(integers)
 
 
 def isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0):
@@ -619,23 +620,23 @@ def isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0):
 
 
 def isfinite(x):
-    raise NotImplementedError
+    return _qmathc._finitecq(x)
 
 
 def isqrt(n):
-    raise NotImplementedError
+    return floorq(sqrtq(n))
 
 
-def lcm(integers):
-    raise NotImplementedError
+def lcm(*integers):
+    return _math.lcm(integers)
 
 
 def perm(iterable, *, start=1):
-    raise NotImplementedError
+    return _math.perm(iterable, start=start)
 
 
 def prod(iterable, *, start=1):
-    raise NotImplementedError
+    return _math.perm(iterable, start=start)
 
 
 def ulp(x):
@@ -643,12 +644,12 @@ def ulp(x):
 
 
 def dist(p, q):
-    raise NotImplementedError
+    return _math.dist(p, q)
 
 
 def degrees(x):
-    raise NotImplementedError
+    return _qmathc.qfloat(x) * _qmathc.qfloat(180.0) / M_PIq
 
 
 def radians(x):
-    raise NotImplementedError
+    return _qmathc.qfloat(x) * M_PIq / _qmathc.qfloat(180.0)

@@ -283,30 +283,30 @@ These are available from ``qcmath``
 
 | Name     | Implemented | Descritpion |
 |----------|-------------|-------------|
-| cabsq | :x: |  complex absolute value function |
-| cargq | :x: | calculate the argument |
-| cimagq | :x: | imaginary part of complex number |
-| crealq | :x: | real part of complex number | 
-| cacoshq | :x: | complex arc hyperbolic cosine function |
-| cacosq | :x: | complex arc cosine function |
-| casinhq | :x: | complex arc hyperbolic sine function |
-| casinq | :x: | complex arc sine function |
-| catanhq | :x: | complex arc hyperbolic tangent function |
-| catanq | :x: | complex arc tangent function |
-| ccosq: | :x: | complex cosine function |
-| ccoshq | :x: | complex hyperbolic cosine function |
-| cexpq | :x: | complex exponential function |
-| cexpiq | :x: | computes the exponential function of ``i`` times a real value |
-| clogq | :x: | complex natural logarithm |
-| clog10q | :x: | complex base 10 logarithm |
-| conjq | :x: | complex conjugate function |
-| cpowq | :x: | complex power function |
-| cprojq | :x: | project into Riemann Sphere |
-| csinq | :x: | complex sine function |
-| csinhq | :x: | complex hyperbolic sine function |
-| csqrtq | :x: | complex square root |
-| ctanq | :x: | complex tangent function |
-| ctanhq | :x: | complex hyperbolic tangent function |
+| cabsq | :heavy_check_mark: |  complex absolute value function |
+| cargq | :heavy_check_mark: | calculate the argument |
+| cimagq | :heavy_check_mark: | imaginary part of complex number |
+| crealq | :heavy_check_mark: | real part of complex number | 
+| cacoshq | :heavy_check_mark: | complex arc hyperbolic cosine function |
+| cacosq | :heavy_check_mark: | complex arc cosine function |
+| casinhq | :heavy_check_mark: | complex arc hyperbolic sine function |
+| casinq | :heavy_check_mark: | complex arc sine function |
+| catanhq | :heavy_check_mark: | complex arc hyperbolic tangent function |
+| catanq | :heavy_check_mark: | complex arc tangent function |
+| ccosq: | :heavy_check_mark: | complex cosine function |
+| ccoshq | :heavy_check_mark: | complex hyperbolic cosine function |
+| cexpq | :heavy_check_mark: | complex exponential function |
+| cexpiq | :heavy_check_mark: | computes the exponential function of ``i`` times a real value |
+| clogq | :heavy_check_mark: | complex natural logarithm |
+| clog10q | :heavy_check_mark: | complex base 10 logarithm |
+| conjq | :heavy_check_mark: | complex conjugate function |
+| cpowq | :heavy_check_mark: | complex power function |
+| cprojq | :heavy_check_mark: | project into Riemann Sphere |
+| csinq | :heavy_check_mark: | complex sine function |
+| csinhq | :heavy_check_mark: | complex hyperbolic sine function |
+| csqrtq | :heavy_check_mark: | complex square root |
+| ctanq | :heavy_check_mark: | complex tangent function |
+| ctanhq | :heavy_check_mark: | complex hyperbolic tangent function |
 
 
 ### Constants from  ``libquadthmath`` library.
