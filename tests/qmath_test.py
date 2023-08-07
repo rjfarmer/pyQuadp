@@ -12,8 +12,8 @@ import decimal
 from hypothesis import given, assume
 from hypothesis.strategies import floats, integers
 
-import pyquad as pq
-import pyquad.qmath as qm
+import pyquadp as pq
+import pyquadp.qmath as qm
 
 
 class TestQMathFloat:

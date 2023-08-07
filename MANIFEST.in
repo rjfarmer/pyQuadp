@@ -3,4 +3,4 @@ include README.md
 include COPYING.txt
 include setup.py
 include setup.cfg
-recursive-include pyquad *.c *.h
+recursive-include pyquadp *.c *.h

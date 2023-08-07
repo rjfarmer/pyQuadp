@@ -1,4 +1,4 @@
 #!/bin/bash
 
-rm -rf *.so build pyquad.egg-info/
+rm -rf *.so build dist pyquadp.egg-info/
 python -m build && python -m pip install .

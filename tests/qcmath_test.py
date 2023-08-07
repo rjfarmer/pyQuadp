@@ -13,9 +13,9 @@ import decimal
 from hypothesis import given, assume
 from hypothesis.strategies import floats, complex_numbers
 
-import pyquad as pq
-import pyquad.qmath as qm
-import pyquad.qcmath as qcm
+import pyquadp as pq
+import pyquadp.qmath as qm
+import pyquadp.qcmath as qcm
 
 
 class TestQCMathFloat:

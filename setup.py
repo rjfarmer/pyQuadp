@@ -2,21 +2,21 @@ from setuptools import setup, Extension
 
 qmath = Extension(
     "qmathc",
-    sources=["pyquad/qfloat.c", "pyquad/qmathc.c"],
+    sources=["pyquadp/qfloat.c", "pyquadp/qmathc.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )
 
 qcmath = Extension(
     "qcmathc",
-    sources=["pyquad/qfloat.c", "pyquad/qcmplx.c", "pyquad/qcmathc.c"],
+    sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c", "pyquadp/qcmathc.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )
 
 qfloat = Extension(
     "qfloat",
-    sources=["pyquad/qfloat.c"],
+    sources=["pyquadp/qfloat.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )
@@ -24,14 +24,14 @@ qfloat = Extension(
 
 qcmplx = Extension(
     "qcmplx",
-    sources=["pyquad/qfloat.c", "pyquad/qcmplx.c"],
+    sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )
 
 qint = Extension(
     "qint",
-    sources=["pyquad/qint.c"],
+    sources=["pyquadp/qint.c"],
     libraries=["quadmath"],
     extra_compile_args=["-ggdb"],
 )

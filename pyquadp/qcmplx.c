@@ -591,7 +591,7 @@ QuadCType_RichCompare(PyObject * o1, PyObject * o2, int opid){
 
 static PyTypeObject QuadCType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "pyquad._qcmplx",
+    .tp_name = "pyquadp._qcmplx",
     .tp_doc = PyDoc_STR("A single quad precision complex variable"),
     .tp_basicsize = sizeof(QuadCObject),
     .tp_itemsize = 0,
@@ -610,7 +610,7 @@ static PyTypeObject QuadCType = {
 
 static PyModuleDef QuadCModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquad.qcmplx",
+    .m_name = "pyquadp.qcmplx",
     .m_doc = "Quad precision module for complex quad's.",
     .m_size = -1,
 };

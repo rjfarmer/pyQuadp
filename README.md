@@ -1,10 +1,10 @@
-[![Continuous Integration](https://github.com/rjfarmer/pyQuad/actions/workflows/ci.yml/badge.svg)](https://github.com/rjfarmer/pyQuad/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/rjfarmer/pyQuad/badge.svg?branch=main)](https://coveralls.io/github/rjfarmer/pyQuad?branch=main)
+[![Continuous Integration](https://github.com/rjfarmer/pyQuadp/actions/workflows/ci.yml/badge.svg)](https://github.com/rjfarmer/pyQuadp/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/rjfarmer/pyQuadp/badge.svg?branch=main)](https://coveralls.io/github/rjfarmer/pyQuadp?branch=main)
 [![Python versions](https://img.shields.io/pypi/pyversions/gfort2py.svg)](https://img.shields.io/pypi/pyversions/gfort2py.svg)
 [![gfortran versions](https://img.shields.io/badge/gfortran-8%7C9%7C10%7C11%7C12-blue)](https://img.shields.io/badge/gfortran-8%7C9%7C10%7C11%7C12-blue)
 
 
-# pyQuad
+# pyQuadp
 
 Python interface to gcc's libquadmath for quad (128-bit) precision maths.
 
@@ -32,23 +32,23 @@ sudo dnf install libquadmath libquadmath-devel
 A quad precision number is created by passing either a int, float, or string to ``qfloat``:
 
 ````python
-import pyquad
+import pyquadp
 
-q = pyquad.qfloat(1)
-q = pyquad.qfloat(1.0)
-q = pyquad.qfloat('1')
+q = pyquadp.qfloat(1)
+q = pyquadp.qfloat(1.0)
+q = pyquadp.qfloat('1')
 ````
 
 A ``qfloat`` implements Python's NumberProtocol, thus it can be used like any other number, either with basic math operations or in rich comparisons:
 
 ````python
 
-q1 = pyquad.qfloat(1)
-q2 = pyquad.qfloat(2)
+q1 = pyquadp.qfloat(1)
+q2 = pyquadp.qfloat(2)
 
-q1+q2 # pyquad.qfloat(3)
-q1*q2  # pyquad.qfloat(2)
-q1+=q2 # pyquad.qfloat(3)
+q1+q2 # pyquadp.qfloat(3)
+q1*q2  # pyquadp.qfloat(2)
+q1+=q2 # pyquadp.qfloat(3)
 
 q1 <= q2 # True
 q1 == q2 # False
@@ -61,13 +61,13 @@ str(q) # "1.000000000000000000000000000000000000e+00"
 A quad precision number is created by passing either a complex variable or two ints, floats, strs, or qfloats to ``qcmplx``:
 
 ````python
-import pyquad
+import pyquadp
 
-q = pyquad.qcmplx(complex(1,1))
-q = pyquad.qcmplx(1,1.0)
-q = pyquad.qcmplx('1',1.0)
-q = pyquad.qcmplx('1','1')
-q = pyquad.qcmplx(pyquad.qfloat(1), pyquad.qfloat('1'))
+q = pyquadp.qcmplx(complex(1,1))
+q = pyquadp.qcmplx(1,1.0)
+q = pyquadp.qcmplx('1',1.0)
+q = pyquadp.qcmplx('1','1')
+q = pyquadp.qcmplx(pyquadp.qfloat(1), pyquadp.qfloat('1'))
 ````
 
 Note that strings must be split into two components. There is no support for ``1+1j`` (unless passed via complex('1+1j'))
@@ -77,12 +77,12 @@ Note that strings must be split into two components. There is no support for ``1
 
 ````python
 
-q1 = pyquad.qfloat(1)
-q2 = pyquad.qfloat(2)
+q1 = pyquadp.qfloat(1)
+q2 = pyquadp.qfloat(2)
 
-q1+q2 # pyquad.qfloat(3)
-q1*q2  # pyquad.qfloat(2)
-q1+=q2 # pyquad.qfloat(3)
+q1+q2 # pyquadp.qfloat(3)
+q1*q2  # pyquadp.qfloat(2)
+q1+=q2 # pyquadp.qfloat(3)
 
 q1 <= q2 # True
 q1 == q2 # False

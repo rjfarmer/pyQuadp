@@ -782,7 +782,7 @@ Quad_qinit(QuadIObject *self, PyObject *args, PyObject *kwds)
 
 static PyTypeObject QuadIType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "pyquad._qint",
+    .tp_name = "pyquadp._qint",
     .tp_doc = PyDoc_STR("A single integer quad precision variable"),
     .tp_basicsize = sizeof(QuadIObject),
     .tp_itemsize = 0,
@@ -801,7 +801,7 @@ static PyTypeObject QuadIType = {
 
 static PyModuleDef QuadIModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquad.qint",
+    .m_name = "pyquadp.qint",
     .m_doc = "Quad precision module for scalar integer quad's.",
     .m_size = -1,
 };

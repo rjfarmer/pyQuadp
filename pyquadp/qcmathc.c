@@ -441,7 +441,7 @@ static PyMethodDef QMathCMethods[] = {
 
 PyModuleDef QMathCModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquad.qcmathc",
+    .m_name = "pyquadp.qcmathc",
     .m_doc = "Quad precision complex math library.",
     .m_size = -1,
     .m_methods = QMathCMethods,

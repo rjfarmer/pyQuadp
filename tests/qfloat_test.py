@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import pickle
 
-import pyquad as pq
+import pyquadp as pq
 
 
 class TestQFloat:

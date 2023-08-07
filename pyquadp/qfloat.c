@@ -633,7 +633,7 @@ Quad_init(QuadObject *self, PyObject *args, PyObject *kwds)
 
 static PyTypeObject QuadType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "pyquad._qfloat",
+    .tp_name = "pyquadp._qfloat",
     .tp_doc = PyDoc_STR("A single quad precision variable"),
     .tp_basicsize = sizeof(QuadObject),
     .tp_itemsize = 0,
@@ -652,7 +652,7 @@ static PyTypeObject QuadType = {
 
 static PyModuleDef QuadModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquad.qfloat",
+    .m_name = "pyquadp.qfloat",
     .m_doc = "Quad precision module for scalar quad's.",
     .m_size = -1,
 };
