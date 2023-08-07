@@ -252,3 +252,34 @@ class Testqint:
         q2 = pq.qint.fromhex("0x11f71fb2b5f")
 
         assert q2 == q
+
+    def test_shifts(self):
+        q1 = pq.qint(5)
+        assert q1 << 3 == 5 << 3
+        q1 = pq.qint(5)
+        assert q1 >> 3 == 5 >> 3
+        q1 = pq.qint(5)
+        assert ~q1 == ~5
+        q1 = pq.qint(5)
+        assert q1 & 8 == 5 & 8
+        q1 = pq.qint(5)
+        assert q1 | 8 == 5 | 8
+        q1 = pq.qint(5)
+        assert q1 ^ 3 == 5 ^ 3
+
+    def test_inplace_shifts(self):
+        q1 = pq.qint(5)
+        q1 <<= 3
+        assert q1 == 5 << 3
+        q1 = pq.qint(5)
+        q1 >>= 5
+        assert q1 == 5 >> 3
+        q1 = pq.qint(5)
+        q1 &= 8
+        assert q1 == 5 & 8
+        q1 = pq.qint(5)
+        q1 |= 8
+        assert q1 == 5 | 8
+        q1 = pq.qint(500)
+        q1 ^= 3
+        assert q1 == 500 ^ 3
