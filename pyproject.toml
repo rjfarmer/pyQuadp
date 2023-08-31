@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "pyquadp"
+description = "Python's bindings for gcc's libquadmath"
+
+authors = [
+    {name="Robert Farmer", email="robert.j.farmer37@gmail.com"}
+]
+
+dependencies =[
+    "numpy"
+]
+
+license = {text = "GPLv2"}
+readme = {file = "README.md", content-type = "text/markdown"}
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Mathematics"
+]
+
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/rjfarmer/pyquadp"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+addopts = "-s"
+
+[tool.setuptools_scm]
+
+
+[tool.cibuildwheel]
+test-requires = "pytest"
+test-command = "pytest {project}/tests"
+
+archs = ["auto"]
+
+before-test = [
+    "pip install -r requirements_dev.txt"
+    ]
+
+before-test-linux = "sudo apt-get install gfortran"
+before-test-macos = [
+    "brew install gcc@12",
+    "ln -s /usr/local/bin/gfortran-12} /usr/local/bin/gfortran",
+    "ln -s /usr/local/bin/gcc-12 /usr/local/bin/gcc"
+    ]
+
