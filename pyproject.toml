@@ -46,17 +46,22 @@ addopts = "-s"
 
 [tool.cibuildwheel]
 test-requires = "pytest"
-test-command = "pytest {project}/tests"
+test-command = "pytest {package}/tests"
 
-archs = ["auto"]
+archs = ["native"]
 
 before-test = [
-    "pip install -r requirements_dev.txt"
+    "pip install -r {project}/requirements_dev.txt"
     ]
 
-before-test-linux = "sudo apt-get install gfortran"
-before-test-macos = [
+[tool.cibuildwheel.linux]
+before-test = "yum install -y gcc-gfortran"
+archs = ["x86_64"]
+
+[tool.cibuildwheel.macos]
+before-test = [
     "brew install gcc@12",
-    "ln -s /usr/local/bin/gfortran-12} /usr/local/bin/gfortran",
+    "ln -s /usr/local/bin/gfortran-12 /usr/local/bin/gfortran",
     "ln -s /usr/local/bin/gcc-12 /usr/local/bin/gcc"
     ]
+archs = ["x86_64", "universal2", "arm64"]
