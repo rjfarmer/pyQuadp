@@ -1,5 +1,5 @@
 include requirements_dev.txt
 include README.md
 include COPYING.txt
-include setup.py
+include pyproject.toml setup.py
 recursive-include pyquadp *.c *.h
