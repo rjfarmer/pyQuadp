@@ -266,16 +266,16 @@ static PyObject * QuadObject_qmath_op1_int(const int op, PyObject * self, PyObje
 
     switch(op){
         case OP_finiteq:
-            result =  PyLong_FromLong(finiteq(q1.value));
+            result =  PyBool_FromLong(finiteq(q1.value));
             break;
         case OP_isinfq:
-            result =  PyLong_FromLong(isinfq(q1.value));
+            result =  PyBool_FromLong(isinfq(q1.value));
             break;
         case OP_ilogbq:
             result =  PyLong_FromLong(ilogbq(q1.value));
             break;
         case OP_isnanq:
-            result =  PyLong_FromLong(isnanq(q1.value));
+            result =  PyBool_FromLong(isnanq(q1.value));
             break;
         case OP_issignalingq:
             #if __GNUC__ > 90000

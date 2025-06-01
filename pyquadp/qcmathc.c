@@ -185,13 +185,13 @@ static PyObject * QuadCObject_qcmath_op1_int(const int op, PyObject * self, PyOb
 
     switch(op){
         case OP_finitecq:
-            result =  PyLong_FromLong(finiteq(crealq(q1.value))&& (finiteq(cimagq(q1.value))));
+            result =  PyBool_FromLong(finiteq(crealq(q1.value))&& (finiteq(cimagq(q1.value))));
             break;
         case OP_isinfcq:
-            result =  PyLong_FromLong(isinfq(crealq(q1.value))|| (isinfq(cimagq(q1.value))));
+            result =  PyBool_FromLong(isinfq(crealq(q1.value))|| (isinfq(cimagq(q1.value))));
             break;
         case OP_isnancq:
-            result =  PyLong_FromLong(isnanq(crealq(q1.value)) || (isnanq(cimagq(q1.value))));
+            result =  PyBool_FromLong(isnanq(crealq(q1.value)) || (isnanq(cimagq(q1.value))));
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;

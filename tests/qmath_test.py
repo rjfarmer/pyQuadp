@@ -203,13 +203,13 @@ class TestQMathFloat:
     def test_ilogbq(self, x):
         assert qm.ilogbq(x) == int(math.log2(math.fabs(x)))
 
-    @given(floats(allow_infinity=False, allow_nan=False))
+    @given(floats())
     def test_isinfq(self, x):
-        assert float(qm.isinfq(x)) == pytest.approx(math.isinf(x))
+        assert qm.isinfq(x) == math.isinf(x)
 
-    @given(floats(allow_infinity=False, allow_nan=False))
+    @given(floats())
     def test_isnanq(self, x):
-        assert float(qm.isnanq(x)) == pytest.approx(math.isnan(x))
+        assert qm.isnanq(x) == math.isnan(x)
 
     def test_issignalingq(self):
         try:
@@ -599,13 +599,13 @@ class TestQMathPy:
     def test_hypot(self, x, y):
         assert float(qm.hypot(x, y)) == pytest.approx(math.hypot(x, y))
 
-    @given(floats(allow_infinity=False, allow_nan=False))
+    @given(floats())
     def test_isinf(self, x):
-        assert float(qm.isinf(x)) == pytest.approx(math.isinf(x))
+        assert qm.isinf(x) == math.isinf(x)
 
-    @given(floats(allow_infinity=False, allow_nan=False))
+    @given(floats())
     def test_isnan(self, x):
-        assert float(qm.isnan(x)) == pytest.approx(math.isnan(x))
+        assert qm.isnan(x) == math.isnan(x)
 
     @given(
         floats(
