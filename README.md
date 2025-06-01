@@ -216,7 +216,7 @@ regarding behavior of exceptional values. While routines from ``libquadmath`` (t
 |modfq | :heavy_check_mark: | decompose the floating-point number |
 |nanq | :heavy_check_mark: | return quiet NaN |
 |nearbyintq | :heavy_check_mark: | round to nearest integer |
-|nextafterq | ::heavy_check_mark: | next representable floating-point number |
+|nextafterq | :heavy_check_mark: | next representable floating-point number |
 |powq | :heavy_check_mark: | power function |
 |remainderq | :heavy_check_mark: | remainder function |
 |remquoq | :heavy_check_mark: | remainder and part of quotient |

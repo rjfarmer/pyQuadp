@@ -4,8 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 
-
-
 [project]
 name = "pyquadp"
 description = "Python's bindings for gcc's libquadmath"
@@ -57,3 +55,14 @@ exclude_dirs = ["tests"]
 source = ["pyQuadp"]
 parallel = true
 concurrency = ["multiprocessing", "thread"]
+
+
+[tool.setuptools]
+ext-modules = [
+    {name='pyquadp.qmathc', sources=["pyquadp/qfloat.c", "pyquadp/qmathc.c"], libraries=['quadmath']},
+    {name='pyquadp.qcmathc', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c", "pyquadp/qcmathc.c"], libraries=['quadmath']},
+    {name='pyquadp.qfloat', sources=["pyquadp/qfloat.c"], libraries=['quadmath']},
+    {name='pyquadp.qcmplx', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"], libraries=['quadmath']},
+    {name='pyquadp.qint', sources=["pyquadp/qint.c"], libraries=['quadmath']},
+]
+
