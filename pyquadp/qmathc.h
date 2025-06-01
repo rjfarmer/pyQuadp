@@ -1,4 +1,5 @@
 #define PY_SSIZE_T_CLEAN
+#define Py_LIMITED_API 3
 #include <Python.h>
 #include <quadmath.h>
 #include <stdbool.h>
