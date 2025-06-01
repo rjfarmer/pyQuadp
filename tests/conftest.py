@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: GPL-2.0+
 
 import subprocess
-import pytest
-import _pytest.skipping
+import os
+from packaging.version import Version
 
 
 def pytest_configure(config):
-    subprocess.call(["make", "clean"], shell=True, cwd="tests")
-    subprocess.call(["make"], shell=True, cwd="tests")
+    """This is run when pytest is setting up in the controller process and in the workers too"""
+    if hasattr(config, "workerinput"):
+        # prevent workers to run the same code
+        return
 
-
-def pytest_sessionfinish(session, exitstatus):
-    subprocess.call(["make", "clean"], shell=True, cwd="tests")
+    subprocess.call(["make", "-f", "Makefile", "all"], cwd="tests")

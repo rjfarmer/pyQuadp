@@ -1,72 +1,59 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
-
+requires = ["setuptools>=64", "wheel", "setuptools_scm[toml]>=8.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+
 
 
 [project]
 name = "pyquadp"
 description = "Python's bindings for gcc's libquadmath"
-requires-python = ">=3.7"
 
 authors = [
     {name="Robert Farmer", email="robert.j.farmer37@gmail.com"}
 ]
 
 dependencies =[
-    "numpy"
+    "numpy",
+    "scipy"
 ]
 
-license = {text = "GPLv2"}
-readme = {file = "README.md", content-type = "text/markdown"}
-
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "GPLv2+"}
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Topic :: Scientific/Engineering :: Mathematics"
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Code Generators",
 ]
 
 dynamic = ["version"]
 
+
 [project.urls]
 Homepage = "https://github.com/rjfarmer/pyquadp"
 
+[project.optional-dependencies]
+test = ['pytest','pytest-xdist','hypothesis']
+coverage = ['pytest', 'pytest-xdist', 'pytest-cov']
+dev = ['pre-commit','black', 'pytest','pytest-xdist']
+perfomance = ["pytest", "pytest-codspeed", 'pytest-xdist']
+
+
 [tool.pytest.ini_options]
-testpaths = [
-    "tests",
-]
-addopts = "-s"
+addopts = "-s -n auto"
+testpaths = ["tests"]
 
-[tool.setuptools]
-packages = ["pyquadp"]
+[tool.bandit]
+exclude_dirs = ["tests"]
 
-
-[tool.setuptools_scm]
-
-
-[tool.cibuildwheel]
-test-requires = "pytest"
-test-command = "pytest {project}"
-
-archs = ["native"]
-
-before-test = [
-    "pip install -r {project}/requirements_dev.txt"
-    ]
-
-[tool.cibuildwheel.linux]
-before-test = "yum install -y gcc-gfortran"
-archs = ["x86_64"]
-
-[tool.cibuildwheel.macos]
-before-test = [
-    "brew install gcc@12",
-    "ln -s /usr/local/bin/gfortran-12 /usr/local/bin/gfortran",
-    "ln -s /usr/local/bin/gcc-12 /usr/local/bin/gcc"
-    ]
-archs = ["x86_64", "arm64"]
+[tool.coverage.run]
+source = ["pyQuadp"]
+parallel = true
+concurrency = ["multiprocessing", "thread"]

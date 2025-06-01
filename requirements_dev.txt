@@ -1,8 +1,0 @@
-pytest
-hypothesis
-scipy
-wheel
-build
-tox
-tox-gh-actions
-coveralls
