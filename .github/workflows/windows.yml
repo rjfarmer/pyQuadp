@@ -38,9 +38,12 @@ jobs:
           version: ${{ matrix.toolchain.version }}
     
       - name: Build
+        env:
+          CC: ${{ steps.setup-fortran.outputs.CC }}
+          FC: ${{ steps.setup-fortran.outputs.FC }}
         run: |
           echo '[build]' > setup.cfg
-          echo 'compiler = ${{ steps.setup-fortran.outputs.CC }}' >> setup.cfg 
+          echo 'compiler = mingw32' >> setup.cfg 
           python -m pip install .[test]
 
   
