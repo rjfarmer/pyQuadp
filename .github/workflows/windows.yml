@@ -38,7 +38,7 @@ jobs:
           version: ${{ matrix.toolchain.version }}
     
       - name: Build
-        run:
+        run: |
           echo '[build]' > setup.cfg
           echo 'compiler = ${{ steps.setup-fortran.outputs.CC }}' >> setup.cfg 
           python -m pip install .[test]
