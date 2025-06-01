@@ -1,5 +1,8 @@
 name: Publish to pypi
-on: [push]
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   pypi-publish:
@@ -7,33 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/pyquadp
+      url: https://pypi.org/project/pyQuadP
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
       with:
-        cache: 'pip'
+        persist-credentials: false
 
-    - name: Install dependices
+    - name: Set up Python 
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
       run: |
-        sudo apt-get install gfortran-12
         python -m pip install --upgrade pip
-        pip install -r requirements_dev.txt
+        python -m pip install build wheel pytest pytest-xdist
     - name: Build a binary wheel and a source tarball
       run: >-
-        python3 -m
-        build
-        --sdist
-        --wheel
-        --outdir dist/
-        .
+        python3 -m build
     - name: Test
       run: |
-        pip install dist/pyquadp*.tar.gz
-        pytest
+        python -m pip install dist/pyquadp*.tar.gz
+        python -m pytest
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
