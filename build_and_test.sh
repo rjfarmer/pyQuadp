@@ -1,3 +1,6 @@
 #!/bin/bash
 
-python -m build && python -m pip install . && python -m pytest 
+rm -rf build dist
+python -m build
+python -m pip install dist/pyquadp*.whl
+python -m pytest 
