@@ -29,7 +29,7 @@ jobs:
         run: |
           choco install make
           python -m pip install --upgrade pip
-          python -m pip install build wheel
+          python -m pip install build wheel pytest pytest-xdist hypothesis
 
       - uses: fortran-lang/setup-fortran@v1
         id: setup-fortran
@@ -45,7 +45,8 @@ jobs:
           echo '[build]' > setup.cfg
           echo 'compiler = mingw32' >> setup.cfg 
           python -m build
-          python -m pip install .[test]
+          ls dist
+          python -m pip install dist/pyquadp*.whl
 
   
       - name: Test
