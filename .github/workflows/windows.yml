@@ -38,6 +38,7 @@ jobs:
           version: ${{ matrix.toolchain.version }}
     
       - name: Build
+        shell: bash
         env:
           CC: ${{ steps.setup-fortran.outputs.CC }}
           FC: ${{ steps.setup-fortran.outputs.FC }}
