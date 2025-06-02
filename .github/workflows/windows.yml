@@ -45,7 +45,7 @@ jobs:
           echo '[build]' > setup.cfg
           echo 'compiler = mingw32' >> setup.cfg 
           python -m build
-          python -m pip install dist/pyquadp*.whl 
+          python -m pip install dist\pyquadp*.whl 
 
   
       - name: Test
