@@ -313,107 +313,107 @@ static PyObject * QuadObject_qmath_op1_int(const int op, PyObject * self, PyObje
 }
 
 
-static PyObject * _acos(PyObject *self, PyObject *args){
+static PyObject * _qacos(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_acosq, self, args);
 };
 
-static PyObject * _acosh(PyObject *self, PyObject *args){
+static PyObject * _qacosh(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_acoshq, self, args);
 };
 
-static PyObject * _asin(PyObject *self, PyObject *args){
+static PyObject * _qasin(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_asinq, self, args);
 };
 
-static PyObject * _asinh(PyObject *self, PyObject *args){
+static PyObject * _qasinh(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_asinhq, self, args);
 };
 
-static PyObject * _atan(PyObject *self, PyObject *args){
+static PyObject * _qatan(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_atanq, self, args);
 };
 
-static PyObject * _atanh(PyObject *self, PyObject *args){
+static PyObject * _qatanh(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_atanhq, self, args);
 };
 
-static PyObject * _atan2(PyObject *self, PyObject *args){
+static PyObject * _qatan2(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_atan2q, self, args);
 };
 
-static PyObject * _cbrt(PyObject *self, PyObject *args){
+static PyObject * _qcbrt(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_cbrtq, self, args);
 };
 
-static PyObject * _ceil(PyObject *self, PyObject *args){
+static PyObject * _qceil(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_ceilq, self, args);
 };
 
-static PyObject * _copysign(PyObject *self, PyObject *args){
+static PyObject * _qcopysign(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_copysignq, self, args);
 };
 
-static PyObject * _cosh(PyObject *self, PyObject *args){
+static PyObject * _qcosh(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_coshq, self, args);
 };
 
-static PyObject * _cos(PyObject *self, PyObject *args){
+static PyObject * _qcos(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_cosq, self, args);
 };
 
-static PyObject * _erf(PyObject *self, PyObject *args){
+static PyObject * _qerf(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_erfq, self, args);
 };
 
-static PyObject * _erfc(PyObject *self, PyObject *args){
+static PyObject * _qerfc(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_erfcq, self, args);
 };
 
-static PyObject * _exp2(PyObject *self, PyObject *args){
+static PyObject * _qexp2(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_exp2q, self, args);
 };
 
-static PyObject * _exp(PyObject *self, PyObject *args){
+static PyObject * _qexp(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_expq, self, args);
 };
 
-static PyObject * _expm1(PyObject *self, PyObject *args){
+static PyObject * _qexpm1(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_expm1q, self, args);
 };
 
-static PyObject * _fabs(PyObject *self, PyObject *args){
+static PyObject * _qfabs(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_fabsq, self, args);
 };
 
-static PyObject * _fdim(PyObject *self, PyObject *args){
+static PyObject * _qfdim(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_fdimq, self, args);
 };
 
-static PyObject * _finite(PyObject *self, PyObject *args){
+static PyObject * _qfinite(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_finiteq, self, args);
 };
 
-static PyObject * _floor(PyObject *self, PyObject *args){
+static PyObject * _qfloor(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_floorq, self, args);
 };
 
-static PyObject * _fma(PyObject *self, PyObject *args){
+static PyObject * _qfma(PyObject *self, PyObject *args){
     return QuadObject_qmath_op3(OP_fmaq, self, args);
 };
 
-static PyObject * _fmax(PyObject *self, PyObject *args){
+static PyObject * _qfmax(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_fmaxq, self, args);
 };
 
-static PyObject * _fmin(PyObject *self, PyObject *args){
+static PyObject * _qfmin(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_fminq, self, args);
 };
 
-static PyObject * _fmod(PyObject *self, PyObject *args){
+static PyObject * _qfmod(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_fmodq, self, args);
 };
 
-static PyObject * _frexp(PyObject *self, PyObject *args){
+static PyObject * _qfrexp(PyObject *self, PyObject *args){
     QuadObject result;
     PyObject * obj1 = NULL;
     int eptr;
@@ -437,35 +437,35 @@ static PyObject * _frexp(PyObject *self, PyObject *args){
 
 };
 
-static PyObject * _hypot(PyObject *self, PyObject *args){
+static PyObject * _qhypot(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_hypotq, self, args);
 };
 
-static PyObject * _ilogb(PyObject *self, PyObject *args){
+static PyObject * _qilogb(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_ilogbq, self, args);
 };
 
-static PyObject * _isinf(PyObject *self, PyObject *args){
+static PyObject * _qisinf(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_isinfq, self, args);
 };
 
-static PyObject * _isnan(PyObject *self, PyObject *args){
+static PyObject * _qisnan(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_isnanq, self, args);
 };
 
-static PyObject * _issignaling(PyObject *self, PyObject *args){
+static PyObject * _qissignaling(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_issignalingq, self, args);
 };
 
-static PyObject * _j0(PyObject *self, PyObject *args){
+static PyObject * _qj0(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_j0q, self, args);
 };
 
-static PyObject * _j1(PyObject *self, PyObject *args){
+static PyObject * _qj1(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_j1q, self, args);
 };
 
-static PyObject * _jn(PyObject *self, PyObject *args){
+static PyObject * _qjn(PyObject *self, PyObject *args){
     QuadObject result;
     PyObject * obj1 = NULL,* obj2 = NULL;
     long n;
@@ -496,7 +496,7 @@ static PyObject * _jn(PyObject *self, PyObject *args){
     return QuadObject_to_PyObject(result);
 };
 
-static PyObject * _ldexp(PyObject *self, PyObject *args){
+static PyObject * _qldexp(PyObject *self, PyObject *args){
     QuadObject result;
     PyObject * obj1 = NULL,* obj2 = NULL;
     long n;
@@ -527,47 +527,47 @@ static PyObject * _ldexp(PyObject *self, PyObject *args){
     return QuadObject_to_PyObject(result);
 };
 
-static PyObject * _lgamma(PyObject *self, PyObject *args){
+static PyObject * _qlgamma(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_lgammaq, self, args);
 };
 
-static PyObject * _llrint(PyObject *self, PyObject *args){
+static PyObject * _qllrint(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_llrintq, self, args);
 };
 
-static PyObject * _llround(PyObject *self, PyObject *args){
+static PyObject * _qllround(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_llroundq, self, args);
 };
 
-static PyObject * _logb(PyObject *self, PyObject *args){
+static PyObject * _qlogb(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_logbq, self, args);
 };
 
-static PyObject * _log(PyObject *self, PyObject *args){
+static PyObject * _qlog(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_logq, self, args);
 };
 
-static PyObject * _log10(PyObject *self, PyObject *args){
+static PyObject * _qlog10(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_log10q, self, args);
 };
 
-static PyObject * _log1p(PyObject *self, PyObject *args){
+static PyObject * _qlog1p(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_log1pq, self, args);
 };
 
-static PyObject * _log2(PyObject *self, PyObject *args){
+static PyObject * _qlog2(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_log2q, self, args);
 };
 
-static PyObject * _lrint(PyObject *self, PyObject *args){
+static PyObject * _qlrint(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_lrintq, self, args);
 };
 
-static PyObject * _lround(PyObject *self, PyObject *args){
+static PyObject * _qlround(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_lroundq, self, args);
 };
 
-static PyObject * _modf(PyObject *self, PyObject *args){
+static PyObject * _qmodf(PyObject *self, PyObject *args){
     QuadObject result, q1;
     PyObject * obj1 = NULL;
 
@@ -591,23 +591,23 @@ static PyObject * _modf(PyObject *self, PyObject *args){
     ); 
 };
 
-static PyObject * _nearbyint(PyObject *self, PyObject *args){
+static PyObject * _qnearbyint(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_nearbyintq, self, args);
 };
 
-static PyObject * _nextafter(PyObject *self, PyObject *args){
+static PyObject * _qnextafter(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_nextafterq, self, args);
 };
 
-static PyObject * _pow(PyObject *self, PyObject *args){
+static PyObject * _qpow(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_powq, self, args);
 };
 
-static PyObject * _remainder(PyObject *self, PyObject *args){
+static PyObject * _qremainder(PyObject *self, PyObject *args){
     return QuadObject_qmath_op2(OP_remainderq, self, args);
 };
 
-static PyObject * _remquo(PyObject *self, PyObject *args){
+static PyObject * _qremquo(PyObject *self, PyObject *args){
     QuadObject result, q1;
     PyObject * obj1 = NULL, * obj2 = NULL;
     int quo;
@@ -636,15 +636,15 @@ static PyObject * _remquo(PyObject *self, PyObject *args){
 };
 
 
-static PyObject * _rint(PyObject *self, PyObject *args){
+static PyObject * _qrint(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_rintq, self, args);
 };
 
-static PyObject * _round(PyObject *self, PyObject *args){
+static PyObject * _qround(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_roundq, self, args);
 };
 
-static PyObject * _scalbln(PyObject *self, PyObject *args){
+static PyObject * _qscalbln(PyObject *self, PyObject *args){
     QuadObject result;
     PyObject * obj1 = NULL,* obj2 = NULL;
     long n;
@@ -674,7 +674,7 @@ static PyObject * _scalbln(PyObject *self, PyObject *args){
 
     return QuadObject_to_PyObject(result);};
 
-static PyObject * _scalbn(PyObject *self, PyObject *args){
+static PyObject * _qscalbn(PyObject *self, PyObject *args){
     QuadObject result;
     PyObject * obj1 = NULL,* obj2 = NULL;
     long n;
@@ -704,11 +704,11 @@ static PyObject * _scalbn(PyObject *self, PyObject *args){
 
     return QuadObject_to_PyObject(result);};
 
-static PyObject * _signbit(PyObject *self, PyObject *args){
+static PyObject * _qsignbit(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1_int(OP_signbitq, self, args);
 };
 
-static PyObject * _sincos(PyObject *self, PyObject *args){
+static PyObject * _qsincos(PyObject *self, PyObject *args){
     QuadObject result, q1, q2;
     PyObject * obj1 = NULL;
 
@@ -733,43 +733,43 @@ static PyObject * _sincos(PyObject *self, PyObject *args){
     ); 
 };
 
-static PyObject * _sinh(PyObject *self, PyObject *args){
+static PyObject * _qsinh(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_sinhq, self, args);
 };
 
-static PyObject * _sin(PyObject *self, PyObject *args){
+static PyObject * _qsin(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_sinq, self, args);
 };
 
-static PyObject * _sqrt(PyObject *self, PyObject *args){
+static PyObject * _qsqrt(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_sqrtq, self, args);
 };
 
-static PyObject * _tan(PyObject *self, PyObject *args){
+static PyObject * _qtan(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_tanq, self, args);
 };
 
-static PyObject * _tanh(PyObject *self, PyObject *args){
+static PyObject * _qtanh(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_tanhq, self, args);
 };
 
-static PyObject * _tgamma(PyObject *self, PyObject *args){
+static PyObject * _qtgamma(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_tgammaq, self, args);
 };
 
-static PyObject * _trunc(PyObject *self, PyObject *args){
+static PyObject * _qtrunc(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_truncq, self, args);
 };
 
-static PyObject * _y0(PyObject *self, PyObject *args){
+static PyObject * _qy0(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_y0q, self, args);
 };
 
-static PyObject * _y1(PyObject *self, PyObject *args){
+static PyObject * _qy1(PyObject *self, PyObject *args){
     return QuadObject_qmath_op1(OP_y1q, self, args);
 };
 
-static PyObject * _yn(PyObject *self, PyObject *args){
+static PyObject * _qyn(PyObject *self, PyObject *args){
     QuadObject result;
     PyObject * obj1 = NULL,* obj2 = NULL;
     long n;
@@ -802,74 +802,74 @@ static PyObject * _yn(PyObject *self, PyObject *args){
 
 
 static PyMethodDef QMathMethods[] = {
-    {"_acos", (PyCFunction) _acos, METH_VARARGS, "acos"},
-    {"_acosh", (PyCFunction) _acosh, METH_VARARGS, "acosh"},
-    {"_asin", (PyCFunction) _asin, METH_VARARGS, "asin"},
-    {"_asinh", (PyCFunction) _asinh, METH_VARARGS, "asinh"},
-    {"_atan", (PyCFunction) _atan, METH_VARARGS, "atan"},
-    {"_atanh", (PyCFunction) _atanh, METH_VARARGS, "atanh"},
-    {"_atan2", (PyCFunction) _atan2, METH_VARARGS, "atan2"},
-    {"_cbrt", (PyCFunction) _cbrt, METH_VARARGS, "cbrt"},
-    {"_ceil", (PyCFunction) _ceil, METH_VARARGS, "ceil"},
-    {"_copysign", (PyCFunction) _copysign, METH_VARARGS, "copysign"},
-    {"_cosh", (PyCFunction) _cosh, METH_VARARGS, "cosh"},
-    {"_cos", (PyCFunction) _cos, METH_VARARGS, "cos"},
-    {"_erf", (PyCFunction) _erf, METH_VARARGS, "erf"},
-    {"_erfc", (PyCFunction) _erfc, METH_VARARGS, "erfc"},
-    {"_exp2", (PyCFunction) _exp2, METH_VARARGS, "exp2"},
-    {"_exp", (PyCFunction) _exp, METH_VARARGS, "exp"},
-    {"_expm1", (PyCFunction) _expm1, METH_VARARGS, "expm1"},
-    {"_fabs", (PyCFunction) _fabs, METH_VARARGS, "fabs"},
-    {"_fdim", (PyCFunction) _fdim, METH_VARARGS, "fdim"},
-    {"_finite", (PyCFunction) _finite, METH_VARARGS, "finite"},
-    {"_floor", (PyCFunction) _floor, METH_VARARGS, "floor"},
-    {"_fma", (PyCFunction) _fma, METH_VARARGS, "fma"},
-    {"_fmax", (PyCFunction) _fmax, METH_VARARGS, "fmax"},
-    {"_fmin", (PyCFunction) _fmin, METH_VARARGS, "fmin"},
-    {"_fmod", (PyCFunction) _fmod, METH_VARARGS, "fmod"},
-    {"_frexp", (PyCFunction) _frexp, METH_VARARGS, "frexp"},
-    {"_hypot", (PyCFunction) _hypot, METH_VARARGS, "hypot"},
-    {"_ilogb", (PyCFunction) _ilogb, METH_VARARGS, "ilogb"},
-    {"_isinf", (PyCFunction) _isinf, METH_VARARGS, "isinf"},
-    {"_isnan", (PyCFunction) _isnan, METH_VARARGS, "isnan"},
-    {"_issignaling", (PyCFunction) _issignaling, METH_VARARGS, "issignaling"},
-    {"_j0", (PyCFunction) _j0, METH_VARARGS, "j0"},
-    {"_j1", (PyCFunction) _j1, METH_VARARGS, "j1"},
-    {"_jn", (PyCFunction) _jn, METH_VARARGS, "jn"},
-    {"_ldexp", (PyCFunction) _ldexp, METH_VARARGS, "ldexp"},
-    {"_lgamma", (PyCFunction) _lgamma, METH_VARARGS, "lgamma"},
-    {"_llrint", (PyCFunction) _llrint, METH_VARARGS, "llrint"},
-    {"_llround", (PyCFunction) _llround, METH_VARARGS, "llround"},
-    {"_logb", (PyCFunction) _logb, METH_VARARGS, "logb"},
-    {"_log", (PyCFunction) _log, METH_VARARGS, "log"},
-    {"_log10", (PyCFunction) _log10, METH_VARARGS, "log10"},
-    {"_log1p", (PyCFunction) _log1p, METH_VARARGS, "log1p"},
-    {"_log2", (PyCFunction) _log2, METH_VARARGS, "log2"},
-    {"_lrint", (PyCFunction) _lrint, METH_VARARGS, "lrint"},
-    {"_lround", (PyCFunction) _lround, METH_VARARGS, "lround"},
-    {"_modf", (PyCFunction) _modf, METH_VARARGS, "modf"},
-    //{"_nan", (PyCFunction) _nan, METH_VARARGS, "nan"},
-    {"_nearbyint", (PyCFunction) _nearbyint, METH_VARARGS, "nearbyint"},
-    {"_nextafter", (PyCFunction) _nextafter, METH_VARARGS, "nextafter"},
-    {"_pow", (PyCFunction) _pow, METH_VARARGS, "pow"},
-    {"_remainder", (PyCFunction) _remainder, METH_VARARGS, "remainder"},
-    {"_remquo", (PyCFunction) _remquo, METH_VARARGS, "remquo"},
-    {"_rint", (PyCFunction) _rint, METH_VARARGS, "rint"},
-    {"_round", (PyCFunction) _round, METH_VARARGS, "round"},
-    {"_scalbln", (PyCFunction) _scalbln, METH_VARARGS, "scalbln"},
-    {"_scalbn", (PyCFunction) _scalbn, METH_VARARGS, "scalbn"},
-    {"_signbit", (PyCFunction) _signbit, METH_VARARGS, "signbit"},
-    {"_sincos", (PyCFunction) _sincos, METH_VARARGS, "sincos"},
-    {"_sinh", (PyCFunction) _sinh, METH_VARARGS, "sinh"},
-    {"_sin", (PyCFunction) _sin, METH_VARARGS, "sin"},
-    {"_sqrt", (PyCFunction) _sqrt, METH_VARARGS, "sqrt"},
-    {"_tan", (PyCFunction) _tan, METH_VARARGS, "tan"},
-    {"_tanh", (PyCFunction) _tanh, METH_VARARGS, "tanh"},
-    {"_tgamma", (PyCFunction) _tgamma, METH_VARARGS, "tgamma"},
-    {"_trunc", (PyCFunction) _trunc, METH_VARARGS, "trunc"},
-    {"_y0", (PyCFunction) _y0, METH_VARARGS, "y0"},
-    {"_y1", (PyCFunction) _y1, METH_VARARGS, "y1"},
-    {"_yn", (PyCFunction) _yn, METH_VARARGS, "yn"},
+    {"_acos", (PyCFunction) _qacos, METH_VARARGS, "acos"},
+    {"_acosh", (PyCFunction) _qacosh, METH_VARARGS, "acosh"},
+    {"_asin", (PyCFunction) _qasin, METH_VARARGS, "asin"},
+    {"_asinh", (PyCFunction) _qasinh, METH_VARARGS, "asinh"},
+    {"_atan", (PyCFunction) _qatan, METH_VARARGS, "atan"},
+    {"_atanh", (PyCFunction) _qatanh, METH_VARARGS, "atanh"},
+    {"_atan2", (PyCFunction) _qatan2, METH_VARARGS, "atan2"},
+    {"_cbrt", (PyCFunction) _qcbrt, METH_VARARGS, "cbrt"},
+    {"_ceil", (PyCFunction) _qceil, METH_VARARGS, "ceil"},
+    {"_copysign", (PyCFunction) _qcopysign, METH_VARARGS, "copysign"},
+    {"_cosh", (PyCFunction) _qcosh, METH_VARARGS, "cosh"},
+    {"_cos", (PyCFunction) _qcos, METH_VARARGS, "cos"},
+    {"_erf", (PyCFunction) _qerf, METH_VARARGS, "erf"},
+    {"_erfc", (PyCFunction) _qerfc, METH_VARARGS, "erfc"},
+    {"_exp2", (PyCFunction) _qexp2, METH_VARARGS, "exp2"},
+    {"_exp", (PyCFunction) _qexp, METH_VARARGS, "exp"},
+    {"_expm1", (PyCFunction) _qexpm1, METH_VARARGS, "expm1"},
+    {"_fabs", (PyCFunction) _qfabs, METH_VARARGS, "fabs"},
+    {"_fdim", (PyCFunction) _qfdim, METH_VARARGS, "fdim"},
+    {"_finite", (PyCFunction) _qfinite, METH_VARARGS, "finite"},
+    {"_floor", (PyCFunction) _qfloor, METH_VARARGS, "floor"},
+    {"_fma", (PyCFunction) _qfma, METH_VARARGS, "fma"},
+    {"_fmax", (PyCFunction) _qfmax, METH_VARARGS, "fmax"},
+    {"_fmin", (PyCFunction) _qfmin, METH_VARARGS, "fmin"},
+    {"_fmod", (PyCFunction) _qfmod, METH_VARARGS, "fmod"},
+    {"_frexp", (PyCFunction) _qfrexp, METH_VARARGS, "frexp"},
+    {"_hypot", (PyCFunction) _qhypot, METH_VARARGS, "hypot"},
+    {"_ilogb", (PyCFunction) _qilogb, METH_VARARGS, "ilogb"},
+    {"_isinf", (PyCFunction) _qisinf, METH_VARARGS, "isinf"},
+    {"_isnan", (PyCFunction) _qisnan, METH_VARARGS, "isnan"},
+    {"_issignaling", (PyCFunction) _qissignaling, METH_VARARGS, "issignaling"},
+    {"_j0", (PyCFunction) _qj0, METH_VARARGS, "j0"},
+    {"_j1", (PyCFunction) _qj1, METH_VARARGS, "j1"},
+    {"_jn", (PyCFunction) _qjn, METH_VARARGS, "jn"},
+    {"_ldexp", (PyCFunction) _qldexp, METH_VARARGS, "ldexp"},
+    {"_lgamma", (PyCFunction) _qlgamma, METH_VARARGS, "lgamma"},
+    {"_llrint", (PyCFunction) _qllrint, METH_VARARGS, "llrint"},
+    {"_llround", (PyCFunction) _qllround, METH_VARARGS, "llround"},
+    {"_logb", (PyCFunction) _qlogb, METH_VARARGS, "logb"},
+    {"_log", (PyCFunction) _qlog, METH_VARARGS, "log"},
+    {"_log10", (PyCFunction) _qlog10, METH_VARARGS, "log10"},
+    {"_log1p", (PyCFunction) _qlog1p, METH_VARARGS, "log1p"},
+    {"_log2", (PyCFunction) _qlog2, METH_VARARGS, "log2"},
+    {"_lrint", (PyCFunction) _qlrint, METH_VARARGS, "lrint"},
+    {"_lround", (PyCFunction) _qlround, METH_VARARGS, "lround"},
+    {"_modf", (PyCFunction) _qmodf, METH_VARARGS, "modf"},
+    //{"_nan", (PyCFunction) _qnan, METH_VARARGS, "nan"},
+    {"_nearbyint", (PyCFunction) _qnearbyint, METH_VARARGS, "nearbyint"},
+    {"_nextafter", (PyCFunction) _qnextafter, METH_VARARGS, "nextafter"},
+    {"_pow", (PyCFunction) _qpow, METH_VARARGS, "pow"},
+    {"_remainder", (PyCFunction) _qremainder, METH_VARARGS, "remainder"},
+    {"_remquo", (PyCFunction) _qremquo, METH_VARARGS, "remquo"},
+    {"_rint", (PyCFunction) _qrint, METH_VARARGS, "rint"},
+    {"_round", (PyCFunction) _qround, METH_VARARGS, "round"},
+    {"_scalbln", (PyCFunction) _qscalbln, METH_VARARGS, "scalbln"},
+    {"_scalbn", (PyCFunction) _qscalbn, METH_VARARGS, "scalbn"},
+    {"_signbit", (PyCFunction) _qsignbit, METH_VARARGS, "signbit"},
+    {"_sincos", (PyCFunction) _qsincos, METH_VARARGS, "sincos"},
+    {"_sinh", (PyCFunction) _qsinh, METH_VARARGS, "sinh"},
+    {"_sin", (PyCFunction) _qsin, METH_VARARGS, "sin"},
+    {"_sqrt", (PyCFunction) _qsqrt, METH_VARARGS, "sqrt"},
+    {"_tan", (PyCFunction) _qtan, METH_VARARGS, "tan"},
+    {"_tanh", (PyCFunction) _qtanh, METH_VARARGS, "tanh"},
+    {"_tgamma", (PyCFunction) _qtgamma, METH_VARARGS, "tgamma"},
+    {"_trunc", (PyCFunction) _qtrunc, METH_VARARGS, "trunc"},
+    {"_y0", (PyCFunction) _qy0, METH_VARARGS, "y0"},
+    {"_y1", (PyCFunction) _qy1, METH_VARARGS, "y1"},
+    {"_yn", (PyCFunction) _qyn, METH_VARARGS, "yn"},
     {NULL, NULL, 0, NULL}
 };
 

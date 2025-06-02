@@ -236,120 +236,120 @@ QuadCObject_qmath_op1_q_to_c(const int op, PyObject * self, PyObject * args){
 
 
 
-static PyObject * _cabs(PyObject *self, PyObject *args){
+static PyObject * _qcabs(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_qfloat(OP_cabsq, self, args);
 };
 
-static PyObject * _carg(PyObject *self, PyObject *args){
+static PyObject * _qcarg(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_qfloat(OP_cargq, self, args);
 };
 
-static PyObject * _cimag(PyObject *self, PyObject *args){
+static PyObject * _qcimag(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_qfloat(OP_cimagq, self, args);
 };
 
-static PyObject * _creal(PyObject *self, PyObject *args){
+static PyObject * _qcreal(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_qfloat(OP_crealq, self, args);
 };
 
-static PyObject * _cacosh(PyObject *self, PyObject *args){
+static PyObject * _qcacosh(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_cacoshq, self, args);
 };
 
-static PyObject * _cacos(PyObject *self, PyObject *args){
+static PyObject * _qcacos(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_cacosq, self, args);
 };
 
-static PyObject * _casinh(PyObject *self, PyObject *args){
+static PyObject * _qcasinh(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_casinhq, self, args);
 };
 
-static PyObject * _casin(PyObject *self, PyObject *args){
+static PyObject * _qcasin(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_casinq, self, args);
 };
 
-static PyObject * _catanh(PyObject *self, PyObject *args){
+static PyObject * _qcatanh(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_catanhq, self, args);
 };
 
-static PyObject * _catan(PyObject *self, PyObject *args){
+static PyObject * _qcatan(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_catanq, self, args);
 };
 
-static PyObject * _ccos(PyObject *self, PyObject *args){
+static PyObject * _qccos(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_ccosq, self, args);
 };
 
-static PyObject * _ccosh(PyObject *self, PyObject *args){
+static PyObject * _qccosh(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_ccoshq, self, args);
 };
 
-static PyObject * _cexp(PyObject *self, PyObject *args){
+static PyObject * _qcexp(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_cexpq, self, args);
 };
 
-static PyObject * _cexpi(PyObject *self, PyObject *args){
+static PyObject * _qcexpi(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1_q_to_c(OP_cexpiq, self, args);
 };
 
-static PyObject * _clog(PyObject *self, PyObject *args){
+static PyObject * _qclog(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_clogq, self, args);
 };
 
-static PyObject * _clog10(PyObject *self, PyObject *args){
+static PyObject * _qclog10(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_clog10q, self, args);
 };
 
-static PyObject * _conj(PyObject *self, PyObject *args){
+static PyObject * _qconj(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_conjq, self, args);
 };
 
-static PyObject * _cpow(PyObject *self, PyObject *args){
+static PyObject * _qcpow(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op2(OP_cpowq, self, args);
 };
 
-static PyObject * _cproj(PyObject *self, PyObject *args){
+static PyObject * _qcproj(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_cprojq, self, args);
 };
 
-static PyObject * _csin(PyObject *self, PyObject *args){
+static PyObject * _qcsin(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_csinq, self, args);
 };
 
-static PyObject * _csinh(PyObject *self, PyObject *args){
+static PyObject * _qcsinh(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_csinhq, self, args);
 };
 
-static PyObject * _csqrt(PyObject *self, PyObject *args){
+static PyObject * _qcsqrt(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_csqrtq, self, args);
 };
 
-static PyObject * _ctan(PyObject *self, PyObject *args){
+static PyObject * _qctan(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_ctanq, self, args);
 };
 
-static PyObject * _ctanh(PyObject *self, PyObject *args){
+static PyObject * _qctanh(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_ctanhq, self, args);
 };
 
-static PyObject * _finitecq(PyObject *self, PyObject *args){
+static PyObject * _qfinitecq(PyObject *self, PyObject *args){
     return QuadCObject_qcmath_op1_int(OP_finitecq, self, args);
 };
 
-static PyObject * _isnancq(PyObject *self, PyObject *args){
+static PyObject * _qisnancq(PyObject *self, PyObject *args){
     return QuadCObject_qcmath_op1_int(OP_isnancq, self, args);
 };
 
-static PyObject * _isinfcq(PyObject *self, PyObject *args){
+static PyObject * _qisinfcq(PyObject *self, PyObject *args){
     return QuadCObject_qcmath_op1_int(OP_isinfcq, self, args);
 };
 
 
-static PyObject * _phase(PyObject *self, PyObject *args){
+static PyObject * _qphase(PyObject *self, PyObject *args){
     return QuadCObject_qmath_op1(OP_phase, self, args);
 };
 
-static PyObject * _polar(PyObject *self, PyObject *args){
+static PyObject * _qpolar(PyObject *self, PyObject *args){
     QuadCObject result;
     PyObject * obj1 = NULL;
     QuadObject absx, phasex;
@@ -374,7 +374,7 @@ static PyObject * _polar(PyObject *self, PyObject *args){
     ); 
 };
 
-static PyObject * _rect(PyObject *self, PyObject *args){
+static PyObject * _qrect(PyObject *self, PyObject *args){
     QuadCObject result;
     PyObject * obj1 = NULL, * obj2 = NULL;
     QuadObject r, phi;
@@ -405,36 +405,36 @@ static PyObject * _rect(PyObject *self, PyObject *args){
 
 
 static PyMethodDef QMathCMethods[] = {
-    {"_cabs", (PyCFunction) _cabs, METH_VARARGS, "cabs"},
-    {"_carg", (PyCFunction) _carg, METH_VARARGS, "carg"},
-    {"_cimag", (PyCFunction) _cimag, METH_VARARGS, "cimag"},
-    {"_creal", (PyCFunction) _creal, METH_VARARGS, "creal"},
-    {"_cacosh", (PyCFunction) _cacosh, METH_VARARGS, "cacosh"},
-    {"_cacos", (PyCFunction) _cacos, METH_VARARGS, "cacos"},
-    {"_casinh", (PyCFunction) _casinh, METH_VARARGS, "casinh"},
-    {"_casin", (PyCFunction) _casin, METH_VARARGS, "casin"},
-    {"_catanh", (PyCFunction) _catanh, METH_VARARGS, "catanh"},
-    {"_catan", (PyCFunction) _catan, METH_VARARGS, "catan"},
-    {"_ccos", (PyCFunction) _ccos, METH_VARARGS, "ccos"},
-    {"_ccosh", (PyCFunction) _ccosh, METH_VARARGS, "ccosh"},
-    {"_cexp", (PyCFunction) _cexp, METH_VARARGS, "cexp"},
-    {"_cexpi", (PyCFunction) _cexpi, METH_VARARGS, "cexpi"},
-    {"_clog", (PyCFunction) _clog, METH_VARARGS, "clog"},
-    {"_clog10", (PyCFunction) _clog10, METH_VARARGS, "clog10"},
-    {"_conj", (PyCFunction) _conj, METH_VARARGS, "conj"},
-    {"_cpow", (PyCFunction) _cpow, METH_VARARGS, "cpow"},
-    {"_cproj", (PyCFunction) _cproj, METH_VARARGS, "cproj"},
-    {"_csin", (PyCFunction) _csin, METH_VARARGS, "csin"},
-    {"_csinh", (PyCFunction) _csinh, METH_VARARGS, "csinh"},
-    {"_csqrt", (PyCFunction) _csqrt, METH_VARARGS, "csqrt"},
-    {"_ctan", (PyCFunction) _ctan, METH_VARARGS, "ctan"},
-    {"_ctanh", (PyCFunction) _ctanh, METH_VARARGS, "ctanh"},
-    {"_finitecq", (PyCFunction) _finitecq, METH_VARARGS, "isfinite"},
-    {"_isnancq", (PyCFunction) _isnancq, METH_VARARGS, "isnan"},
-    {"_isinfcq", (PyCFunction) _isinfcq, METH_VARARGS, "isinf"},
-    {"_phase", (PyCFunction) _phase, METH_VARARGS, "phase"},
-    {"_polar", (PyCFunction) _polar, METH_VARARGS, "polar"},
-    {"_rect", (PyCFunction) _rect, METH_VARARGS, "rect"},
+    {"_cabs", (PyCFunction) _qcabs, METH_VARARGS, "cabs"},
+    {"_carg", (PyCFunction) _qcarg, METH_VARARGS, "carg"},
+    {"_cimag", (PyCFunction) _qcimag, METH_VARARGS, "cimag"},
+    {"_creal", (PyCFunction) _qcreal, METH_VARARGS, "creal"},
+    {"_cacosh", (PyCFunction) _qcacosh, METH_VARARGS, "cacosh"},
+    {"_cacos", (PyCFunction) _qcacos, METH_VARARGS, "cacos"},
+    {"_casinh", (PyCFunction) _qcasinh, METH_VARARGS, "casinh"},
+    {"_casin", (PyCFunction) _qcasin, METH_VARARGS, "casin"},
+    {"_catanh", (PyCFunction) _qcatanh, METH_VARARGS, "catanh"},
+    {"_catan", (PyCFunction) _qcatan, METH_VARARGS, "catan"},
+    {"_ccos", (PyCFunction) _qccos, METH_VARARGS, "ccos"},
+    {"_ccosh", (PyCFunction) _qccosh, METH_VARARGS, "ccosh"},
+    {"_cexp", (PyCFunction) _qcexp, METH_VARARGS, "cexp"},
+    {"_cexpi", (PyCFunction) _qcexpi, METH_VARARGS, "cexpi"},
+    {"_clog", (PyCFunction) _qclog, METH_VARARGS, "clog"},
+    {"_clog10", (PyCFunction) _qclog10, METH_VARARGS, "clog10"},
+    {"_conj", (PyCFunction) _qconj, METH_VARARGS, "conj"},
+    {"_cpow", (PyCFunction) _qcpow, METH_VARARGS, "cpow"},
+    {"_cproj", (PyCFunction) _qcproj, METH_VARARGS, "cproj"},
+    {"_csin", (PyCFunction) _qcsin, METH_VARARGS, "csin"},
+    {"_csinh", (PyCFunction) _qcsinh, METH_VARARGS, "csinh"},
+    {"_csqrt", (PyCFunction) _qcsqrt, METH_VARARGS, "csqrt"},
+    {"_ctan", (PyCFunction) _qctan, METH_VARARGS, "ctan"},
+    {"_ctanh", (PyCFunction) _qctanh, METH_VARARGS, "ctanh"},
+    {"_finitecq", (PyCFunction) _qfinitecq, METH_VARARGS, "isfinite"},
+    {"_isnancq", (PyCFunction) _qisnancq, METH_VARARGS, "isnan"},
+    {"_isinfcq", (PyCFunction) _qisinfcq, METH_VARARGS, "isinf"},
+    {"_phase", (PyCFunction) _qphase, METH_VARARGS, "phase"},
+    {"_polar", (PyCFunction) _qpolar, METH_VARARGS, "polar"},
+    {"_rect", (PyCFunction) _qrect, METH_VARARGS, "rect"},
     {NULL, NULL, 0, NULL}
 };
 
