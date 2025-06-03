@@ -26,6 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build wheel
           sudo apt-get update
+          apt-cache search libquadmath0
           sudo apt-get install -y gcc gfortran libopenblas-dev libquadmath0
 
     
