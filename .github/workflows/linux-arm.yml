@@ -25,6 +25,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install build wheel
+          sudo apt-get update
           sudo apt-get install -y gcc gfortran libopenblas-dev libquadmath0
 
     
