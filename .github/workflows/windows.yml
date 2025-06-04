@@ -48,12 +48,12 @@ jobs:
           python -m build
           
 
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheel
-          path: dist/pyquadp*.whl
-          retention-days: 1
+      # - name: 'Upload Artifact'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: wheel
+      #     path: dist/pyquadp*.whl
+      #     retention-days: 1
 
       - name: Install
         shell: bash

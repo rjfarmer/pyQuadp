@@ -66,3 +66,5 @@ ext-modules = [
     {name='qint', sources=["pyquadp/qint.c"], libraries=['quadmath'],py-limited-api=true, language="C"},
 ]
 
+[tool.setuptools.package-data]
+moduleName = ["*.so","*.dll"]
