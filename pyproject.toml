@@ -67,4 +67,4 @@ ext-modules = [
 ]
 
 [tool.setuptools.package-data]
-moduleName = ["*.so","*.dll"]
+"*" = ["lib/*.*"]
