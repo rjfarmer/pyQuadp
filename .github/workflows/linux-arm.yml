@@ -31,6 +31,7 @@ jobs:
     
       - name: Build
         run: |
+          find / -name libquadmath.so 2>/dev/null
           which gcc
           gcc -E -Wp,-v -xc /dev/null
           python -m pip install .[test]
