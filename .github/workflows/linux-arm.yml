@@ -30,7 +30,10 @@ jobs:
 
     
       - name: Build
-        run: python -m pip install .[test]
+        run: |
+          which gcc
+          gcc -E -Wp,-v -xc /dev/null
+          python -m pip install .[test]
 
   
       - name: Test
