@@ -14,7 +14,6 @@ authors = [
 
 dependencies =[
     "numpy",
-    "scipy"
 ]
 
 readme = "README.md"
@@ -38,10 +37,10 @@ dynamic = ["version"]
 Homepage = "https://github.com/rjfarmer/pyquadp"
 
 [project.optional-dependencies]
-test = ['pytest','pytest-xdist','hypothesis']
-coverage = ['pytest', 'pytest-xdist', 'pytest-cov']
-dev = ['pre-commit','black', 'pytest','pytest-xdist']
-perfomance = ["pytest", "pytest-codspeed", 'pytest-xdist']
+test = ['pytest','pytest-xdist','hypothesis',"scipy"]
+coverage = ['pytest', 'pytest-xdist', 'pytest-cov',"scipy"]
+dev = ['pre-commit','black', 'pytest','pytest-xdist',"scipy"]
+perfomance = ["pytest", "pytest-codspeed", 'pytest-xdist',"scipy"]
 
 
 [tool.pytest.ini_options]
@@ -66,5 +65,5 @@ ext-modules = [
     {name='qint', sources=["pyquadp/qint.c"], libraries=['quadmath'],py-limited-api=true, language="C"},
 ]
 
-[tool.setuptools.package-data]
-"*" = ["lib/*.*"]
+[tool.setuptools.package-dir]
+pyquadp = "pyquadp"
