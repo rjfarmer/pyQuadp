@@ -3,7 +3,7 @@ on: [push, pull_request]
 permissions: {}
 
 jobs:
-  linux_ci:
+  macos_ci:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
