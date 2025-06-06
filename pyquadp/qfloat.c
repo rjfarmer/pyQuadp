@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0+
 #define PY_SSIZE_T_CLEAN
+#define Py_LIMITED_API 0x030A0000
 #include <Python.h>
-#include "structmember.h"
+#include <structmember.h>
 #include <quadmath.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -555,14 +556,14 @@ static PyNumberMethods Quad_math_methods = {
     (unaryfunc) QuadObject_pos,
     (unaryfunc) QuadObject_abs,
     (inquiry) QuadObject_bool,
-    0,//  unaryfunc nb_invert;
-    0,//  binaryfunc nb_lshift;
-    0,//  binaryfunc nb_rshift;
-    0,//  binaryfunc nb_and;
-    0,//  binaryfunc nb_xor;
-    0,//  binaryfunc nb_or;
+    NULL,//  unaryfunc nb_invert;
+    NULL,//  binaryfunc nb_lshift;
+    NULL,//  binaryfunc nb_rshift;
+    NULL,//  binaryfunc nb_and;
+    NULL,//  binaryfunc nb_xor;
+    NULL,//  binaryfunc nb_or;
     (unaryfunc) QuadObject_int,
-    0,//  void *nb_reserved;
+    NULL,//  void *nb_reserved;
     (unaryfunc) QuadObject_float,
 
     (binaryfunc) QuadObject_inplace_add,
@@ -570,21 +571,21 @@ static PyNumberMethods Quad_math_methods = {
     (binaryfunc) QuadObject_inplace_mult,
     (binaryfunc) QuadObject_inplace_remainder,
     (ternaryfunc) QuadObject_inplace_pow,
-    0,//  binaryfunc nb_inplace_lshift;
-    0,//  binaryfunc nb_inplace_rshift;
-    0,//  binaryfunc nb_inplace_and;
-    0,//  binaryfunc nb_inplace_xor;
-    0,//  binaryfunc nb_inplace_or;
+    NULL,//  binaryfunc nb_inplace_lshift;
+    NULL,//  binaryfunc nb_inplace_rshift;
+    NULL,//  binaryfunc nb_inplace_and;
+    NULL,//  binaryfunc nb_inplace_xor;
+    NULL,//  binaryfunc nb_inplace_or;
 
     (binaryfunc) QuadObject_floor_divide,//  binaryfunc nb_floor_divide;
     (binaryfunc) QuadObject_true_divide,//  binaryfunc nb_true_divide;
     (binaryfunc) QuadObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
     (binaryfunc) QuadObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
 
-    0,//(unaryfunc) QuadObject_int,//  unaryfunc nb_index;
+    NULL,//(unaryfunc) QuadObject_int,//  unaryfunc nb_index;
 
-    0,//  binaryfunc nb_matrix_multiply;
-    0,//  binaryfunc nb_inplace_matrix_multiply;
+    NULL,//  binaryfunc nb_matrix_multiply;
+    NULL,//  binaryfunc nb_inplace_matrix_multiply;
 };
 
 // attributes
@@ -688,7 +689,7 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
 
     if(PyUnicode_Check(in)){
         // Is a string
-        const char *buf = PyUnicode_AsUTF8(in);
+        const char *buf = PyUnicode_AsUTF8AndSize(in, NULL);
         if (buf==NULL){
             PyErr_Print();
             return false;

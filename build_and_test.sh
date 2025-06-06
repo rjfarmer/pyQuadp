@@ -2,5 +2,4 @@
 
 rm -rf build dist
 python -m build
-python -m pip install dist/pyquadp*.whl --force-reinstall
-python -m pytest 
+python -m pip install dist/pyquadp*.whl --force-reinstall && python -m pytest 

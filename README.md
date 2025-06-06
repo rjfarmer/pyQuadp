@@ -1,6 +1,6 @@
 [![Continuous Integration](https://github.com/rjfarmer/pyQuadp/actions/workflows/ci.yml/badge.svg)](https://github.com/rjfarmer/pyQuadp/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/rjfarmer/pyQuadp/badge.svg?branch=main)](https://coveralls.io/github/rjfarmer/pyQuadp?branch=main)
-[![Python versions](https://img.shields.io/pypi/pyversions/gfort2py.svg)](https://img.shields.io/pypi/pyversions/gfort2py.svg)
+[![Python versions](https://img.shields.io/pypi/pyversions/pyQuadp.svg)](https://img.shields.io/pypi/pyversions/pyQuadp.svg)
 [![gfortran versions](https://img.shields.io/badge/gfortran-8%7C9%7C10%7C11%7C12-blue)](https://img.shields.io/badge/gfortran-8%7C9%7C10%7C11%7C12-blue)
 
 
