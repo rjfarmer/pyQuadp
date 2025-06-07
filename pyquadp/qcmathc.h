@@ -1,11 +1,7 @@
-#define PY_SSIZE_T_CLEAN
-#define Py_LIMITED_API 0x030A0000
-#include <Python.h>
-
-#include <quadmath.h>
-#include <stdbool.h>
-
+// SPDX-License-Identifier: GPL-2.0+
 #pragma once
+#include "pyquadp.h"
+
 
 #include "qcmplx.h"
 #include "qfloat.h"
