@@ -537,46 +537,27 @@ static PyObject * QuadObject_from_hex(PyTypeObject *type, PyObject * arg){
 // Header data
 
 static PyNumberMethods Quad_math_methods = {
-    (binaryfunc) QuadObject_add,
-    (binaryfunc) QuadObject_subtract,
-    (binaryfunc) QuadObject_mult,
-    (binaryfunc) QuadObject_remainder,
-    (binaryfunc) QuadObject_divmod,
-    (ternaryfunc) QuadObject_pow,
-    (unaryfunc) QuadObject_neg,
-    (unaryfunc) QuadObject_pos,
-    (unaryfunc) QuadObject_abs,
-    (inquiry) QuadObject_bool,
-    NULL,//  unaryfunc nb_invert;
-    NULL,//  binaryfunc nb_lshift;
-    NULL,//  binaryfunc nb_rshift;
-    NULL,//  binaryfunc nb_and;
-    NULL,//  binaryfunc nb_xor;
-    NULL,//  binaryfunc nb_or;
-    (unaryfunc) QuadObject_int,
-    NULL,//  void *nb_reserved;
-    (unaryfunc) QuadObject_float,
-
-    (binaryfunc) QuadObject_inplace_add,
-    (binaryfunc) QuadObject_inplace_subtract,
-    (binaryfunc) QuadObject_inplace_mult,
-    (binaryfunc) QuadObject_inplace_remainder,
-    (ternaryfunc) QuadObject_inplace_pow,
-    NULL,//  binaryfunc nb_inplace_lshift;
-    NULL,//  binaryfunc nb_inplace_rshift;
-    NULL,//  binaryfunc nb_inplace_and;
-    NULL,//  binaryfunc nb_inplace_xor;
-    NULL,//  binaryfunc nb_inplace_or;
-
-    (binaryfunc) QuadObject_floor_divide,//  binaryfunc nb_floor_divide;
-    (binaryfunc) QuadObject_true_divide,//  binaryfunc nb_true_divide;
-    (binaryfunc) QuadObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
-    (binaryfunc) QuadObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
-
-    NULL,//(unaryfunc) QuadObject_int,//  unaryfunc nb_index;
-
-    NULL,//  binaryfunc nb_matrix_multiply;
-    NULL,//  binaryfunc nb_inplace_matrix_multiply;
+    .nb_add = (binaryfunc) QuadObject_add,
+    .nb_subtract = (binaryfunc) QuadObject_subtract,
+    .nb_multiply = (binaryfunc) QuadObject_mult,
+    .nb_remainder = (binaryfunc) QuadObject_remainder,
+    .nb_divmod = (binaryfunc) QuadObject_divmod,
+    .nb_power = (ternaryfunc) QuadObject_pow,
+    .nb_negative = (unaryfunc) QuadObject_neg,
+    .nb_positive = (unaryfunc) QuadObject_pos,
+    .nb_absolute = (unaryfunc) QuadObject_abs,
+    .nb_bool = (inquiry) QuadObject_bool,
+    .nb_int = (unaryfunc) QuadObject_int,
+    .nb_float = (unaryfunc) QuadObject_float,
+    .nb_inplace_add = (binaryfunc) QuadObject_inplace_add,
+    .nb_inplace_subtract = (binaryfunc) QuadObject_inplace_subtract,
+    .nb_inplace_multiply = (binaryfunc) QuadObject_inplace_mult,
+    .nb_inplace_remainder = (binaryfunc) QuadObject_inplace_remainder,
+    .nb_inplace_power = (ternaryfunc) QuadObject_inplace_pow,
+    .nb_floor_divide = (binaryfunc) QuadObject_floor_divide,//  binaryfunc nb_floor_divide;
+    .nb_true_divide = (binaryfunc) QuadObject_true_divide,//  binaryfunc nb_true_divide;
+    .nb_inplace_floor_divide = (binaryfunc) QuadObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
+    .nb_inplace_true_divide = (binaryfunc) QuadObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
 };
 
 // attributes
