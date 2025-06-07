@@ -385,7 +385,8 @@ static PyObject * _qrect(PyObject *self, PyObject *args){
 
     alloc_QuadCType(&result);
 
-    result.value = r.value*(cosq(phi.value) + sinq(phi.value)*I);
+    __real__ result.value = r.value * cosq(phi.value); 
+    __imag__ result.value = r.value * sinq(phi.value);
 
     return QuadCObject_to_PyObject(result);
 

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 
 #pragma once
-
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <structmember.h> // Removed in 3.12

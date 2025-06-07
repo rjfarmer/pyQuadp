@@ -619,8 +619,6 @@ PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
     if(alloc)
         alloc_QuadCType(out);
 
-    //printf("%d\n",PyObject_TypeCheck(in, &QuadCType));
-
     if(PyObject_TypeCheck(in, &QuadCType)){
         // Is a complex quad
         out->value = QuadCObject_complex128((QuadCObject *)in);
@@ -634,7 +632,16 @@ PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
     }
 
     if(PyComplex_Check(in)){
-        out->value = (__float128) PyComplex_RealAsDouble(in) + (__float128) PyComplex_ImagAsDouble(in) * I;
+        __real__ out->value = (__float128) PyComplex_RealAsDouble(in);
+
+        if(PyErr_Occurred())
+            return NULL;
+
+        __imag__ out->value = (__float128) PyComplex_ImagAsDouble(in);
+        
+        if(PyErr_Occurred())
+            return NULL;
+
         return true;
     }
 
@@ -648,33 +655,32 @@ PyObject_to_QuadCObject2(PyObject * in1,PyObject * in2, QuadCObject * out, const
     bool set1=false,set2=false;
     QuadObject q1,q2;
 
-
     if(alloc)
         alloc_QuadCType(out);
 
     if(QuadObject_Check(in1)){
         // Is a quad
-        out->value = QuadObject_float128((QuadObject *) in1) + 0*I;
+        __real__ out->value = QuadObject_float128((QuadObject *) in1);
         set1 = true;
     }
 
     if(!set1){
         if(PyObject_to_QuadObject(in1, &q1,true)){
-            out->value = QuadObject_float128(&q1)+ 0*I;
+            __real__ out->value = QuadObject_float128(&q1);
             set1=true;
         }
     }
     
     if(QuadObject_Check(in2)){
         // Is a quad
-        out->value += QuadObject_float128((QuadObject *) in2)*I;
+        __imag__ out->value = QuadObject_float128((QuadObject *) in2);
         set2 = true;
     }
 
     
     if(!set2){
         if(PyObject_to_QuadObject(in2, &q2,true)){
-            out->value +=  QuadObject_float128(&q2)*I;
+            __imag__ out->value =  QuadObject_float128(&q2);
             set2=true;
         }
     }
