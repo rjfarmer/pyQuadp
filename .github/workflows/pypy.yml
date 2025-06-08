@@ -37,9 +37,9 @@ jobs:
           version: ${{ matrix.toolchain.version }}
     
       - name: Build
-        run: 
-          pypy3 -m build
-          pypy3 -m pip install dist/pyquadp*.whl
+        run: |
+          python -m build
+          python -m pip install dist/pyquadp*.whl
 
       - name: Test
         run: pypy3 -m pytest

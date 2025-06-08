@@ -32,7 +32,7 @@ jobs:
 
     
       - name: Build
-        run: 
+        run: |
           python -m build
           python -m pip install dist/pyquadp*.whl
 
