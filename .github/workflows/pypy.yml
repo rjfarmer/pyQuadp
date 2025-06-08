@@ -25,7 +25,9 @@ jobs:
       - name: Install dependencies
         run: |
           pypy3 -m pip install --upgrade pip
-          pypy3 -m pip install build wheel
+          pypy3 -m pip install build wheel pip-compile
+          pip-compile -o requirements.txt --extra test --strip-extras
+          pypy3 -m pip install -r requirements.txt
           sudo apt-get install -y libopenblas-dev
 
       - uses: fortran-lang/setup-fortran@v1
@@ -35,7 +37,9 @@ jobs:
           version: ${{ matrix.toolchain.version }}
     
       - name: Build
-        run: pypy3 -m pip install .[test]
+        run: 
+          pypy3 -m build
+          pypy3 -m pip install dist/pyquadp*.whl
 
       - name: Test
         run: pypy3 -m pytest

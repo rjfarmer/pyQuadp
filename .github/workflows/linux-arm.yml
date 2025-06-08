@@ -24,17 +24,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install build wheel
+          python -m pip install build wheel pip-compile
+          pip-compile -o requirements.txt --extra test --strip-extras
+          python -m pip install -r requirements.txt
           sudo apt-get update
           sudo apt-get install -y gcc gfortran libopenblas-dev libquadmath0-amd64-cross
 
     
       - name: Build
-        run: |
-          find / -name libquadmath.so 2>/dev/null
-          which gcc
-          gcc -E -Wp,-v -xc /dev/null
-          python -m pip install .[test]
+        run: 
+          python -m build
+          python -m pip install dist/pyquadp*.whl
 
   
       - name: Test

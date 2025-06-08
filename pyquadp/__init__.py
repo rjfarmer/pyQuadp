@@ -5,5 +5,4 @@ from .qmint import qint
 
 from .qmcmplx import qcmplx
 
-
 from .constant import *
