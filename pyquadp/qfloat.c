@@ -718,8 +718,10 @@ static bool QuadObject_Check(PyObject * obj){
 static double QuadObject_to_double(QuadObject * x){
     double ret;
     
-    if(fabsq(x->value)> DBL_MAX){
+    if(x->value > DBL_MAX){
         ret = INFINITY;
+    } else if(x->value < -DBL_MAX){
+        ret = -INFINITY;
     } else if (isinfq(x->value)) {
         ret = INFINITY;
     } else if (isnanq(x->value)) {
@@ -735,8 +737,10 @@ static double QuadObject_to_double(QuadObject * x){
 static double __float128_to_double(__float128 x){
     double ret;
     
-    if(fabsq(x)> DBL_MAX){
+    if(x > DBL_MAX){
         ret = INFINITY;
+    } else if(x < -DBL_MAX){
+        ret = -INFINITY;
     } else if (isinfq(x)) {
         ret = INFINITY;
     } else if (isnanq(x)) {
