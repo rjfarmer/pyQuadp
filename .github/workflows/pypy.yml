@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           pypy3 -m pip install --upgrade pip
-          pypy3 -m pip install build wheel pip-compile
+          pypy3 -m pip install build wheel pip-tools
           pip-compile -o requirements.txt --extra test --strip-extras
           pypy3 -m pip install -r requirements.txt
           sudo apt-get install -y libopenblas-dev
