@@ -448,11 +448,8 @@ QuadObject___setstate__(QuadObject *self, PyObject *state) {
     /* Version check. */
     /* Borrowed reference but no need to increment as we create a C long
      * from it. */
-    PyObject *temp = PyDict_GetItemString(state, PICKLE_VERSION_KEY);
+    PyObject *temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat(PICKLE_VERSION_KEY));
     if (temp == NULL) {
-        /* PyDict_GetItemString does not set any error state so we have to. */
-        PyErr_Format(PyExc_KeyError, "No \"%s\" in pickled dict.",
-                     PICKLE_VERSION_KEY);
         return NULL;
     }
     int pickle_version = (int) PyLong_AsLong(temp);
@@ -463,10 +460,9 @@ QuadObject___setstate__(QuadObject *self, PyObject *state) {
         return NULL;
     }
 
-    temp = PyDict_GetItemString(state, "bytes");
+    temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat("bytes"));
 
     if (temp == NULL) {
-        PyErr_Format(PyExc_KeyError, "No bytes in pickled dict.");
         return NULL;
     }
 

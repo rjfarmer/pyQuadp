@@ -44,8 +44,9 @@ jobs:
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYTEST_COVERAGE: 1
+        # Don't use python -m pytest as that screws up the module loading
         run: |
-          python -m pytest --cov=pyquadp --cov-report lcov:lcov.info
+          pytest --cov=pyquadp --cov-report lcov:lcov.info
 
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@master

@@ -24,11 +24,12 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get install -y libopenblas-dev
           pypy3 -m pip install --upgrade pip
           pypy3 -m pip install build wheel pip-tools
           pip-compile -o requirements.txt --extra test --strip-extras
           pypy3 -m pip install -r requirements.txt
-          sudo apt-get install -y libopenblas-dev
+
 
       - uses: fortran-lang/setup-fortran@v1
         id: setup-fortran
@@ -38,8 +39,10 @@ jobs:
     
       - name: Build
         run: |
-          python -m build
-          python -m pip install dist/pyquadp*.whl
+          pypy3 -m build
+          pypy3 -m pip install dist/pyquadp*.whl
 
       - name: Test
-        run: pypy3 -m pytest
+        # Don't use python -m pytest as that screws up the module loading
+        run: |
+          pytest -v

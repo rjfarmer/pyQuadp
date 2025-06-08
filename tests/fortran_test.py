@@ -8,8 +8,6 @@ import platform
 import pytest
 
 import pyquadp as pq
-import pyquadp.qmath as qm
-import pyquadp.qcmath as qcm
 
 
 def lib_ext():

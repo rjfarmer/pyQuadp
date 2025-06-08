@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-from .qmfloat import qfloat
-from .qmint import qint
+from pyquadp.qmfloat import qfloat
+from pyquadp.qmint import qint
+from pyquadp.qmcmplx import qcmplx
 
-from .qmcmplx import qcmplx
-
-from .constant import *
+from pyquadp.constant import *

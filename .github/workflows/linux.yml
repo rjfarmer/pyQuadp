@@ -46,5 +46,7 @@ jobs:
 
   
       - name: Test
-        run: python -m pytest -v
+        # Don't use python -m pytest as that screws up the module loading
+        run: |
+          pytest -v
 

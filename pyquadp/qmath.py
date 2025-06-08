@@ -1,5 +1,5 @@
 from .constant import *
-import qmathc as _qmathc
+import pyquadp.qmathc as _qmathc
 import math as _math
 
 
