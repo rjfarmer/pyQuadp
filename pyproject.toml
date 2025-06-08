@@ -62,6 +62,6 @@ ext-modules = [
     {name='pyquadp.qmfloat', sources=["pyquadp/qfloat.c"], libraries=['quadmath']},
     {name='pyquadp.qmcmplx', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"], libraries=['quadmath']},
     {name='pyquadp.qmint', sources=["pyquadp/qint.c"], libraries=['quadmath']},
-    {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], libraries=['quadmath']},
+#    {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], libraries=['quadmath']},
 ]
 packages = ["pyquadp"]
