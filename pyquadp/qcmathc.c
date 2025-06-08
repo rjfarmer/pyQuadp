@@ -431,8 +431,8 @@ static PyMethodDef QMathCMethods[] = {
 
 PyModuleDef QMathCModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquadp.qcmathc",
-    .m_doc = "Quad precision complex math library.",
+    .m_name = "qcmathc",
+    .m_doc = PyDoc_STR("Quad precision complex math library."),
     .m_size = -1,
     .m_methods = QMathCMethods,
 };
@@ -447,9 +447,9 @@ PyInit_qcmathc(void)
     if (m == NULL)
         return NULL;
 
-    if (import_qfloat() < 0)
+    if (import_qmfloat() < 0)
         return NULL;
-    if (import_qcmplx() < 0)
+    if (import_qmcmplx() < 0)
         return NULL;
 
     return m;

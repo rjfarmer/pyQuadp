@@ -115,9 +115,9 @@ static void **PyQfloat_API;
  * PyCapsule_Import will set an exception if there's an error.
  */
 static int
-import_qfloat(void)
+import_qmfloat(void)
 {
-    PyQfloat_API = (void **)PyCapsule_Import("qfloat._C_API", 0);
+    PyQfloat_API = (void **)PyCapsule_Import("pyquadp.qmfloat._C_API", 0);
     return (PyQfloat_API != NULL) ? 0 : -1;
 }
 

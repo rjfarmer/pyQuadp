@@ -111,9 +111,9 @@ static void **PyQInt_API;
  * PyCapsule_Import will set an exception if there's an error.
  */
 static int
-import_qint(void)
+import_qmint(void)
 {
-    PyQInt_API = (void **)PyCapsule_Import("qint._C_API", 0);
+    PyQInt_API = (void **)PyCapsule_Import("qmint._C_API", 0);
     return (PyQInt_API != NULL) ? 0 : -1;
 }
 

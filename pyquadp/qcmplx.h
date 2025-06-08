@@ -105,9 +105,9 @@ static void **PyQcmplx_API;
  * PyCapsule_Import will set an exception if there's an error.
  */
 static int
-import_qcmplx(void)
+import_qmcmplx(void)
 {
-    PyQcmplx_API = (void **)PyCapsule_Import("qcmplx._C_API", 0);
+    PyQcmplx_API = (void **)PyCapsule_Import("qmcmplx._C_API", 0);
     return (PyQcmplx_API != NULL) ? 0 : -1;
 }
 

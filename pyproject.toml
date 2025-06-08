@@ -57,11 +57,11 @@ concurrency = ["multiprocessing", "thread"]
 
 [tool.setuptools]
 ext-modules = [
-    {name='qmathc', sources=["pyquadp/qfloat.c", "pyquadp/qmathc.c"], libraries=['quadmath']},
-    {name='qcmathc', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c", "pyquadp/qcmathc.c"], libraries=['quadmath']},
-    {name='qfloat', sources=["pyquadp/qfloat.c"], libraries=['quadmath']},
-    {name='qcmplx', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"], libraries=['quadmath']},
-    {name='qint', sources=["pyquadp/qint.c"], libraries=['quadmath']},
-    {name='qarray', sources=["pyquadp/qfloatarray.c"], libraries=['quadmath']},
+    {name='pyquadp.qmathc', sources=["pyquadp/qfloat.c", "pyquadp/qmathc.c"], libraries=['quadmath']},
+    {name='pyquadp.qcmathc', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c", "pyquadp/qcmathc.c"], libraries=['quadmath']},
+    {name='pyquadp.qmfloat', sources=["pyquadp/qfloat.c"], libraries=['quadmath']},
+    {name='pyquadp.qmcmplx', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"], libraries=['quadmath']},
+    {name='pyquadp.qmint', sources=["pyquadp/qint.c"], libraries=['quadmath']},
+    {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], libraries=['quadmath']},
 ]
 packages = ["pyquadp"]

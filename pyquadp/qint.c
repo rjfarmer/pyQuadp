@@ -774,7 +774,7 @@ Quad_qinit(QuadIObject *self, PyObject *args, PyObject *kwds)
 
 static PyTypeObject QuadIType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "pyquadp._qint",
+    .tp_name = "qint",
     .tp_doc = PyDoc_STR("A single integer quad precision variable"),
     .tp_basicsize = sizeof(QuadIObject),
     .tp_itemsize = 0,
@@ -793,7 +793,7 @@ static PyTypeObject QuadIType = {
 
 static PyModuleDef QuadIModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquadp.qint",
+    .m_name = "qmint",
     .m_doc = "Quad precision module for scalar integer quad's.",
     .m_size = -1,
 };
@@ -880,7 +880,7 @@ static void alloc_QuadIType(QuadIObject * result){
 }
 
 PyMODINIT_FUNC
-PyInit_qint(void)
+PyInit_qmint(void)
 {
     PyObject *m;
     static void *PyQInt_API[PyQInt_API_pointers];
@@ -903,7 +903,7 @@ PyInit_qint(void)
 
 
     Py_INCREF(&QuadIType);
-    if (PyModule_AddObject(m, "_qint", (PyObject *) &QuadIType) < 0) {
+    if (PyModule_AddObject(m, "qint", (PyObject *) &QuadIType) < 0) {
         Py_DECREF(&QuadIType);
         Py_DECREF(m);
         return NULL;
@@ -911,7 +911,7 @@ PyInit_qint(void)
 
 
     /* Create a Capsule containing the API pointer array's address */
-    c_api_object = PyCapsule_New((void *)PyQInt_API, "qint._C_API", NULL);
+    c_api_object = PyCapsule_New((void *)PyQInt_API, "qmint._C_API", NULL);
 
     if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
         Py_XDECREF(c_api_object);

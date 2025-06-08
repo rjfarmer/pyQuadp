@@ -1,4 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
+
+// Helpful guide https://github.com/moble/quaternion/blob/main/src/numpy_quaternion.c
+
 #define NPY_TARGET_VERSION NPY_2_0_API_VERSION
 #define NPY_NO_DEPRECATED_API NPY_2_0_API_VERSION
 
@@ -20,7 +23,7 @@ PyArray_DescrProto QuadArrayDescrProto;
 
 static PyModuleDef QuadArrayModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquadp.qarray",
+    .m_name = "qarray",
     .m_doc = "Quad precision module for array quad's.",
     .m_size = -1,
 };

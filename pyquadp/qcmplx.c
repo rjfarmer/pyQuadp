@@ -564,7 +564,7 @@ QuadCType_RichCompare(PyObject * o1, PyObject * o2, int opid){
 
 static PyTypeObject QuadCType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "pyquadp._qcmplx",
+    .tp_name = "qcmplx",
     .tp_doc = PyDoc_STR("A single quad precision complex variable"),
     .tp_basicsize = sizeof(QuadCObject),
     .tp_itemsize = 0,
@@ -583,8 +583,8 @@ static PyTypeObject QuadCType = {
 
 static PyModuleDef QuadCModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquadp.qcmplx",
-    .m_doc = "Quad precision module for complex quad's.",
+    .m_name = "qmcmplx",
+    .m_doc = PyDoc_STR("Quad precision module for complex quad's."),
     .m_size = -1,
 };
 
@@ -713,7 +713,7 @@ static void alloc_QuadCType(QuadCObject * result){
 }
 
 PyMODINIT_FUNC
-PyInit_qcmplx(void)
+PyInit_qmcmplx(void)
 {
     PyObject *m;
     static void *PyQcmplx_API[PyQcmplx_API_pointers];
@@ -733,7 +733,7 @@ PyInit_qcmplx(void)
     PyQcmplx_API[PyQcmplx_alloc_NUM] = (void *)alloc_QuadCType;
 
     Py_INCREF(&QuadCType);
-    if (PyModule_AddObject(m, "_qcmplx", (PyObject *) &QuadCType) < 0) {
+    if (PyModule_AddObject(m, "qcmplx", (PyObject *) &QuadCType) < 0) {
         Py_DECREF(&QuadCType);
         Py_DECREF(m);
         return NULL;
@@ -741,7 +741,7 @@ PyInit_qcmplx(void)
 
 
     /* Create a Capsule containing the API pointer array's address */
-    c_api_object = PyCapsule_New((void *)PyQcmplx_API, "qcmplx._C_API", NULL);
+    c_api_object = PyCapsule_New((void *)PyQcmplx_API, "qmcmplx._C_API", NULL);
 
     if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
         Py_XDECREF(c_api_object);
@@ -749,7 +749,7 @@ PyInit_qcmplx(void)
         return NULL;
     }
 
-    if (import_qfloat() < 0)
+    if (import_qmfloat() < 0)
         return NULL;
 
 

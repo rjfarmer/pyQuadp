@@ -606,7 +606,7 @@ Quad_init(QuadObject *self, PyObject *args, PyObject *kwds)
 
 static PyTypeObject QuadType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "pyquadp._qfloat",
+    .tp_name = "qfloat",
     .tp_doc = PyDoc_STR("A single quad precision variable"),
     .tp_basicsize = sizeof(QuadObject),
     .tp_itemsize = 0,
@@ -625,8 +625,8 @@ static PyTypeObject QuadType = {
 
 static PyModuleDef QuadModule = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "pyquadp.qfloat",
-    .m_doc = "Quad precision module for scalar quad's.",
+    .m_name = "qmfloat",
+    .m_doc = PyDoc_STR("Quad precision module for scalar quad's."),
     .m_size = -1,
 };
 
@@ -771,7 +771,7 @@ static void alloc_QuadType(QuadObject * result){
 }
 
 PyMODINIT_FUNC
-PyInit_qfloat(void)
+PyInit_qmfloat(void)
 {
     PyObject *m;
     static void *PyQfloat_API[PyQfloat_API_pointers];
@@ -796,7 +796,7 @@ PyInit_qfloat(void)
 
 
     Py_INCREF(&QuadType);
-    if (PyModule_AddObject(m, "_qfloat", (PyObject *) &QuadType) < 0) {
+    if (PyModule_AddObject(m, "qfloat", (PyObject *) &QuadType) < 0) {
         Py_DECREF(&QuadType);
         Py_DECREF(m);
         return NULL;
@@ -804,7 +804,7 @@ PyInit_qfloat(void)
 
 
     /* Create a Capsule containing the API pointer array's address */
-    c_api_object = PyCapsule_New((void *)PyQfloat_API, "qfloat._C_API", NULL);
+    c_api_object = PyCapsule_New((void *)PyQfloat_API, "pyquadp.qmfloat._C_API", NULL);
 
     if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
         Py_XDECREF(c_api_object);

@@ -1,4 +1,5 @@
 #!/bin/bash
 
-rm -rf *.so build dist pyquadp.egg-info/
-python -m build && python -m pip install .
+rm -rf build dist
+python -m build
+python -m pip install dist/pyquadp*.whl --force-reinstall
