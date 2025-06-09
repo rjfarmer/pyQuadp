@@ -107,7 +107,7 @@ static void **PyQcmplx_API;
 static int
 import_qmcmplx(void)
 {
-    PyQcmplx_API = (void **)PyCapsule_Import("qmcmplx._C_API", 0);
+    PyQcmplx_API = (void **)PyCapsule_Import("pyquadp.qmcmplx._C_API", 0);
     return (PyQcmplx_API != NULL) ? 0 : -1;
 }
 

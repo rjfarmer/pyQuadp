@@ -2,9 +2,8 @@
 #pragma once
 #include "pyquadp.h"
 
-
-#include "qcmplx.h"
 #include "qfloat.h"
+#include "qcmplx.h"
 
 
 #define OP_cabsq  0

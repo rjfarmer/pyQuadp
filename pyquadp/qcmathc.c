@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0+
 #include "pyquadp.h"
 
+#include "qcmathc.h"
 #include "qfloat.h"
 #include "qcmplx.h"
-#include "qcmathc.h"
 
 
 static PyObject * QuadCObject_qmath_op1_qfloat(const int op, PyObject * self, PyObject * args){
@@ -449,6 +449,7 @@ PyInit_qcmathc(void)
 
     if (import_qmfloat() < 0)
         return NULL;
+
     if (import_qmcmplx() < 0)
         return NULL;
 

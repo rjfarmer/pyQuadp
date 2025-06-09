@@ -2,6 +2,7 @@
 #include "pyquadp.h"
 
 #include "qfloat.h"
+#include "qcmplx.h"
 #include "qmathc.h"
 
 static PyObject * QuadObject_qmath_op1(const int op, PyObject * self, PyObject * args){

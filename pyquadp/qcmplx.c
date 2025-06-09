@@ -737,7 +737,7 @@ PyInit_qmcmplx(void)
 
 
     /* Create a Capsule containing the API pointer array's address */
-    c_api_object = PyCapsule_New((void *)PyQcmplx_API, "qmcmplx._C_API", NULL);
+    c_api_object = PyCapsule_New((void *)PyQcmplx_API, "pyquadp.qmcmplx._C_API", NULL);
 
     if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
         Py_XDECREF(c_api_object);

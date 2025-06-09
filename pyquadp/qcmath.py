@@ -1,104 +1,101 @@
 from .constant import *
-from pyquadp.qmfloat import qfloat
-from pyquadp.qmint import qint
-from pyquadp.qmcmplx import qcmplx
-import pyquadp.qcmathc as _qcmathc
+import pyquadp.qcmathc as qcmathc
 
 
 def cabsq(x):
-    return _qcmathc._cabs(x)
+    return qcmathc._cabs(x)
 
 
 def cargq(x):
-    return _qcmathc._carg(x)
+    return qcmathc._carg(x)
 
 
 def cimagq(x):
-    return _qcmathc._cimag(x)
+    return qcmathc._cimag(x)
 
 
 def crealq(x):
-    return _qcmathc._creal(x)
+    return qcmathc._creal(x)
 
 
 def cacoshq(x):
-    return _qcmathc._cacosh(x)
+    return qcmathc._cacosh(x)
 
 
 def cacosq(x):
-    return _qcmathc._cacos(x)
+    return qcmathc._cacos(x)
 
 
 def casinhq(x):
-    return _qcmathc._casinh(x)
+    return qcmathc._casinh(x)
 
 
 def casinq(x):
-    return _qcmathc._casin(x)
+    return qcmathc._casin(x)
 
 
 def catanhq(x):
-    return _qcmathc._catanh(x)
+    return qcmathc._catanh(x)
 
 
 def catanq(x):
-    return _qcmathc._catan(x)
+    return qcmathc._catan(x)
 
 
 def ccosq(x):
-    return _qcmathc._ccos(x)
+    return qcmathc._ccos(x)
 
 
 def ccoshq(x):
-    return _qcmathc._ccosh(x)
+    return qcmathc._ccosh(x)
 
 
 def cexpq(x):
-    return _qcmathc._cexp(x)
+    return qcmathc._cexp(x)
 
 
 def cexpiq(x):
-    return _qcmathc._cexpi(x)
+    return qcmathc._cexpi(x)
 
 
 def clogq(x):
-    return _qcmathc._clog(x)
+    return qcmathc._clog(x)
 
 
 def clog10q(x):
-    return _qcmathc._clog10(x)
+    return qcmathc._clog10(x)
 
 
 def conjq(x):
-    return _qcmathc._conj(x)
+    return qcmathc._conj(x)
 
 
 def cpowq(x, y):
-    return _qcmathc._cpow(x, y)
+    return qcmathc._cpow(x, y)
 
 
 def cprojq(x):
-    return _qcmathc._cproj(x)
+    return qcmathc._cproj(x)
 
 
 def csinq(x):
-    return _qcmathc._csin(x)
+    return qcmathc._csin(x)
 
 
 def csinhq(x):
-    return _qcmathc._csinh(x)
+    return qcmathc._csinh(x)
 
 
 def csqrtq(x):
-    return _qcmathc._csqrt(x)
+    return qcmathc._csqrt(x)
 
 
 def ctanq(x):
-    return _qcmathc._ctan(x)
+    return qcmathc._ctan(x)
 
 
 def ctanhq(x):
-    return _qcmathc._ctanh(x)
+    return qcmathc._ctanh(x)
 
 
 ##################################
@@ -107,87 +104,87 @@ def ctanhq(x):
 
 
 def phase(x):
-    return _qcmathc._phase(x)
+    return qcmathc._phase(x)
 
 
 def polar(x):
-    return _qcmathc._polar(x)
+    return qcmathc._polar(x)
 
 
 def rect(r, phi):
-    return _qcmathc._polar(r, phi)
+    return qcmathc._polar(r, phi)
 
 
 def acos(x):
-    res = _qcmathc._cacos(x)
+    res = qcmathc._cacos(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def acosh(x):
-    res = _qcmathc._cacosh(x)
+    res = qcmathc._cacosh(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def asin(x):
-    res = _qcmathc._casin(x)
+    res = qcmathc._casin(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def asinh(x):
-    res = _qcmathc._casinh(x)
+    res = qcmathc._casinh(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def atan(x):
-    res = _qcmathc._catan(x)
+    res = qcmathc._catan(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def atanh(x):
-    res = _qcmathc._catanh(x)
+    res = qcmathc._catanh(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def cosh(x):
-    res = _qcmathc._ccosh(x)
+    res = qcmathc._ccosh(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def cos(x):
-    res = _qcmathc._ccos(x)
+    res = qcmathc._ccos(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def exp(x):
-    res = _qcmathc._cexp(x)
+    res = qcmathc._cexp(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def log(x, base=None):
-    res = _qcmathc._clog(x)
+    res = qcmathc._clog(x)
     if not isfinite(res):
         raise ValueError("math domain error")
 
     if base is not None:
-        res = res / _qcmathc._clog(base)
+        res = res / qcmathc._clog(base)
 
     if not isfinite(res):
         raise ValueError("math domain error")
@@ -196,64 +193,64 @@ def log(x, base=None):
 
 
 def log10(x):
-    res = _qcmathc._clog10(x)
+    res = qcmathc._clog10(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def pow(x, y):
-    res = _qcmathc._cpow(x, y)
+    res = qcmathc._cpow(x, y)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def sinh(x):
-    res = _qcmathc._csinh(x)
+    res = qcmathc._csinh(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def sin(x):
-    res = _qcmathc._csin(x)
+    res = qcmathc._csin(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def sqrt(x):
-    res = _qcmathc._csqrt(x)
+    res = qcmathc._csqrt(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def tan(x):
-    res = _qcmathc._ctan(x)
+    res = qcmathc._ctan(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def tanh(x):
-    res = _qcmathc._ctanh(x)
+    res = qcmathc._ctanh(x)
     if not isfinite(res):
         raise ValueError("math domain error")
     return res
 
 
 def isfinite(x):
-    return _qcmathc._finitecq(x)
+    return qcmathc._finitecq(x)
 
 
 def isnan(x):
-    return _qcmathc._isnancq(x)
+    return qcmathc._isnancq(x)
 
 
 def isinf(x):
-    return _qcmathc._isinfcq(x)
+    return qcmathc._isinfcq(x)
 
 
 def isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0):
