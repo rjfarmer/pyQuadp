@@ -1,4 +1,4 @@
-[![Continuous Integration](https://github.com/rjfarmer/pyQuadp/actions/workflows/ci.yml/badge.svg)](https://github.com/rjfarmer/pyQuadp/actions/workflows/ci.yml)
+[![Continuous Integration](https://github.com/rjfarmer/pyQuadp/actions/workflows/linux.yml/badge.svg)](https://github.com/rjfarmer/pyQuadp/actions/workflows/linux.yml)
 [![Coverage Status](https://coveralls.io/repos/github/rjfarmer/pyQuadp/badge.svg?branch=main)](https://coveralls.io/github/rjfarmer/pyQuadp?branch=main)
 [![Python versions](https://img.shields.io/pypi/pyversions/pyQuadp.svg)](https://img.shields.io/pypi/pyversions/pyQuadp.svg)
 [![gfortran versions](https://img.shields.io/badge/gfortran-8%7C9%7C10%7C11%7C12-blue)](https://img.shields.io/badge/gfortran-8%7C9%7C10%7C11%7C12-blue)
@@ -13,8 +13,6 @@ Python interface to gcc's libquadmath for quad (128-bit) precision maths.
 python -m build
 python -m pip install . 
 ````
-
-Package is not yet available on pypi.
 
 This package requires ``quadmath.h`` and ``libquadmath.so``. This might come installed with your installation of gcc/gfortran from your package manager. Or it might require a separate installation. This should be installed before trying to install the Python package.
 
