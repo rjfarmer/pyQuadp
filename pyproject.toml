@@ -50,7 +50,7 @@ testpaths = ["tests"]
 exclude_dirs = ["tests"]
 
 [tool.coverage.run]
-source = ["pyquadp"]
+source = ["pyQuadp"]
 parallel = true
 concurrency = ["multiprocessing", "thread"]
 
