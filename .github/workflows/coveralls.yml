@@ -36,9 +36,10 @@ jobs:
           version: ${{ matrix.toolchain.version }}
     
       - name: Build
+        # Needs editable install for coverage to work
         run: |
           python -m build
-          python -m pip install dist/pyquadp*.whl
+          python -m pip install -e .
         
       - name: Run coveralls
         env: 
@@ -46,7 +47,7 @@ jobs:
           PYTEST_COVERAGE: 1
         # Don't use python -m pytest as that screws up the module loading
         run: |
-          pytest --cov=pyquadp --cov-report lcov:lcov.info
+          python -m python --cov=pyquadp --cov-report lcov:lcov.info
 
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@master
