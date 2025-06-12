@@ -48,6 +48,7 @@ jobs:
         # Don't use python -m pytest as that screws up the module loading
         run: |
           python -m pytest --cov=pyquadp --cov-report lcov:lcov.info
+          sed -i 's/pyquadp/pyQuadp/g' lcov.info
 
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@master
