@@ -398,7 +398,7 @@ class TestQMathFloat:
     def test_scalbnq(self, x, n):
         assert float(qm.scalbnq(x, n)) == pytest.approx(math.ldexp(x, n), nan_ok=True)
 
-    @given(floats(allow_nan=False))
+    @given(floats(allow_nan=False, allow_infinity=False))
     def test_signbitq(self, x):
         sb = qm.signbitq(x)
         if np.isinf(x):

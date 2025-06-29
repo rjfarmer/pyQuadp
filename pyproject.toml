@@ -37,10 +37,10 @@ dynamic = ["version"]
 Homepage = "https://github.com/rjfarmer/pyquadp"
 
 [project.optional-dependencies]
-test = ['pytest','pytest-xdist','hypothesis',"scipy"]
-coverage = ['pytest', 'pytest-xdist', 'pytest-cov',"scipy"]
-dev = ['pre-commit','black', 'pytest','pytest-xdist',"scipy"]
-perfomance = ["pytest", "pytest-codspeed", 'pytest-xdist',"scipy"]
+test = ['pytest','pytest-xdist[psutil]','hypothesis',"scipy"]
+coverage = ['pytest', 'pytest-xdist[psutil]', 'pytest-cov',"scipy"]
+dev = ['pre-commit','black', 'pytest','pytest-xdist[psutil]',"scipy"]
+perfomance = ["pytest", "pytest-codspeed", 'pytest-xdist[psutil]',"scipy"]
 
 
 [tool.pytest.ini_options]
@@ -66,3 +66,10 @@ ext-modules = [
 #    {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], libraries=['quadmath']},
 ]
 packages = ["pyquadp"]
+
+
+
+[tool.cibuildwheel]
+test-sources = ["tests"]
+test-requires = ['pytest','pytest-xdist[psutil]','hypothesis',"scipy"]
+test-command = "pytest {project}/tests"
