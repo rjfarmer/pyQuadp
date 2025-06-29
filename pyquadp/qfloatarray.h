@@ -13,20 +13,6 @@
 extern "C" {
 #endif
 
-typedef struct {
-    PyObject_HEAD
-    __float128 *data;
-    int nd;
-    npy_intp *dimensions;
-    npy_intp *strides;
-    PyObject *base;
-    PyArray_Descr *descr;
-    int flags;
-    PyObject *weakreflist;
-    /* version dependent private members */
-} PyQArrayObject;
-
-
 
 
 #ifdef __cplusplus

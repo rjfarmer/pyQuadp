@@ -164,8 +164,6 @@ QuadArray_fillwithscalar(__float128 *buffer, npy_intp length, __float128 *value,
   }
 }
 
-
-
 PyMODINIT_FUNC
 PyInit_qfloatArray(void)
 {

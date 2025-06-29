@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=74.1.0", "wheel", "setuptools_scm[toml]>=8.0"]
+requires = ["setuptools>=74.1.0", "wheel", "setuptools_scm[toml]>=8.0","numpy>=2.0,<3"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -13,7 +13,7 @@ authors = [
 ]
 
 dependencies =[
-    "numpy<2.3.0",
+    "numpy",
 ]
 
 readme = "README.md"
