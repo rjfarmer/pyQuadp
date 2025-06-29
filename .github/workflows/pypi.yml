@@ -1,8 +1,5 @@
 name: Publish to pypi
-on:
-  push:
-    tags:
-      - 'v*'
+on: [push, pull_request]
 
 permissions: {}
 
