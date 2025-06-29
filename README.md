@@ -139,12 +139,12 @@ regarding behavior of exceptional values. While routines from ``libquadmath`` (t
 | atan | :heavy_check_mark: |  |
 | atan2 | :heavy_check_mark: |  |
 | cos | :heavy_check_mark: |  |
-| dist | :x: |  |
+| dist | :heavy_check_mark: |  |
 | hypot | :heavy_check_mark: |  |
 | sin | :heavy_check_mark: |  |
 | tan | :heavy_check_mark: |  |
-| degress | :x: |  |
-| radians | :x: |  |
+| degress | :heavy_check_mark: |  |
+| radians | :heavy_check_mark: |  |
 | acosh | :heavy_check_mark: |  |
 | asinh| :heavy_check_mark: |  |
 | atanh| :heavy_check_mark: |  |
