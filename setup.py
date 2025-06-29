@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from setuptools import Extension, setup
-import numpy as np
+
+# import numpy as np
 
 extensions = [
     # Extension(
