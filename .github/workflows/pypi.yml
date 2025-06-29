@@ -20,7 +20,7 @@ jobs:
 
     env:
         MACOSX_DEPLOYMENT_TARGET: 14.0
-        CIBW_TEST_REQUIRES: pytest
+        CIBW_TEST_REQUIRES: pytest pytest-xdist hypothesis scipy
         CIBW_TEST_COMMAND: "pytest {project}/tests"
 
     steps:
