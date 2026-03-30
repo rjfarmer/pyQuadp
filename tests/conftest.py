@@ -7,7 +7,6 @@ from packaging.version import Version
 import pathlib
 import _pytest.pathlib
 
-
 resolve_pkg_path_orig = _pytest.pathlib.resolve_package_path
 
 # we consider all dirs in repo/ to be namespace packages
