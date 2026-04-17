@@ -70,6 +70,67 @@ q1 == q2 # False
 str(q) # "1.000000000000000000000000000000000000e+00"
 ````
 
+### qarray
+
+``qarray`` provides NumPy-compatible arrays of quad-precision (128-bit) values. It registers a custom NumPy dtype so arrays behave like any other NumPy array where supported.
+
+````python
+import pyquadp
+import numpy as np
+
+# creation
+arr = pyquadp.qarray.zeros(4)           # array of four zeros
+arr = pyquadp.qarray.ones(3)            # array of three ones
+arr = pyquadp.qarray.from_list([1, 2.5, "3.141592653589793238"])  # from Python sequence
+arr = pyquadp.qarray.from_array(np.linspace(0, 1, 5))  # from any NumPy array
+
+# dtype handle for asarray / casting
+dt = pyquadp.qarray.dtype
+
+# casting to/from standard NumPy dtypes
+out64 = np.asarray(arr, dtype=np.float64)          # qarray → float64
+back  = np.asarray(out64, dtype=pyquadp.qarray.dtype)  # float64 → qarray
+````
+
+#### Arithmetic ufuncs
+
+All standard element-wise binary and unary arithmetic ufuncs work directly:
+
+````python
+a = pyquadp.qarray.from_list([1.0, 2.0, 3.0])
+b = pyquadp.qarray.from_list([0.5, 1.5, 2.5])
+
+np.add(a, b)       # qarray([1.5, 3.5, 5.5])
+np.subtract(a, b)  # qarray([0.5, 0.5, 0.5])
+np.multiply(a, b)  # qarray([0.5, 3.0, 7.5])
+np.divide(a, b)    # qarray([2.0, 1.333..., 1.2])
+np.negative(a)     # qarray([-1.0, -2.0, -3.0])
+np.absolute(a)     # qarray([1.0,  2.0,  3.0])
+np.square(a)       # qarray([1.0,  4.0,  9.0])
+````
+
+Operands can be mixed with ``float64`` arrays; the output dtype is always ``qarray``:
+
+````python
+d = np.array([10.0, 20.0, 30.0], dtype=np.float64)
+np.add(a, d)       # qarray([11.0, 22.0, 33.0])
+np.multiply(d, a)  # qarray([10.0, 40.0, 90.0])
+````
+
+#### Math ufuncs
+
+````python
+np.sqrt(a)   # quad-precision square root
+np.exp(a)    # quad-precision exponential
+np.log(a)    # quad-precision natural log
+np.sin(a)    # quad-precision sine
+np.cos(a)    # quad-precision cosine
+````
+
+#### Platform requirements
+
+``qarray`` requires GCC's ``libquadmath`` and a NumPy ≥ 2.0 installation. 
+
 ### qcmplx
 
 A quad precision number is created by passing either a complex variable or two ints, floats, strs, or qfloats to ``qcmplx``:

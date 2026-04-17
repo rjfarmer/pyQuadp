@@ -3,6 +3,7 @@
 from pyquadp.qmfloat import qfloat
 from pyquadp.qmint import qint
 from pyquadp.qmcmplx import qcmplx
+from pyquadp import qarray
 
 from pyquadp.constant import *
 

@@ -24,6 +24,7 @@ class TestQArrayConstructors:
         assert isinstance(arr, np.ndarray)
         assert arr.shape == (4,)
         assert arr.dtype == qarray.dtype
+        assert arr.dtype.name == "qfloat"
 
     def test_ones_constructor(self):
         qarray = pytest.importorskip("pyquadp.qarray")

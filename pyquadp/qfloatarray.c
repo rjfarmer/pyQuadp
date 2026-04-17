@@ -1017,6 +1017,7 @@ PyInit_qarray(void)
     QuadArrayDescrProto.elsize = sizeof(__float128);
     QuadArrayDescrProto.alignment = alignof(__float128);
     QuadArrayDescrProto.f = &QuadArrayFuncs;
+    QuadArrayDescrProto.name = "qfloat";
     QuadArrayDescrProto.subarray = NULL;
     QuadArrayDescrProto.fields = NULL;
     QuadArrayDescrProto.names = NULL;
