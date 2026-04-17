@@ -18,6 +18,7 @@
 #include "qcmplx.h"
 
 static int QuadCArrayTypeNum = -1;
+static int QuadArrayTypeNum = -1;
 
 static PyTypeObject QuadCArrayType = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -296,6 +297,112 @@ QuadCArray_ufunc_positive(char **args, const npy_intp *dims, const npy_intp *ste
     }
 }
 
+static void
+QuadCArray_ufunc_absolute(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__float128 *)out = cabsq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_square(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        __complex128 v = *(__complex128 *)in;
+        *(__complex128 *)out = v * v;
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_sqrt(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = csqrtq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_exp(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = cexpq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_log(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = clogq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_sin(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = csinq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_cos(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = ccosq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
 static int
 QuadCArray_register_ufunc_binary(const char *name, PyUFuncGenericFunction loop)
 {
@@ -391,6 +498,39 @@ QuadCArray_register_ufunc_unary(const char *name, PyUFuncGenericFunction loop)
 }
 
 static int
+QuadCArray_register_ufunc_unary_types(
+    const char *name,
+    PyUFuncGenericFunction loop,
+    int in0,
+    int out)
+{
+    PyObject *numpy_mod;
+    PyObject *ufunc;
+    int types[2];
+
+    numpy_mod = PyImport_ImportModule("numpy");
+    if (numpy_mod == NULL) {
+        return -1;
+    }
+    ufunc = PyObject_GetAttrString(numpy_mod, name);
+    Py_DECREF(numpy_mod);
+    if (ufunc == NULL) {
+        return -1;
+    }
+
+    types[0] = in0;
+    types[1] = out;
+
+    if (PyUFunc_RegisterLoopForType((PyUFuncObject *)ufunc, QuadCArrayTypeNum, loop, types, NULL) < 0) {
+        Py_DECREF(ufunc);
+        return -1;
+    }
+
+    Py_DECREF(ufunc);
+    return 0;
+}
+
+static int
 QuadCArray_register_ufuncs(void)
 {
     if (QuadCArray_register_ufunc_binary("add", QuadCArray_ufunc_add) < 0) {
@@ -435,6 +575,31 @@ QuadCArray_register_ufuncs(void)
         return -1;
     }
     if (QuadCArray_register_ufunc_unary("positive", QuadCArray_ufunc_positive) < 0) {
+        return -1;
+    }
+    if (QuadArrayTypeNum < 0) {
+        PyErr_SetString(PyExc_RuntimeError, "qarray dtype not initialized");
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary_types("absolute", QuadCArray_ufunc_absolute, QuadCArrayTypeNum, QuadArrayTypeNum) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("square", QuadCArray_ufunc_square) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("sqrt", QuadCArray_ufunc_sqrt) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("exp", QuadCArray_ufunc_exp) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("log", QuadCArray_ufunc_log) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("sin", QuadCArray_ufunc_sin) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("cos", QuadCArray_ufunc_cos) < 0) {
         return -1;
     }
 
@@ -876,6 +1041,8 @@ PyMODINIT_FUNC
 PyInit_qcarray(void)
 {
     PyObject *m;
+    PyObject *qarray_mod;
+    PyObject *qarray_type_num_obj;
     int qcarrayNum;
 
     m = PyModule_Create(&QuadCArrayModule);
@@ -884,6 +1051,24 @@ PyInit_qcarray(void)
     }
 
     if (import_qmcmplx() < 0) {
+        Py_DECREF(m);
+        return NULL;
+    }
+
+    qarray_mod = PyImport_ImportModule("pyquadp.qarray");
+    if (qarray_mod == NULL) {
+        Py_DECREF(m);
+        return NULL;
+    }
+    qarray_type_num_obj = PyObject_GetAttrString(qarray_mod, "dtype_num");
+    Py_DECREF(qarray_mod);
+    if (qarray_type_num_obj == NULL) {
+        Py_DECREF(m);
+        return NULL;
+    }
+    QuadArrayTypeNum = (int)PyLong_AsLong(qarray_type_num_obj);
+    Py_DECREF(qarray_type_num_obj);
+    if (QuadArrayTypeNum < 0 && PyErr_Occurred()) {
         Py_DECREF(m);
         return NULL;
     }
