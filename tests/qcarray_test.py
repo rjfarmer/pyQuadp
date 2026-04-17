@@ -126,6 +126,74 @@ class TestQCArrayUfuncs:
             c + np.asarray(q, dtype=np.complex128),
         )
 
+    @pytest.mark.parametrize(
+        ("ufunc", "expected_qc", "expected_cq"),
+        [
+            (np.add, lambda q, c: q + c, lambda q, c: c + q),
+            (np.subtract, lambda q, c: q - c, lambda q, c: c - q),
+            (np.multiply, lambda q, c: q * c, lambda q, c: c * q),
+            (np.divide, lambda q, c: q / c, lambda q, c: c / q),
+        ],
+    )
+    def test_mixed_complex128_binary_ufuncs(self, ufunc, expected_qc, expected_cq):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        q = qcarray.from_list([2 + 1j, -3 + 0.5j, 0.25 - 2j])
+        c = np.array([1 - 4j, 0.25 + 0.75j, -2 + 0.5j], dtype=np.complex128)
+
+        out_qc = ufunc(q, c)
+        out_cq = ufunc(c, q)
+
+        assert out_qc.dtype == qcarray.dtype
+        assert out_cq.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out_qc, dtype=np.complex128),
+            expected_qc(np.asarray(q, dtype=np.complex128), c),
+        )
+        np.testing.assert_allclose(
+            np.asarray(out_cq, dtype=np.complex128),
+            expected_cq(np.asarray(q, dtype=np.complex128), c),
+        )
+
+    @pytest.mark.parametrize("ufunc", [np.add, np.subtract, np.multiply, np.divide])
+    def test_mixed_complex128_scalar_binary_ufuncs(self, ufunc):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        q = qcarray.from_list([2 + 1j, -3 + 0.5j, 0.25 - 2j])
+        scalar = np.complex128(1.5 - 0.25j)
+        q128 = np.asarray(q, dtype=np.complex128)
+
+        out_qs = ufunc(q, scalar)
+        out_sq = ufunc(scalar, q)
+
+        assert out_qs.dtype == qcarray.dtype
+        assert out_sq.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out_qs, dtype=np.complex128),
+            ufunc(q128, scalar),
+        )
+        np.testing.assert_allclose(
+            np.asarray(out_sq, dtype=np.complex128),
+            ufunc(scalar, q128),
+        )
+
+    @pytest.mark.parametrize("ufunc", [np.add, np.subtract, np.multiply, np.divide])
+    def test_mixed_complex128_broadcasting_binary_ufuncs(self, ufunc):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        q = qcarray.from_list([2 + 1j, -3 + 0.5j, 0.25 - 2j])
+        c = np.array([1.5 - 0.25j], dtype=np.complex128)
+        q128 = np.asarray(q, dtype=np.complex128)
+
+        out_qc = ufunc(q, c)
+        out_cq = ufunc(c, q)
+
+        assert out_qc.dtype == qcarray.dtype
+        assert out_cq.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out_qc, dtype=np.complex128), ufunc(q128, c)
+        )
+        np.testing.assert_allclose(
+            np.asarray(out_cq, dtype=np.complex128), ufunc(c, q128)
+        )
+
     def test_binary_ufuncs_broadcasting(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
         left = qcarray.from_list([1 + 1j, 2 - 3j, -4 + 0.5j])
@@ -152,6 +220,18 @@ class TestQCArrayUfuncs:
         q128 = np.asarray(q, dtype=np.complex128)
         assert np.allclose(np.asarray(pos, dtype=np.complex128), +q128)
         assert np.allclose(np.asarray(neg, dtype=np.complex128), -q128)
+
+    def test_conjugate_ufunc(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        q = qcarray.from_list([1 - 2j, -3 + 4j, 0.5 + 0j])
+
+        out = np.conjugate(q)
+
+        assert out.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out, dtype=np.complex128),
+            np.conjugate(np.asarray(q, dtype=np.complex128)),
+        )
 
     def test_unary_math_ufuncs(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
@@ -306,3 +386,112 @@ class TestQCArrayHardening:
         assert np.isneginf(values[1].imag)
         assert np.isneginf(values[2].real)
         assert values[2].imag == pytest.approx(0.0)
+
+    def test_argmax_uses_complex_magnitude(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.from_list([1 + 1j, 2 + 0j, 1 + 3j, -2 - 2j])
+
+        idx = np.argmax(arr)
+
+        assert idx == 2
+
+    def test_argmax_returns_first_nan(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.from_list(
+            [1 + 1j, complex(np.nan, 0.0), complex(0.0, np.nan), 10 + 0j]
+        )
+
+        idx = np.argmax(arr)
+
+        assert idx == 1
+
+    def test_sort_and_argsort_match_complex128(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        values = np.array(
+            [1 + 2j, 1 + 1j, 0 + 5j, -1 + 10j, -1 + 2j, complex(np.nan, 0.0)],
+            dtype=np.complex128,
+        )
+        arr = qcarray.from_array(values)
+
+        np.testing.assert_array_equal(np.argsort(arr), np.argsort(values))
+        np.testing.assert_allclose(
+            np.asarray(np.sort(arr), dtype=np.complex128),
+            np.sort(values),
+            equal_nan=True,
+        )
+
+    def test_argmin_uses_lexicographic_order(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.from_list([1 + 2j, 1 + 1j, 0 + 5j, -1 + 10j, -1 + 2j])
+
+        idx = np.argmin(arr)
+
+        assert idx == 4
+
+    def test_argmin_returns_first_nan(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.from_list(
+            [1 + 1j, complex(np.nan, 0.0), complex(0.0, np.nan), -10 + 0j]
+        )
+
+        idx = np.argmin(arr)
+
+        assert idx == 1
+
+    def test_min_and_max_match_complex128(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        values = np.array(
+            [1 + 2j, 1 + 1j, 0 + 5j, -1 + 10j, -1 + 2j, complex(np.nan, 0.0)],
+            dtype=np.complex128,
+        )
+        arr = qcarray.from_array(values)
+
+        min_out = np.min(arr)
+        max_out = np.max(arr)
+
+        np.testing.assert_allclose(
+            np.array([complex(min_out)], dtype=np.complex128),
+            np.array([np.min(values)], dtype=np.complex128),
+            equal_nan=True,
+        )
+        np.testing.assert_allclose(
+            np.array([complex(max_out)], dtype=np.complex128),
+            np.array([np.max(values)], dtype=np.complex128),
+            equal_nan=True,
+        )
+
+    def test_axis_ordering_reductions_match_complex128(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        values = np.array(
+            [[1 + 2j, -1 + 10j, complex(np.nan, 0.0)], [1 + 1j, -1 + 2j, 3 + 0j]],
+            dtype=np.complex128,
+        )
+        arr = qcarray.from_array(values)
+
+        np.testing.assert_allclose(
+            np.asarray(np.min(arr, axis=0), dtype=np.complex128),
+            np.min(values, axis=0),
+            equal_nan=True,
+        )
+        np.testing.assert_allclose(
+            np.asarray(np.min(arr, axis=1), dtype=np.complex128),
+            np.min(values, axis=1),
+            equal_nan=True,
+        )
+        np.testing.assert_allclose(
+            np.asarray(np.max(arr, axis=0), dtype=np.complex128),
+            np.max(values, axis=0),
+            equal_nan=True,
+        )
+        np.testing.assert_allclose(
+            np.asarray(np.max(arr, axis=1), dtype=np.complex128),
+            np.max(values, axis=1),
+            equal_nan=True,
+        )
+        np.testing.assert_array_equal(np.argmin(arr, axis=0), np.argmin(values, axis=0))
+        np.testing.assert_array_equal(np.argmin(arr, axis=1), np.argmin(values, axis=1))
+        np.testing.assert_array_equal(np.argmax(arr, axis=0), np.argmax(values, axis=0))
+        np.testing.assert_array_equal(np.argmax(arr, axis=1), np.argmax(values, axis=1))
+        np.testing.assert_array_equal(
+            np.argsort(arr, axis=1), np.argsort(values, axis=1)
+        )

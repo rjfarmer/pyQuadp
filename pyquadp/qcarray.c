@@ -298,6 +298,21 @@ QuadCArray_ufunc_positive(char **args, const npy_intp *dims, const npy_intp *ste
 }
 
 static void
+QuadCArray_ufunc_conjugate(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = conjq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
 QuadCArray_ufunc_absolute(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
 {
     npy_intp i;
@@ -575,6 +590,9 @@ QuadCArray_register_ufuncs(void)
         return -1;
     }
     if (QuadCArray_register_ufunc_unary("positive", QuadCArray_ufunc_positive) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("conjugate", QuadCArray_ufunc_conjugate) < 0) {
         return -1;
     }
     if (QuadArrayTypeNum < 0) {
@@ -974,10 +992,10 @@ QuadCArray_compare(__complex128 *pa, __complex128 *pb, PyArrayObject *NPY_UNUSED
     npy_bool bnan = qcomplex_isnan(*pb);
 
     if (anan) {
-        return bnan ? 0 : -1;
+        return bnan ? 0 : 1;
     }
     if (bnan) {
-        return 1;
+        return -1;
     }
 
     if (__real__ *pa < __real__ *pb) {
@@ -1023,6 +1041,32 @@ QuadCArray_argmax(__complex128 *ip, npy_intp n, npy_intp *max_ind, PyArrayObject
         }
     }
     (void)mp;
+    return 0;
+}
+
+static int
+QuadCArray_argmin(__complex128 *ip, npy_intp n, npy_intp *min_ind, PyArrayObject *NPY_UNUSED(aip))
+{
+    npy_intp i;
+    __complex128 mp = *ip;
+
+    *min_ind = 0;
+
+    if (qcomplex_isnan(mp)) {
+        return 0;
+    }
+
+    for (i = 1; i < n; i++) {
+        ip++;
+        if (qcomplex_isnan(*ip)) {
+            *min_ind = i;
+            break;
+        }
+        if (QuadCArray_compare(ip, &mp, NULL) < 0) {
+            mp = *ip;
+            *min_ind = i;
+        }
+    }
     return 0;
 }
 
@@ -1100,6 +1144,7 @@ PyInit_qcarray(void)
     QuadCArrayFuncs.getitem = (PyArray_GetItemFunc *)QuadCArray_getitem;
     QuadCArrayFuncs.compare = (PyArray_CompareFunc *)QuadCArray_compare;
     QuadCArrayFuncs.argmax = (PyArray_ArgFunc *)QuadCArray_argmax;
+    QuadCArrayFuncs.argmin = (PyArray_ArgFunc *)QuadCArray_argmin;
     QuadCArrayFuncs.fillwithscalar = (PyArray_FillWithScalarFunc *)QuadCArray_fillwithscalar;
 
     Py_SET_TYPE(&QuadCArrayDescrProto, &PyArrayDescr_Type);
