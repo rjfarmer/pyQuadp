@@ -193,3 +193,127 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(mul_dq, dtype=np.float64), d * qf)
         assert np.allclose(np.asarray(div_qd, dtype=np.float64), qf / d)
         assert np.allclose(np.asarray(div_dq, dtype=np.float64), d / qf)
+
+
+@pytest.mark.qarray
+class TestQArrayHardening:
+    def test_nan_propagates_through_add(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.0, float("nan"), 3.0])
+        b = qarray.from_list([2.0, 2.0, 2.0])
+
+        out = np.add(a, b)
+        with pytest.warns(RuntimeWarning, match="invalid value"):
+            vals = np.asarray(out, dtype=np.float64)
+        assert np.isnan(vals[1])
+        assert vals[0] == pytest.approx(3.0)
+        assert vals[2] == pytest.approx(5.0)
+
+    def test_inf_propagates_through_multiply(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.0, float("inf"), -1.0])
+        b = qarray.from_list([2.0, 2.0, float("-inf")])
+
+        out = np.multiply(a, b)
+        vals = np.asarray(out, dtype=np.float64)
+        assert vals[0] == pytest.approx(2.0)
+        assert np.isposinf(vals[1])
+        assert np.isposinf(vals[2])
+
+    def test_divide_by_zero_gives_inf(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.0, -1.0])
+        b = qarray.from_list([0.0, 0.0])
+
+        with pytest.warns(RuntimeWarning, match="divide by zero"):
+            out = np.divide(a, b)
+        vals = np.asarray(out, dtype=np.float64)
+        assert np.isposinf(vals[0])
+        assert np.isneginf(vals[1])
+
+    def test_sqrt_of_negative_gives_nan(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([-1.0, 4.0])
+
+        with pytest.warns(RuntimeWarning):
+            out = np.sqrt(a)
+            vals = np.asarray(out, dtype=np.float64)
+        assert np.isnan(vals[0])
+        assert vals[1] == pytest.approx(2.0)
+
+    def test_log_of_zero_gives_neg_inf(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([0.0, 1.0])
+
+        with pytest.warns(RuntimeWarning, match="divide by zero"):
+            out = np.log(a)
+        vals = np.asarray(out, dtype=np.float64)
+        assert np.isneginf(vals[0])
+        assert vals[1] == pytest.approx(0.0)
+
+    def test_absolute_of_nan_is_nan(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([float("nan"), -2.0])
+
+        out = np.absolute(a)
+        with pytest.warns(RuntimeWarning, match="invalid value"):
+            vals = np.asarray(out, dtype=np.float64)
+        assert np.isnan(vals[0])
+        assert vals[1] == pytest.approx(2.0)
+
+    def test_argmax_with_nan(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.0, float("nan"), 3.0])
+
+        # NaN propagation: first NaN encountered becomes the "max"
+        idx = np.argmax(a)
+        assert idx == 1
+
+    def test_argmax_with_inf(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.0, float("inf"), 3.0])
+
+        idx = np.argmax(a)
+        assert idx == 1
+
+    def test_noncontiguous_add(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        base = qarray.from_list([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+        a = base[::2]  # [0, 2, 4] — non-contiguous stride
+        b = base[1::2]  # [1, 3, 5] — non-contiguous stride
+
+        out = np.add(a, b)
+        assert out.dtype == qarray.dtype
+        assert np.allclose(np.asarray(out, dtype=np.float64), [1.0, 5.0, 9.0])
+
+    def test_noncontiguous_unary(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        base = qarray.from_list([1.0, -2.0, 3.0, -4.0])
+        sliced = base[1::2]  # [-2, -4] — non-contiguous
+
+        out = np.negative(sliced)
+        assert out.dtype == qarray.dtype
+        assert np.allclose(np.asarray(out, dtype=np.float64), [2.0, 4.0])
+
+    def test_2d_array_ufunc(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        src = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
+        a = qarray.from_array(src)
+        b = qarray.from_array(src * 2)
+
+        out = np.add(a, b)
+        assert out.dtype == qarray.dtype
+        assert out.shape == (2, 2)
+        expected = np.array([[3.0, 6.0], [9.0, 12.0]])
+        assert np.allclose(np.asarray(out, dtype=np.float64), expected)
+
+    def test_setitem_and_getitem_nan_inf(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        arr = qarray.zeros(3)
+        arr[0] = float("nan")
+        arr[1] = float("inf")
+        arr[2] = float("-inf")
+
+        assert np.isnan(float(arr[0]))
+        assert np.isposinf(float(arr[1]))
+        assert np.isneginf(float(arr[2]))
