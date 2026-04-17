@@ -1,6 +1,5 @@
 [build-system]
-# "numpy>=2.0,<3" not needed at the moment
-requires = ["setuptools>=74.1.0", "wheel", "setuptools_scm[toml]>=8.0"]
+requires = ["setuptools>=74.1.0", "wheel", "setuptools_scm[toml]>=8.0", "numpy>=2.0,<3"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -47,6 +46,9 @@ perfomance = ["pytest", "pytest-codspeed", 'pytest-xdist[psutil]',"scipy"]
 [tool.pytest.ini_options]
 addopts = "-s -n auto"
 testpaths = ["tests"]
+markers = [
+    "qarray: tests for NumPy-compatible quad array support",
+]
 
 [tool.bandit]
 exclude_dirs = ["tests"]
@@ -64,7 +66,7 @@ ext-modules = [
     {name='pyquadp.qmfloat', sources=["pyquadp/qfloat.c"], libraries=['quadmath']},
     {name='pyquadp.qmcmplx', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"], libraries=['quadmath']},
     {name='pyquadp.qmint', sources=["pyquadp/qint.c"], libraries=['quadmath']},
-#    {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], libraries=['quadmath']},
+    {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], include-dirs=["pyquadp"], libraries=['quadmath']},
 ]
 packages = ["pyquadp"]
 

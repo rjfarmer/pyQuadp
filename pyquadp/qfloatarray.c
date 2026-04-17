@@ -11,20 +11,307 @@
 #include <numpy/npy_math.h>
 #include <numpy/ufuncobject.h>
 #include <stdalign.h>
+#include <string.h>
 
 #define QFLOATARRAY_MODULE
 #include "qfloatarray.h"
 #include "qfloat.h"
 
-static PyTypeObject QuadArrayType;
+static int QuadArrayTypeNum = -1;
+
+static PyTypeObject QuadArrayType = {
+  PyVarObject_HEAD_INIT(NULL, 0)
+  .tp_name = "pyquadp.qarray",
+  .tp_basicsize = sizeof(PyObject),
+  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_doc = "NumPy custom dtype support for quad precision values",
+};
 PyArray_ArrFuncs QuadArrayFuncs;
 PyArray_Descr* QuadArrayDescr;
 PyArray_DescrProto QuadArrayDescrProto;
+
+static int QuadArray_setitem(PyObject* item, __float128* data, void* array);
+
+static void
+QuadArray_cast_to_float64(void *from, void *to, npy_intp n, void *NPY_UNUSED(fromarr), void *NPY_UNUSED(toarr))
+{
+  npy_intp i;
+  __float128 *src = (__float128 *)from;
+  npy_float64 *dst = (npy_float64 *)to;
+
+  for (i = 0; i < n; ++i) {
+    dst[i] = (npy_float64)__float128_to_double(src[i]);
+  }
+}
+
+static void
+QuadArray_cast_to_float32(void *from, void *to, npy_intp n, void *NPY_UNUSED(fromarr), void *NPY_UNUSED(toarr))
+{
+  npy_intp i;
+  __float128 *src = (__float128 *)from;
+  npy_float32 *dst = (npy_float32 *)to;
+
+  for (i = 0; i < n; ++i) {
+    dst[i] = (npy_float32)__float128_to_double(src[i]);
+  }
+}
+
+static void
+QuadArray_cast_from_float64(void *from, void *to, npy_intp n, void *NPY_UNUSED(fromarr), void *NPY_UNUSED(toarr))
+{
+  npy_intp i;
+  npy_float64 *src = (npy_float64 *)from;
+  __float128 *dst = (__float128 *)to;
+
+  for (i = 0; i < n; ++i) {
+    dst[i] = (__float128)src[i];
+  }
+}
+
+static void
+QuadArray_cast_from_float32(void *from, void *to, npy_intp n, void *NPY_UNUSED(fromarr), void *NPY_UNUSED(toarr))
+{
+  npy_intp i;
+  npy_float32 *src = (npy_float32 *)from;
+  __float128 *dst = (__float128 *)to;
+
+  for (i = 0; i < n; ++i) {
+    dst[i] = (__float128)src[i];
+  }
+}
+
+static int
+QuadArray_register_casts(PyArray_Descr *quad_descr, int quad_type_num)
+{
+  PyArray_Descr *float64_descr;
+  PyArray_Descr *float32_descr;
+
+  if (PyArray_RegisterCastFunc(quad_descr, NPY_DOUBLE, QuadArray_cast_to_float64) < 0) {
+    return -1;
+  }
+  if (PyArray_RegisterCastFunc(quad_descr, NPY_FLOAT, QuadArray_cast_to_float32) < 0) {
+    return -1;
+  }
+  if (PyArray_RegisterCanCast(quad_descr, NPY_DOUBLE, NPY_NOSCALAR) < 0) {
+    return -1;
+  }
+  if (PyArray_RegisterCanCast(quad_descr, NPY_FLOAT, NPY_NOSCALAR) < 0) {
+    return -1;
+  }
+
+  float64_descr = PyArray_DescrFromType(NPY_DOUBLE);
+  if (float64_descr == NULL) {
+    return -1;
+  }
+  if (PyArray_RegisterCastFunc(float64_descr, quad_type_num, QuadArray_cast_from_float64) < 0) {
+    Py_DECREF(float64_descr);
+    return -1;
+  }
+  if (PyArray_RegisterCanCast(float64_descr, quad_type_num, NPY_NOSCALAR) < 0) {
+    Py_DECREF(float64_descr);
+    return -1;
+  }
+  Py_DECREF(float64_descr);
+
+  float32_descr = PyArray_DescrFromType(NPY_FLOAT);
+  if (float32_descr == NULL) {
+    return -1;
+  }
+  if (PyArray_RegisterCastFunc(float32_descr, quad_type_num, QuadArray_cast_from_float32) < 0) {
+    Py_DECREF(float32_descr);
+    return -1;
+  }
+  if (PyArray_RegisterCanCast(float32_descr, quad_type_num, NPY_NOSCALAR) < 0) {
+    Py_DECREF(float32_descr);
+    return -1;
+  }
+  Py_DECREF(float32_descr);
+
+  return 0;
+}
+
+static PyArrayObject *
+QuadArray_new_empty(int nd, npy_intp *dims)
+{
+  PyArray_Descr *descr;
+
+  if (QuadArrayDescr == NULL) {
+    PyErr_SetString(PyExc_RuntimeError, "qarray dtype not initialized");
+    return NULL;
+  }
+
+  descr = QuadArrayDescr;
+  Py_INCREF(descr);
+  return (PyArrayObject *)PyArray_SimpleNewFromDescr(nd, dims, descr);
+}
+
+static PyObject *
+qarray_zeros(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  Py_ssize_t n;
+  npy_intp dims[1];
+  PyArrayObject *arr;
+
+  if (!PyArg_ParseTuple(args, "n", &n)) {
+    return NULL;
+  }
+  if (n < 0) {
+    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+    return NULL;
+  }
+
+  dims[0] = (npy_intp)n;
+  arr = QuadArray_new_empty(1, dims);
+  if (arr == NULL) {
+    return NULL;
+  }
+
+  memset(PyArray_DATA(arr), 0, (size_t)dims[0] * sizeof(__float128));
+  return (PyObject *)arr;
+}
+
+static PyObject *
+qarray_ones(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  Py_ssize_t n;
+  npy_intp i;
+  npy_intp dims[1];
+  PyArrayObject *arr;
+  __float128 *data;
+
+  if (!PyArg_ParseTuple(args, "n", &n)) {
+    return NULL;
+  }
+  if (n < 0) {
+    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+    return NULL;
+  }
+
+  dims[0] = (npy_intp)n;
+  arr = QuadArray_new_empty(1, dims);
+  if (arr == NULL) {
+    return NULL;
+  }
+
+  data = (__float128 *)PyArray_DATA(arr);
+  for (i = 0; i < dims[0]; ++i) {
+    data[i] = 1.0Q;
+  }
+  return (PyObject *)arr;
+}
+
+static PyObject *
+qarray_from_list(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  PyObject *obj;
+  PyObject *seq;
+  Py_ssize_t i;
+  Py_ssize_t n;
+  npy_intp dims[1];
+  PyArrayObject *arr;
+  __float128 *data;
+
+  if (!PyArg_ParseTuple(args, "O", &obj)) {
+    return NULL;
+  }
+
+  seq = PySequence_Fast(obj, "from_list requires a sequence");
+  if (seq == NULL) {
+    return NULL;
+  }
+
+  n = PySequence_Fast_GET_SIZE(seq);
+  dims[0] = (npy_intp)n;
+  arr = QuadArray_new_empty(1, dims);
+  if (arr == NULL) {
+    Py_DECREF(seq);
+    return NULL;
+  }
+
+  data = (__float128 *)PyArray_DATA(arr);
+  for (i = 0; i < n; ++i) {
+    PyObject *item = PySequence_Fast_GET_ITEM(seq, i);
+    if (QuadArray_setitem(item, &data[i], arr) < 0) {
+      Py_DECREF(arr);
+      Py_DECREF(seq);
+      return NULL;
+    }
+  }
+
+  Py_DECREF(seq);
+  return (PyObject *)arr;
+}
+
+static PyObject *
+qarray_from_array(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  PyObject *obj;
+  PyArrayObject *input;
+  PyArrayObject *arr;
+  PyArrayIterObject *it;
+  npy_intp i;
+  __float128 *data;
+
+  if (!PyArg_ParseTuple(args, "O", &obj)) {
+    return NULL;
+  }
+
+  input = (PyArrayObject *)PyArray_FROM_O(obj);
+  if (input == NULL) {
+    return NULL;
+  }
+
+  arr = QuadArray_new_empty(PyArray_NDIM(input), PyArray_DIMS(input));
+  if (arr == NULL) {
+    Py_DECREF(input);
+    return NULL;
+  }
+
+  it = (PyArrayIterObject *)PyArray_IterNew((PyObject *)input);
+  if (it == NULL) {
+    Py_DECREF(arr);
+    Py_DECREF(input);
+    return NULL;
+  }
+
+  data = (__float128 *)PyArray_DATA(arr);
+  for (i = 0; i < it->size; ++i) {
+    PyObject *item = PyArray_GETITEM(input, it->dataptr);
+    if (item == NULL) {
+      Py_DECREF(it);
+      Py_DECREF(arr);
+      Py_DECREF(input);
+      return NULL;
+    }
+    if (QuadArray_setitem(item, &data[i], arr) < 0) {
+      Py_DECREF(item);
+      Py_DECREF(it);
+      Py_DECREF(arr);
+      Py_DECREF(input);
+      return NULL;
+    }
+    Py_DECREF(item);
+    PyArray_ITER_NEXT(it);
+  }
+
+  Py_DECREF(it);
+  Py_DECREF(input);
+  return (PyObject *)arr;
+}
+
+static PyMethodDef QuadArrayMethods[] = {
+  {"zeros", qarray_zeros, METH_VARARGS, "Create a 1-D qarray of zeros."},
+  {"ones", qarray_ones, METH_VARARGS, "Create a 1-D qarray of ones."},
+  {"from_list", qarray_from_list, METH_VARARGS, "Create a qarray from a Python sequence."},
+  {"from_array", qarray_from_array, METH_VARARGS, "Create a qarray from an array-like object."},
+  {NULL, NULL, 0, NULL},
+};
 
 static PyModuleDef QuadArrayModule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "qarray",
     .m_doc = "Quad precision module for array quad's.",
+  .m_methods = QuadArrayMethods,
     .m_size = -1,
 };
 
@@ -46,14 +333,24 @@ static void
 QuadArray_copyswap(__float128 *dst, __float128 *src,
                     int swap, void *NPY_UNUSED(arr))
 {
-    if(src== NULL) return;
+  size_t i;
+  char *bytes;
 
-    if(swap!=0){
-        __float128 *tmp = dst;
-        dst = src;
-        src = tmp;
-    } else {
-        dst = src;
+  if (src == NULL) {
+    src = dst;
+  }
+  if (src != dst) {
+    memcpy(dst, src, sizeof(__float128));
+  }
+
+  if (swap != 0) {
+    char tmp;
+    bytes = (char *)dst;
+    for (i = 0; i < (sizeof(__float128) / 2); ++i) {
+      tmp = bytes[i];
+      bytes[i] = bytes[sizeof(__float128) - 1 - i];
+      bytes[sizeof(__float128) - 1 - i] = tmp;
+    }
     }
 }
 
@@ -77,12 +374,13 @@ QuadArray_copyswapn(void *dst, npy_intp dstride, void *src,
 
 
 static int QuadArray_setitem(PyObject* item, __float128* data, void* array){
+  QuadObject tmp;
 
-    QuadObject *tmp;
+  (void)array;
 
-    if(PyObject_to_QuadObject(item, tmp, true)){
-        data = &tmp->value;
-    } else {
+  if (PyObject_to_QuadObject(item, &tmp, false)) {
+    *data = tmp.value;
+  } else {
         PyErr_SetString(PyExc_TypeError,
                     "Failed to setitem in QuadArray");
         return -1;
@@ -165,33 +463,30 @@ QuadArray_fillwithscalar(__float128 *buffer, npy_intp length, __float128 *value,
 }
 
 PyMODINIT_FUNC
-PyInit_qfloatArray(void)
+PyInit_qarray(void)
 {
 
     PyObject *m;
-    PyObject* numpy;
-    PyObject* numpy_dict;
     int qarrayNum;
 
     m = PyModule_Create(&QuadArrayModule);
     if (m == NULL)
         return NULL;
 
+    if (import_qmfloat() < 0) {
+      Py_DECREF(m);
+      return NULL;
+    }
+
     // Initialize numpy
     import_array();
     if (PyErr_Occurred()) {
+      Py_DECREF(m);
         return NULL;
     }
     import_umath();
     if (PyErr_Occurred()) {
-        return NULL;
-    }
-    numpy = PyImport_ImportModule("numpy");
-    if (!numpy) {
-        return NULL;
-    }
-    numpy_dict = PyModule_GetDict(numpy);
-    if (!numpy_dict) {
+      Py_DECREF(m);
         return NULL;
     }
 
@@ -199,6 +494,7 @@ PyInit_qfloatArray(void)
     if (PyType_Ready(&QuadArrayType) < 0) {
         PyErr_Print();
         PyErr_SetString(PyExc_SystemError, "Could not initialize QuadArrayType.");
+      Py_DECREF(m);
         return NULL;
     }
 
@@ -233,12 +529,35 @@ PyInit_qfloatArray(void)
     qarrayNum = PyArray_RegisterDataType(&QuadArrayDescrProto);
 
     if (qarrayNum < 0) {
+      Py_DECREF(m);
         return NULL;
     }
+    QuadArrayTypeNum = qarrayNum;
     QuadArrayDescr = PyArray_DescrFromType(qarrayNum);
+    if (QuadArrayDescr == NULL) {
+      Py_DECREF(m);
+      return NULL;
+    }
 
+    if (QuadArray_register_casts(QuadArrayDescr, qarrayNum) < 0) {
+      Py_DECREF(m);
+      return NULL;
+    }
 
-    PyModule_AddObject(m, "qarray", (PyObject *)&QuadArrayType);
+    if (PyModule_AddObject(m, "qarray", (PyObject *)&QuadArrayType) < 0) {
+      Py_DECREF(m);
+      return NULL;
+    }
+    if (PyModule_AddIntConstant(m, "dtype_num", qarrayNum) < 0) {
+      Py_DECREF(m);
+      return NULL;
+    }
+    Py_INCREF(QuadArrayDescr);
+    if (PyModule_AddObject(m, "dtype", (PyObject *)QuadArrayDescr) < 0) {
+      Py_DECREF(QuadArrayDescr);
+      Py_DECREF(m);
+      return NULL;
+    }
 
     return m;
 }

@@ -10,8 +10,24 @@ Python interface to gcc's libquadmath for quad (128-bit) precision maths.
 
 ## Build
 ````bash
+CC=gcc CXX=g++ FC=gfortran python -m build
+python -m pip install .
+````
+
+For editable installs, also force the same toolchain:
+
+````bash
+CC=gcc CXX=g++ FC=gfortran python -m pip install -e . --no-build-isolation
+````
+
+If your shell should always use GCC/GFortran for local development:
+
+````bash
+export CC=gcc
+export CXX=g++
+export FC=gfortran
 python -m build
-python -m pip install . 
+python -m pip install .
 ````
 
 This package requires ``quadmath.h`` and ``libquadmath.so``. This might come installed with your installation of gcc/gfortran from your package manager. Or it might require a separate installation. This should be installed before trying to install the Python package.
