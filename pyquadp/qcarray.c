@@ -418,6 +418,51 @@ QuadCArray_ufunc_cos(char **args, const npy_intp *dims, const npy_intp *steps, v
     }
 }
 
+static void
+QuadCArray_ufunc_tan(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = ctanq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_sinh(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = csinhq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
+static void
+QuadCArray_ufunc_cosh(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+    npy_intp i;
+    npy_intp n = dims[0];
+    char *in = args[0];
+    char *out = args[1];
+
+    for (i = 0; i < n; ++i) {
+        *(__complex128 *)out = ccoshq(*(__complex128 *)in);
+        in += steps[0];
+        out += steps[1];
+    }
+}
+
 static int
 QuadCArray_register_ufunc_binary(const char *name, PyUFuncGenericFunction loop)
 {
@@ -618,6 +663,15 @@ QuadCArray_register_ufuncs(void)
         return -1;
     }
     if (QuadCArray_register_ufunc_unary("cos", QuadCArray_ufunc_cos) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("tan", QuadCArray_ufunc_tan) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("sinh", QuadCArray_ufunc_sinh) < 0) {
+        return -1;
+    }
+    if (QuadCArray_register_ufunc_unary("cosh", QuadCArray_ufunc_cosh) < 0) {
         return -1;
     }
 

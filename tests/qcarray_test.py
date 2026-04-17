@@ -246,6 +246,9 @@ class TestQCArrayUfuncs:
         log_out = np.log(q)
         sin_out = np.sin(q)
         cos_out = np.cos(q)
+        tan_out = np.tan(q)
+        sinh_out = np.sinh(q)
+        cosh_out = np.cosh(q)
 
         assert abs_out.dtype == qarray.dtype
         assert sq_out.dtype == qcarray.dtype
@@ -254,6 +257,9 @@ class TestQCArrayUfuncs:
         assert log_out.dtype == qcarray.dtype
         assert sin_out.dtype == qcarray.dtype
         assert cos_out.dtype == qcarray.dtype
+        assert tan_out.dtype == qcarray.dtype
+        assert sinh_out.dtype == qcarray.dtype
+        assert cosh_out.dtype == qcarray.dtype
 
         abs_expected = np.abs(q128)
         assert np.allclose(np.asarray(abs_out, dtype=np.float64), abs_expected)
@@ -263,6 +269,38 @@ class TestQCArrayUfuncs:
         assert np.allclose(np.asarray(log_out, dtype=np.complex128), np.log(q128))
         assert np.allclose(np.asarray(sin_out, dtype=np.complex128), np.sin(q128))
         assert np.allclose(np.asarray(cos_out, dtype=np.complex128), np.cos(q128))
+        assert np.allclose(np.asarray(tan_out, dtype=np.complex128), np.tan(q128))
+        assert np.allclose(np.asarray(sinh_out, dtype=np.complex128), np.sinh(q128))
+        assert np.allclose(np.asarray(cosh_out, dtype=np.complex128), np.cosh(q128))
+
+    def test_ufunc_out_parameter_for_qcarray_outputs(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        q = qcarray.from_list([0.25 + 0.5j, 1.0 + 0j, -0.75 + 0.25j])
+        q128 = np.asarray(q, dtype=np.complex128)
+
+        out_sin = qcarray.zeros(3)
+        returned = np.sin(q, out=out_sin)
+
+        assert returned is out_sin
+        assert out_sin.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out_sin, dtype=np.complex128), np.sin(q128)
+        )
+
+    def test_ufunc_out_parameter_for_absolute_qarray_output(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        qarray = pytest.importorskip("pyquadp.qarray")
+        q = qcarray.from_list([3 + 4j, 5 + 12j, -8 + 15j])
+
+        out_abs = qarray.zeros(3)
+        returned = np.absolute(q, out=out_abs)
+
+        assert returned is out_abs
+        assert out_abs.dtype == qarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out_abs, dtype=np.float64),
+            np.abs(np.asarray(q, dtype=np.complex128)),
+        )
 
     def test_absolute_returns_qarray_after_mixed_arithmetic(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
@@ -494,4 +532,105 @@ class TestQCArrayHardening:
         np.testing.assert_array_equal(np.argmax(arr, axis=1), np.argmax(values, axis=1))
         np.testing.assert_array_equal(
             np.argsort(arr, axis=1), np.argsort(values, axis=1)
+        )
+
+    def test_sort_along_axes_matches_complex128(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        values = np.array(
+            [
+                [1 + 2j, -1 + 10j, complex(np.nan, 0.0)],
+                [1 + 1j, -1 + 2j, 3 + 0j],
+                [0 + 5j, -2 + 3j, -4 + 9j],
+            ],
+            dtype=np.complex128,
+        )
+        arr = qcarray.from_array(values)
+
+        np.testing.assert_allclose(
+            np.asarray(np.sort(arr, axis=0), dtype=np.complex128),
+            np.sort(values, axis=0),
+            equal_nan=True,
+        )
+        np.testing.assert_allclose(
+            np.asarray(np.sort(arr, axis=1), dtype=np.complex128),
+            np.sort(values, axis=1),
+            equal_nan=True,
+        )
+        np.testing.assert_array_equal(
+            np.argsort(arr, axis=0),
+            np.argsort(values, axis=0),
+        )
+
+    def test_ordering_reductions_on_mixed_view_match_complex128(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        left = qcarray.from_list([1 + 2j, -3 + 4j, 0.5 - 0.25j, -2 + 3j])
+        right = np.array(
+            [0.5 - 1j, 1.5 + 0.5j, -2 + 0j, 0.25 - 0.75j],
+            dtype=np.complex128,
+        )
+
+        mixed = np.add(left, right)
+        view = mixed[::-1]
+        expected = np.asarray(view, dtype=np.complex128)
+
+        assert complex(np.min(view)) == complex(np.min(expected))
+        assert complex(np.max(view)) == complex(np.max(expected))
+        np.testing.assert_array_equal(np.argmin(view), np.argmin(expected))
+        np.testing.assert_array_equal(np.argmax(view), np.argmax(np.abs(expected)))
+        np.testing.assert_array_equal(np.argsort(view), np.argsort(expected))
+
+    def test_reduction_out_parameter_matches_complex128(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        values = np.array(
+            [
+                [1 + 2j, -1 + 10j, 2 + 0j],
+                [1 + 1j, -1 + 2j, 3 + 0j],
+            ],
+            dtype=np.complex128,
+        )
+        arr = qcarray.from_array(values)
+
+        out_min = qcarray.zeros(3)
+        out_max = qcarray.zeros(3)
+
+        ret_min = np.min(arr, axis=0, out=out_min)
+        ret_max = np.max(arr, axis=0, out=out_max)
+
+        assert ret_min is out_min
+        assert ret_max is out_max
+        np.testing.assert_allclose(
+            np.asarray(out_min, dtype=np.complex128),
+            np.min(values, axis=0),
+        )
+        np.testing.assert_allclose(
+            np.asarray(out_max, dtype=np.complex128),
+            np.max(values, axis=0),
+        )
+
+    def test_mixed_broadcast_reduce_parity(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        left = qcarray.from_list([1 + 2j, -3 + 4j, 0.5 - 0.25j])
+        right = np.array([0.25 - 1j, -2 + 0.5j], dtype=np.complex128)
+
+        mixed = np.multiply(left[:, None], right[None, :]) + (1 - 0.5j)
+        expected = np.asarray(left, dtype=np.complex128)[:, None] * right[None, :] + (
+            1 - 0.5j
+        )
+
+        np.testing.assert_allclose(
+            np.asarray(np.min(mixed, axis=0), dtype=np.complex128),
+            np.min(expected, axis=0),
+        )
+        np.testing.assert_allclose(
+            np.asarray(np.max(mixed, axis=1), dtype=np.complex128),
+            np.max(expected, axis=1),
+        )
+        np.testing.assert_array_equal(
+            np.argmin(mixed, axis=0), np.argmin(expected, axis=0)
+        )
+        np.testing.assert_array_equal(
+            np.argmax(mixed, axis=1), np.argmax(np.abs(expected), axis=1)
+        )
+        np.testing.assert_array_equal(
+            np.argsort(mixed, axis=1), np.argsort(expected, axis=1)
         )
