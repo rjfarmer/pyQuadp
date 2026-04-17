@@ -57,4 +57,7 @@ if __name__ == "__main__":
         ]
     )
 
-    setup(ext_modules=extensions)
+    setup(
+        ext_modules=extensions,
+        package_data={"pyquadp": ["*.pyi", "py.typed"]},
+    )

@@ -39,7 +39,8 @@ Homepage = "https://github.com/rjfarmer/pyquadp"
 [project.optional-dependencies]
 test = ['pytest','pytest-xdist[psutil]','hypothesis',"scipy"]
 coverage = ['pytest', 'pytest-xdist[psutil]', 'pytest-cov',"scipy"]
-dev = ['pre-commit','black', 'pytest','pytest-xdist[psutil]',"scipy"]
+dev = ['pre-commit','black','mypy>=1.11', 'pytest','pytest-xdist[psutil]',"scipy"]
+types = ['mypy>=1.11','types-setuptools']
 perfomance = ["pytest", "pytest-codspeed", 'pytest-xdist[psutil]',"scipy"]
 
 
@@ -63,6 +64,18 @@ concurrency = ["multiprocessing", "thread"]
 
 [tool.setuptools]
 packages = ["pyquadp"]
+
+[tool.setuptools.package-data]
+pyquadp = ["*.pyi", "py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["pyquadp"]
+exclude = ["^tests/"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+strict_equality = true
+no_implicit_optional = true
 
 
 

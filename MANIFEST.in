@@ -2,3 +2,4 @@ include README.md
 include COPYING.txt
 include pyproject.toml setup.py
 recursive-include pyquadp *.c *.h
+recursive-include pyquadp *.pyi py.typed
