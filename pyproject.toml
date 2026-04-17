@@ -48,6 +48,7 @@ addopts = "-s -n auto"
 testpaths = ["tests"]
 markers = [
     "qarray: tests for NumPy-compatible quad array support",
+    "qcarray: tests for NumPy-compatible quad complex array support",
 ]
 
 [tool.bandit]
@@ -67,6 +68,7 @@ ext-modules = [
     {name='pyquadp.qmcmplx', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"], libraries=['quadmath']},
     {name='pyquadp.qmint', sources=["pyquadp/qint.c"], libraries=['quadmath']},
     {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], include-dirs=["pyquadp"], libraries=['quadmath']},
+    {name='pyquadp.qcarray', sources=["pyquadp/qcarray.c"], include-dirs=["pyquadp"], libraries=['quadmath']},
 ]
 packages = ["pyquadp"]
 
