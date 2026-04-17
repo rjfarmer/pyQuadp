@@ -33,6 +33,504 @@ PyArray_DescrProto QuadArrayDescrProto;
 static int QuadArray_setitem(PyObject* item, __float128* data, void* array);
 
 static void
+QuadArray_ufunc_add(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in1 = args[0];
+  char *in2 = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)in1 + *(__float128 *)in2;
+    in1 += steps[0];
+    in2 += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_subtract(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in1 = args[0];
+  char *in2 = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)in1 - *(__float128 *)in2;
+    in1 += steps[0];
+    in2 += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_multiply(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in1 = args[0];
+  char *in2 = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)in1 * *(__float128 *)in2;
+    in1 += steps[0];
+    in2 += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_divide(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in1 = args[0];
+  char *in2 = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)in1 / *(__float128 *)in2;
+    in1 += steps[0];
+    in2 += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_add_qd(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *inq = args[0];
+  char *ind = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)inq + (__float128)(*(npy_float64 *)ind);
+    inq += steps[0];
+    ind += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_add_dq(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *ind = args[0];
+  char *inq = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = (__float128)(*(npy_float64 *)ind) + *(__float128 *)inq;
+    ind += steps[0];
+    inq += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_subtract_qd(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *inq = args[0];
+  char *ind = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)inq - (__float128)(*(npy_float64 *)ind);
+    inq += steps[0];
+    ind += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_subtract_dq(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *ind = args[0];
+  char *inq = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = (__float128)(*(npy_float64 *)ind) - *(__float128 *)inq;
+    ind += steps[0];
+    inq += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_multiply_qd(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *inq = args[0];
+  char *ind = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)inq * (__float128)(*(npy_float64 *)ind);
+    inq += steps[0];
+    ind += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_multiply_dq(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *ind = args[0];
+  char *inq = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = (__float128)(*(npy_float64 *)ind) * *(__float128 *)inq;
+    ind += steps[0];
+    inq += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_divide_qd(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *inq = args[0];
+  char *ind = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = *(__float128 *)inq / (__float128)(*(npy_float64 *)ind);
+    inq += steps[0];
+    ind += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_divide_dq(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *ind = args[0];
+  char *inq = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = (__float128)(*(npy_float64 *)ind) / *(__float128 *)inq;
+    ind += steps[0];
+    inq += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_negative(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = -*(__float128 *)in;
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_positive(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = +*(__float128 *)in;
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_absolute(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = fabsq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_square(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    __float128 v = *(__float128 *)in;
+    *(__float128 *)out = v * v;
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_sqrt(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = sqrtq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_exp(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = expq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_log(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = logq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_sin(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = sinq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_cos(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = cosq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static int
+QuadArray_register_ufunc_binary(const char *name, PyUFuncGenericFunction loop)
+{
+  PyObject *numpy_mod;
+  PyObject *ufunc;
+  int types[3];
+
+  numpy_mod = PyImport_ImportModule("numpy");
+  if (numpy_mod == NULL) {
+    return -1;
+  }
+  ufunc = PyObject_GetAttrString(numpy_mod, name);
+  Py_DECREF(numpy_mod);
+  if (ufunc == NULL) {
+    return -1;
+  }
+
+  types[0] = QuadArrayTypeNum;
+  types[1] = QuadArrayTypeNum;
+  types[2] = QuadArrayTypeNum;
+
+  if (PyUFunc_RegisterLoopForType((PyUFuncObject *)ufunc, QuadArrayTypeNum, loop, types, NULL) < 0) {
+    Py_DECREF(ufunc);
+    return -1;
+  }
+
+  Py_DECREF(ufunc);
+  return 0;
+}
+
+static int
+QuadArray_register_ufunc_binary_types(const char *name, PyUFuncGenericFunction loop, int in0, int in1, int out)
+{
+  PyObject *numpy_mod;
+  PyObject *ufunc;
+  int types[3];
+
+  numpy_mod = PyImport_ImportModule("numpy");
+  if (numpy_mod == NULL) {
+    return -1;
+  }
+  ufunc = PyObject_GetAttrString(numpy_mod, name);
+  Py_DECREF(numpy_mod);
+  if (ufunc == NULL) {
+    return -1;
+  }
+
+  types[0] = in0;
+  types[1] = in1;
+  types[2] = out;
+
+  if (PyUFunc_RegisterLoopForType((PyUFuncObject *)ufunc, QuadArrayTypeNum, loop, types, NULL) < 0) {
+    Py_DECREF(ufunc);
+    return -1;
+  }
+
+  Py_DECREF(ufunc);
+  return 0;
+}
+
+static int
+QuadArray_register_ufunc_unary(const char *name, PyUFuncGenericFunction loop)
+{
+  PyObject *numpy_mod;
+  PyObject *ufunc;
+  int types[2];
+
+  numpy_mod = PyImport_ImportModule("numpy");
+  if (numpy_mod == NULL) {
+    return -1;
+  }
+  ufunc = PyObject_GetAttrString(numpy_mod, name);
+  Py_DECREF(numpy_mod);
+  if (ufunc == NULL) {
+    return -1;
+  }
+
+  types[0] = QuadArrayTypeNum;
+  types[1] = QuadArrayTypeNum;
+
+  if (PyUFunc_RegisterLoopForType((PyUFuncObject *)ufunc, QuadArrayTypeNum, loop, types, NULL) < 0) {
+    Py_DECREF(ufunc);
+    return -1;
+  }
+
+  Py_DECREF(ufunc);
+  return 0;
+}
+
+static int
+QuadArray_register_ufuncs(void)
+{
+  if (QuadArray_register_ufunc_binary("add", QuadArray_ufunc_add) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary("subtract", QuadArray_ufunc_subtract) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary("multiply", QuadArray_ufunc_multiply) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary("divide", QuadArray_ufunc_divide) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("add", QuadArray_ufunc_add_qd, QuadArrayTypeNum, NPY_DOUBLE, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("add", QuadArray_ufunc_add_dq, NPY_DOUBLE, QuadArrayTypeNum, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("subtract", QuadArray_ufunc_subtract_qd, QuadArrayTypeNum, NPY_DOUBLE, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("subtract", QuadArray_ufunc_subtract_dq, NPY_DOUBLE, QuadArrayTypeNum, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("multiply", QuadArray_ufunc_multiply_qd, QuadArrayTypeNum, NPY_DOUBLE, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("multiply", QuadArray_ufunc_multiply_dq, NPY_DOUBLE, QuadArrayTypeNum, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("divide", QuadArray_ufunc_divide_qd, QuadArrayTypeNum, NPY_DOUBLE, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("divide", QuadArray_ufunc_divide_dq, NPY_DOUBLE, QuadArrayTypeNum, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("negative", QuadArray_ufunc_negative) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("positive", QuadArray_ufunc_positive) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("absolute", QuadArray_ufunc_absolute) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("square", QuadArray_ufunc_square) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("sqrt", QuadArray_ufunc_sqrt) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("exp", QuadArray_ufunc_exp) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("log", QuadArray_ufunc_log) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("sin", QuadArray_ufunc_sin) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("cos", QuadArray_ufunc_cos) < 0) {
+    return -1;
+  }
+  return 0;
+}
+
+static void
 QuadArray_cast_to_float64(void *from, void *to, npy_intp n, void *NPY_UNUSED(fromarr), void *NPY_UNUSED(toarr))
 {
   npy_intp i;
@@ -540,6 +1038,11 @@ PyInit_qarray(void)
     }
 
     if (QuadArray_register_casts(QuadArrayDescr, qarrayNum) < 0) {
+      Py_DECREF(m);
+      return NULL;
+    }
+
+    if (QuadArray_register_ufuncs() < 0) {
       Py_DECREF(m);
       return NULL;
     }
