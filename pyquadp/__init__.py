@@ -5,6 +5,7 @@ from pyquadp.qmint import qint
 from pyquadp.qmcmplx import qcmplx
 from pyquadp import qarray
 from pyquadp import qcarray
+from pyquadp import qiarray
 
 from pyquadp.constant import *
 

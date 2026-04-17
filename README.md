@@ -134,6 +134,26 @@ np.cos(a)    # quad-precision cosine
 
 ``qarray`` requires GCC's ``libquadmath`` and a NumPy ≥ 2.0 installation. 
 
+### qiarray
+
+``qiarray`` provides NumPy-compatible arrays of signed ``__int128`` values through a custom NumPy dtype.
+
+````python
+import pyquadp
+import numpy as np
+
+arr = pyquadp.qiarray.arange(5)
+arr = pyquadp.qiarray.from_list([1, "2", -3])
+arr = np.asarray(np.array([4, 5, 6], dtype=np.int64), dtype=pyquadp.qiarray.dtype)
+
+np.add(arr, arr)
+np.multiply(arr, 3)
+np.bitwise_and(arr, np.array([1, 1, 1], dtype=np.int64))
+np.asarray(arr, dtype=np.int64)
+````
+
+The v1 surface is intentionally narrow: constructors, casts to and from signed fixed-width integer dtypes, and core arithmetic, division, shift, and bitwise ufuncs.
+
 ### qcmplx
 
 A quad precision number is created by passing either a complex variable or two ints, floats, strs, or qfloats to ``qcmplx``:
