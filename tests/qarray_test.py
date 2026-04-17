@@ -17,6 +17,61 @@ class TestQArrayImport:
 
 @pytest.mark.qarray
 class TestQArrayConstructors:
+    def test_arange_stop_constructor(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        arr = qarray.arange(4)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (4,)
+        assert arr.dtype == qarray.dtype
+        assert np.allclose(np.asarray(arr, dtype=np.float64), np.arange(4.0))
+
+    def test_arange_start_stop_step_constructor(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        arr = qarray.arange(1.5, 3.0, 0.5)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (3,)
+        assert arr.dtype == qarray.dtype
+        assert np.allclose(np.asarray(arr, dtype=np.float64), np.array([1.5, 2.0, 2.5]))
+
+    def test_linspace_constructor_endpoint_true(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        arr = qarray.linspace(1.0, 2.0, 5)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (5,)
+        assert arr.dtype == qarray.dtype
+        assert np.allclose(np.asarray(arr, dtype=np.float64), np.linspace(1.0, 2.0, 5))
+
+    def test_linspace_constructor_endpoint_false(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        arr = qarray.linspace(1.0, 2.0, 4, False)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (4,)
+        assert arr.dtype == qarray.dtype
+        assert np.allclose(
+            np.asarray(arr, dtype=np.float64), np.linspace(1.0, 2.0, 4, endpoint=False)
+        )
+
+    def test_empty_constructor(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        arr = qarray.empty(5)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (5,)
+        assert arr.dtype == qarray.dtype
+
+    def test_full_constructor(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        arr = qarray.full(4, -2.5)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (4,)
+        assert arr.dtype == qarray.dtype
+        assert np.allclose(np.asarray(arr, dtype=np.float64), [-2.5, -2.5, -2.5, -2.5])
+
     def test_zeros_constructor(self):
         qarray = pytest.importorskip("pyquadp.qarray")
         arr = qarray.zeros(4)
@@ -110,6 +165,15 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(mul, dtype=np.float64), [8.0, 18.0, 32.0])
         assert np.allclose(np.asarray(div, dtype=np.float64), [2.0, 2.0, 2.0])
 
+    def test_power_ufunc(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([2.0, 3.0, 4.0])
+        b = qarray.from_list([3.0, 2.0, 0.5])
+
+        out = np.power(a, b)
+        assert out.dtype == qarray.dtype
+        assert np.allclose(np.asarray(out, dtype=np.float64), [8.0, 9.0, 2.0])
+
     def test_add_ufunc_broadcasting(self):
         qarray = pytest.importorskip("pyquadp.qarray")
         a = qarray.from_list([1.0, 2.0, 3.0])
@@ -189,8 +253,21 @@ class TestQArrayUfuncs:
         mul_dq = np.multiply(d, q)
         div_qd = np.divide(q, d)
         div_dq = np.divide(d, q)
+        pow_qd = np.power(q, d)
+        pow_dq = np.power(d, q)
 
-        for out in [add_qd, add_dq, sub_qd, sub_dq, mul_qd, mul_dq, div_qd, div_dq]:
+        for out in [
+            add_qd,
+            add_dq,
+            sub_qd,
+            sub_dq,
+            mul_qd,
+            mul_dq,
+            div_qd,
+            div_dq,
+            pow_qd,
+            pow_dq,
+        ]:
             assert out.dtype == qarray.dtype
 
         qf = np.array([2.0, 3.0, 4.0], dtype=np.float64)
@@ -202,6 +279,8 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(mul_dq, dtype=np.float64), d * qf)
         assert np.allclose(np.asarray(div_qd, dtype=np.float64), qf / d)
         assert np.allclose(np.asarray(div_dq, dtype=np.float64), d / qf)
+        assert np.allclose(np.asarray(pow_qd, dtype=np.float64), np.power(qf, d))
+        assert np.allclose(np.asarray(pow_dq, dtype=np.float64), np.power(d, qf))
 
 
 @pytest.mark.qarray

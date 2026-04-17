@@ -17,6 +17,50 @@ class TestQCArrayImport:
 
 @pytest.mark.qcarray
 class TestQCArrayConstructors:
+    def test_linspace_constructor_endpoint_true(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.linspace(1.0 + 2.0j, -1.0 + 0.5j, 5)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (5,)
+        assert arr.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(arr, dtype=np.complex128),
+            np.linspace(1.0 + 2.0j, -1.0 + 0.5j, 5),
+        )
+
+    def test_linspace_constructor_endpoint_false(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.linspace(1.0 + 2.0j, -1.0 + 0.5j, 4, False)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (4,)
+        assert arr.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(arr, dtype=np.complex128),
+            np.linspace(1.0 + 2.0j, -1.0 + 0.5j, 4, endpoint=False),
+        )
+
+    def test_empty_constructor(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.empty(4)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (4,)
+        assert arr.dtype == qcarray.dtype
+
+    def test_full_constructor(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        arr = qcarray.full(3, 1.5 - 0.25j)
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.shape == (3,)
+        assert arr.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(arr, dtype=np.complex128),
+            np.array([1.5 - 0.25j, 1.5 - 0.25j, 1.5 - 0.25j], dtype=np.complex128),
+        )
+
     def test_zeros_constructor(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
         arr = qcarray.zeros(3)
@@ -94,11 +138,13 @@ class TestQCArrayUfuncs:
         sub_out = np.subtract(a, b)
         mul_out = np.multiply(a, b)
         div_out = np.divide(a, b)
+        pow_out = np.power(a, b)
 
         assert add_out.dtype == qcarray.dtype
         assert sub_out.dtype == qcarray.dtype
         assert mul_out.dtype == qcarray.dtype
         assert div_out.dtype == qcarray.dtype
+        assert pow_out.dtype == qcarray.dtype
 
         a128 = np.asarray(a, dtype=np.complex128)
         b128 = np.asarray(b, dtype=np.complex128)
@@ -106,6 +152,9 @@ class TestQCArrayUfuncs:
         assert np.allclose(np.asarray(sub_out, dtype=np.complex128), a128 - b128)
         assert np.allclose(np.asarray(mul_out, dtype=np.complex128), a128 * b128)
         assert np.allclose(np.asarray(div_out, dtype=np.complex128), a128 / b128)
+        assert np.allclose(
+            np.asarray(pow_out, dtype=np.complex128), np.power(a128, b128)
+        )
 
     def test_mixed_with_complex128(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
@@ -133,6 +182,7 @@ class TestQCArrayUfuncs:
             (np.subtract, lambda q, c: q - c, lambda q, c: c - q),
             (np.multiply, lambda q, c: q * c, lambda q, c: c * q),
             (np.divide, lambda q, c: q / c, lambda q, c: c / q),
+            (np.power, lambda q, c: np.power(q, c), lambda q, c: np.power(c, q)),
         ],
     )
     def test_mixed_complex128_binary_ufuncs(self, ufunc, expected_qc, expected_cq):
@@ -154,7 +204,9 @@ class TestQCArrayUfuncs:
             expected_cq(np.asarray(q, dtype=np.complex128), c),
         )
 
-    @pytest.mark.parametrize("ufunc", [np.add, np.subtract, np.multiply, np.divide])
+    @pytest.mark.parametrize(
+        "ufunc", [np.add, np.subtract, np.multiply, np.divide, np.power]
+    )
     def test_mixed_complex128_scalar_binary_ufuncs(self, ufunc):
         qcarray = pytest.importorskip("pyquadp.qcarray")
         q = qcarray.from_list([2 + 1j, -3 + 0.5j, 0.25 - 2j])
@@ -175,7 +227,9 @@ class TestQCArrayUfuncs:
             ufunc(scalar, q128),
         )
 
-    @pytest.mark.parametrize("ufunc", [np.add, np.subtract, np.multiply, np.divide])
+    @pytest.mark.parametrize(
+        "ufunc", [np.add, np.subtract, np.multiply, np.divide, np.power]
+    )
     def test_mixed_complex128_broadcasting_binary_ufuncs(self, ufunc):
         qcarray = pytest.importorskip("pyquadp.qcarray")
         q = qcarray.from_list([2 + 1j, -3 + 0.5j, 0.25 - 2j])

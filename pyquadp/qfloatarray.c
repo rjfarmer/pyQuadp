@@ -101,6 +101,23 @@ QuadArray_ufunc_divide(char **args, const npy_intp *dims, const npy_intp *steps,
 }
 
 static void
+QuadArray_ufunc_power(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in1 = args[0];
+  char *in2 = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = powq(*(__float128 *)in1, *(__float128 *)in2);
+    in1 += steps[0];
+    in2 += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
 QuadArray_ufunc_add_qd(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
 {
   npy_intp i;
@@ -230,6 +247,40 @@ QuadArray_ufunc_divide_dq(char **args, const npy_intp *dims, const npy_intp *ste
 
   for (i = 0; i < n; ++i) {
     *(__float128 *)out = (__float128)(*(npy_float64 *)ind) / *(__float128 *)inq;
+    ind += steps[0];
+    inq += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_power_qd(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *inq = args[0];
+  char *ind = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = powq(*(__float128 *)inq, (__float128)(*(npy_float64 *)ind));
+    inq += steps[0];
+    ind += steps[1];
+    out += steps[2];
+  }
+}
+
+static void
+QuadArray_ufunc_power_dq(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *ind = args[0];
+  char *inq = args[1];
+  char *out = args[2];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = powq((__float128)(*(npy_float64 *)ind), *(__float128 *)inq);
     ind += steps[0];
     inq += steps[1];
     out += steps[2];
@@ -521,6 +572,9 @@ QuadArray_register_ufuncs(void)
   if (QuadArray_register_ufunc_binary("divide", QuadArray_ufunc_divide) < 0) {
     return -1;
   }
+  if (QuadArray_register_ufunc_binary("power", QuadArray_ufunc_power) < 0) {
+    return -1;
+  }
   if (QuadArray_register_ufunc_binary_types("add", QuadArray_ufunc_add_qd, QuadArrayTypeNum, NPY_DOUBLE, QuadArrayTypeNum) < 0) {
     return -1;
   }
@@ -543,6 +597,12 @@ QuadArray_register_ufuncs(void)
     return -1;
   }
   if (QuadArray_register_ufunc_binary_types("divide", QuadArray_ufunc_divide_dq, NPY_DOUBLE, QuadArrayTypeNum, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("power", QuadArray_ufunc_power_qd, QuadArrayTypeNum, NPY_DOUBLE, QuadArrayTypeNum) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_binary_types("power", QuadArray_ufunc_power_dq, NPY_DOUBLE, QuadArrayTypeNum, QuadArrayTypeNum) < 0) {
     return -1;
   }
   if (QuadArray_register_ufunc_unary("negative", QuadArray_ufunc_negative) < 0) {
@@ -723,6 +783,24 @@ qarray_zeros(PyObject *NPY_UNUSED(self), PyObject *args)
 }
 
 static PyObject *
+qarray_empty(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  Py_ssize_t n;
+  npy_intp dims[1];
+
+  if (!PyArg_ParseTuple(args, "n", &n)) {
+    return NULL;
+  }
+  if (n < 0) {
+    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+    return NULL;
+  }
+
+  dims[0] = (npy_intp)n;
+  return (PyObject *)QuadArray_new_empty(1, dims);
+}
+
+static PyObject *
 qarray_ones(PyObject *NPY_UNUSED(self), PyObject *args)
 {
   Py_ssize_t n;
@@ -749,6 +827,178 @@ qarray_ones(PyObject *NPY_UNUSED(self), PyObject *args)
   for (i = 0; i < dims[0]; ++i) {
     data[i] = 1.0Q;
   }
+  return (PyObject *)arr;
+}
+
+static PyObject *
+qarray_full(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  PyObject *fill_obj;
+  Py_ssize_t n;
+  npy_intp i;
+  npy_intp dims[1];
+  PyArrayObject *arr;
+  __float128 fill;
+  __float128 *data;
+
+  if (!PyArg_ParseTuple(args, "nO", &n, &fill_obj)) {
+    return NULL;
+  }
+  if (n < 0) {
+    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+    return NULL;
+  }
+
+  dims[0] = (npy_intp)n;
+  arr = QuadArray_new_empty(1, dims);
+  if (arr == NULL) {
+    return NULL;
+  }
+
+  if (QuadArray_setitem(fill_obj, &fill, arr) < 0) {
+    Py_DECREF(arr);
+    return NULL;
+  }
+
+  data = (__float128 *)PyArray_DATA(arr);
+  for (i = 0; i < dims[0]; ++i) {
+    data[i] = fill;
+  }
+
+  return (PyObject *)arr;
+}
+
+static PyObject *
+qarray_arange(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  Py_ssize_t nargs;
+  PyObject *start_obj = NULL;
+  PyObject *stop_obj = NULL;
+  PyObject *step_obj = NULL;
+  __float128 start = 0.0Q;
+  __float128 stop = 0.0Q;
+  __float128 step = 1.0Q;
+  npy_intp n = 0;
+  npy_intp i;
+  npy_intp dims[1];
+  PyArrayObject *arr;
+  __float128 *data;
+
+  nargs = PyTuple_GET_SIZE(args);
+  if (nargs < 1 || nargs > 3) {
+    PyErr_SetString(PyExc_TypeError, "arange expects 1 to 3 positional arguments");
+    return NULL;
+  }
+
+  if (nargs == 1) {
+    stop_obj = PyTuple_GET_ITEM(args, 0);
+  } else if (nargs == 2) {
+    start_obj = PyTuple_GET_ITEM(args, 0);
+    stop_obj = PyTuple_GET_ITEM(args, 1);
+  } else {
+    start_obj = PyTuple_GET_ITEM(args, 0);
+    stop_obj = PyTuple_GET_ITEM(args, 1);
+    step_obj = PyTuple_GET_ITEM(args, 2);
+  }
+
+  if (start_obj != NULL && QuadArray_setitem(start_obj, &start, NULL) < 0) {
+    return NULL;
+  }
+  if (QuadArray_setitem(stop_obj, &stop, NULL) < 0) {
+    return NULL;
+  }
+  if (step_obj != NULL && QuadArray_setitem(step_obj, &step, NULL) < 0) {
+    return NULL;
+  }
+
+  if (step == 0.0Q) {
+    PyErr_SetString(PyExc_ValueError, "step must not be zero");
+    return NULL;
+  }
+
+  if ((step > 0.0Q && start < stop) || (step < 0.0Q && start > stop)) {
+    __float128 span = (stop - start) / step;
+    __float128 n_float = ceilq(span);
+    if (n_float > (__float128)NPY_MAX_INTP) {
+      PyErr_SetString(PyExc_OverflowError, "arange result is too large");
+      return NULL;
+    }
+    if (n_float > 0.0Q) {
+      n = (npy_intp)n_float;
+    }
+  }
+
+  dims[0] = n;
+  arr = QuadArray_new_empty(1, dims);
+  if (arr == NULL) {
+    return NULL;
+  }
+
+  data = (__float128 *)PyArray_DATA(arr);
+  for (i = 0; i < n; ++i) {
+    data[i] = start + step * (__float128)i;
+  }
+
+  return (PyObject *)arr;
+}
+
+static PyObject *
+qarray_linspace(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  PyObject *start_obj;
+  PyObject *stop_obj;
+  Py_ssize_t num;
+  int endpoint = 1;
+  __float128 start;
+  __float128 stop;
+  __float128 step;
+  npy_intp i;
+  npy_intp dims[1];
+  PyArrayObject *arr;
+  __float128 *data;
+
+  if (!PyArg_ParseTuple(args, "OOn|p", &start_obj, &stop_obj, &num, &endpoint)) {
+    return NULL;
+  }
+  if (num < 0) {
+    PyErr_SetString(PyExc_ValueError, "num must be non-negative");
+    return NULL;
+  }
+  if (QuadArray_setitem(start_obj, &start, NULL) < 0) {
+    return NULL;
+  }
+  if (QuadArray_setitem(stop_obj, &stop, NULL) < 0) {
+    return NULL;
+  }
+
+  dims[0] = (npy_intp)num;
+  arr = QuadArray_new_empty(1, dims);
+  if (arr == NULL) {
+    return NULL;
+  }
+
+  data = (__float128 *)PyArray_DATA(arr);
+  if (num == 0) {
+    return (PyObject *)arr;
+  }
+  if (num == 1) {
+    data[0] = start;
+    return (PyObject *)arr;
+  }
+
+  if (endpoint) {
+    step = (stop - start) / (__float128)(num - 1);
+    for (i = 0; i < (npy_intp)num; ++i) {
+      data[i] = start + step * (__float128)i;
+    }
+    data[num - 1] = stop;
+  } else {
+    step = (stop - start) / (__float128)num;
+    for (i = 0; i < (npy_intp)num; ++i) {
+      data[i] = start + step * (__float128)i;
+    }
+  }
+
   return (PyObject *)arr;
 }
 
@@ -852,6 +1102,10 @@ qarray_from_array(PyObject *NPY_UNUSED(self), PyObject *args)
 }
 
 static PyMethodDef QuadArrayMethods[] = {
+  {"arange", qarray_arange, METH_VARARGS, "Create a 1-D qarray with evenly spaced values in an interval."},
+  {"linspace", qarray_linspace, METH_VARARGS, "Create a 1-D qarray with evenly spaced samples over an interval."},
+  {"empty", qarray_empty, METH_VARARGS, "Create a 1-D uninitialized qarray."},
+  {"full", qarray_full, METH_VARARGS, "Create a 1-D qarray filled with a value."},
   {"zeros", qarray_zeros, METH_VARARGS, "Create a 1-D qarray of zeros."},
   {"ones", qarray_ones, METH_VARARGS, "Create a 1-D qarray of ones."},
   {"from_list", qarray_from_list, METH_VARARGS, "Create a qarray from a Python sequence."},
