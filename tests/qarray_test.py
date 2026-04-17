@@ -144,7 +144,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(abs_out, dtype=np.float64), [1.5, 2.0, 3.0])
         assert np.allclose(np.asarray(sq_out, dtype=np.float64), [2.25, 4.0, 9.0])
 
-    def test_sqrt_exp_log_sin_cos_ufuncs(self):
+    def test_sqrt_exp_log_sin_cos_tan_sinh_cosh_ufuncs(self):
         qarray = pytest.importorskip("pyquadp.qarray")
         a = qarray.from_list([0.25, 1.0, 4.0])
 
@@ -153,12 +153,18 @@ class TestQArrayUfuncs:
         log_out = np.log(a)
         sin_out = np.sin(a)
         cos_out = np.cos(a)
+        tan_out = np.tan(a)
+        sinh_out = np.sinh(a)
+        cosh_out = np.cosh(a)
 
         assert sqrt_out.dtype == qarray.dtype
         assert exp_out.dtype == qarray.dtype
         assert log_out.dtype == qarray.dtype
         assert sin_out.dtype == qarray.dtype
         assert cos_out.dtype == qarray.dtype
+        assert tan_out.dtype == qarray.dtype
+        assert sinh_out.dtype == qarray.dtype
+        assert cosh_out.dtype == qarray.dtype
 
         expected = np.array([0.25, 1.0, 4.0], dtype=np.float64)
         assert np.allclose(np.asarray(sqrt_out, dtype=np.float64), np.sqrt(expected))
@@ -166,6 +172,9 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(log_out, dtype=np.float64), np.log(expected))
         assert np.allclose(np.asarray(sin_out, dtype=np.float64), np.sin(expected))
         assert np.allclose(np.asarray(cos_out, dtype=np.float64), np.cos(expected))
+        assert np.allclose(np.asarray(tan_out, dtype=np.float64), np.tan(expected))
+        assert np.allclose(np.asarray(sinh_out, dtype=np.float64), np.sinh(expected))
+        assert np.allclose(np.asarray(cosh_out, dtype=np.float64), np.cosh(expected))
 
     def test_mixed_qarray_float64_binary_ufuncs_promote_to_qarray(self):
         qarray = pytest.importorskip("pyquadp.qarray")
@@ -274,6 +283,21 @@ class TestQArrayHardening:
         a = qarray.from_list([1.0, float("inf"), 3.0])
 
         idx = np.argmax(a)
+        assert idx == 1
+
+    def test_argmin_with_nan(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.0, float("nan"), 3.0])
+
+        # NaN propagation: first NaN encountered becomes the "min"
+        idx = np.argmin(a)
+        assert idx == 1
+
+    def test_argmin_with_neg_inf(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.0, float("-inf"), 3.0])
+
+        idx = np.argmin(a)
         assert idx == 1
 
     def test_noncontiguous_add(self):

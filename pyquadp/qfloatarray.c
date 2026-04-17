@@ -372,6 +372,51 @@ QuadArray_ufunc_cos(char **args, const npy_intp *dims, const npy_intp *steps, vo
   }
 }
 
+static void
+QuadArray_ufunc_tan(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = tanq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_sinh(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = sinhq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
+static void
+QuadArray_ufunc_cosh(char **args, const npy_intp *dims, const npy_intp *steps, void *NPY_UNUSED(data))
+{
+  npy_intp i;
+  npy_intp n = dims[0];
+  char *in = args[0];
+  char *out = args[1];
+
+  for (i = 0; i < n; ++i) {
+    *(__float128 *)out = coshq(*(__float128 *)in);
+    in += steps[0];
+    out += steps[1];
+  }
+}
+
 static int
 QuadArray_register_ufunc_binary(const char *name, PyUFuncGenericFunction loop)
 {
@@ -525,6 +570,15 @@ QuadArray_register_ufuncs(void)
     return -1;
   }
   if (QuadArray_register_ufunc_unary("cos", QuadArray_ufunc_cos) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("tan", QuadArray_ufunc_tan) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("sinh", QuadArray_ufunc_sinh) < 0) {
+    return -1;
+  }
+  if (QuadArray_register_ufunc_unary("cosh", QuadArray_ufunc_cosh) < 0) {
     return -1;
   }
   return 0;
@@ -949,6 +1003,34 @@ QuadArray_argmax(__float128 *ip, npy_intp n, npy_intp *max_ind, PyArrayObject *N
   return 0;
 }
 
+static int
+QuadArray_argmin(__float128 *ip, npy_intp n, npy_intp *min_ind, PyArrayObject *NPY_UNUSED(aip))
+{
+  npy_intp i;
+  __float128 mp = *ip;
+
+  *min_ind = 0;
+
+  if (isnanq(mp)) {
+    // nan encountered; it's minimal
+    return 0;
+  }
+
+  for (i = 1; i < n; i++) {
+    ip++;
+    // Propagate nans, similarly as max() and min()
+    if (!(*ip > mp)) {  // negated, for correct nan handling
+      mp = *ip;
+      *min_ind = i;
+      if (isnanq(mp)) {
+        // nan encountered, it's minimal
+        break;
+      }
+    }
+  }
+  return 0;
+}
+
 static void
 QuadArray_fillwithscalar(__float128 *buffer, npy_intp length, __float128 *value, void *NPY_UNUSED(ignored))
 {
@@ -1004,6 +1086,7 @@ PyInit_qarray(void)
     QuadArrayFuncs.getitem = (PyArray_GetItemFunc*) QuadArray_getitem;
     QuadArrayFuncs.compare = (PyArray_CompareFunc*) QuadArray_compare;
     QuadArrayFuncs.argmax = (PyArray_ArgFunc*) QuadArray_argmax;
+    QuadArrayFuncs.argmin = (PyArray_ArgFunc*) QuadArray_argmin;
     QuadArrayFuncs.fillwithscalar = (PyArray_FillWithScalarFunc*) QuadArray_fillwithscalar;
 
 
