@@ -17,6 +17,7 @@ class Testqint:
     def test_make_basic(self):
         q = pq.qint(1)
         assert str(q) == "1"
+        assert repr(q) == "qint(1)"
 
         with pytest.raises(TypeError) as cm:
             q = pq.qint(1.0)
@@ -75,12 +76,11 @@ class Testqint:
 
         assert q1 * q2 == q3
 
-    @pytest.mark.skip
     def test_true_div(self):
         q1 = pq.qint(5)
         q2 = pq.qint(2)
 
-        assert q1 / q2 == 5 / 2
+        assert q1 / q2 == 2.5
 
     def test_floor_div(self):
         q1 = pq.qint(5)
@@ -187,7 +187,7 @@ class Testqint:
 
         q1 /= q2
 
-        assert q1 == pq.qint(5) / pq.qint(2)
+        assert q1 == 2.5
 
     def test_floor_inp_div(self):
         q1 = pq.qint(5)
@@ -242,6 +242,7 @@ class Testqint:
         # Check dict lookup
         x = {q1: "abc"}
         assert x[q1] == "abc"
+        assert hash(pq.qint(1)) == hash(1)
 
     @pytest.mark.skip
     def test_hex(self):
@@ -273,7 +274,7 @@ class Testqint:
         assert q1 == 5 << 3
         q1 = pq.qint(5)
         q1 >>= 5
-        assert q1 == 5 >> 3
+        assert q1 == 5 >> 5
         q1 = pq.qint(5)
         q1 &= 8
         assert q1 == 5 & 8
@@ -283,3 +284,15 @@ class Testqint:
         q1 = pq.qint(500)
         q1 ^= 3
         assert q1 == 500 ^ 3
+
+    def test_negative_floor_mod_semantics(self):
+        q1 = pq.qint(-5)
+        q2 = pq.qint(2)
+
+        assert q1 // q2 == (-5 // 2)
+        assert q1 % q2 == (-5 % 2)
+
+    def test_index_protocol(self):
+        q1 = pq.qint(2)
+        data = [10, 20, 30, 40]
+        assert data[q1] == 30

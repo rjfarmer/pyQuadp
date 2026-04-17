@@ -4,6 +4,97 @@
 #define QINT_MODULE
 #include "qint.h"
 
+static __uint128_t u128_from_i128(__int128 v)
+{
+    return (__uint128_t)v;
+}
+
+static __int128 wrap_add_i128(__int128 a, __int128 b)
+{
+    return (__int128)(u128_from_i128(a) + u128_from_i128(b));
+}
+
+static __int128 wrap_sub_i128(__int128 a, __int128 b)
+{
+    return (__int128)(u128_from_i128(a) - u128_from_i128(b));
+}
+
+static __int128 wrap_mul_i128(__int128 a, __int128 b)
+{
+    return (__int128)(u128_from_i128(a) * u128_from_i128(b));
+}
+
+static bool floor_divmod_i128(__int128 a, __int128 b, __int128 *q, __int128 *r)
+{
+    __int128 q0;
+    __int128 r0;
+
+    if (b == 0) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "division or modulo by zero");
+        return false;
+    }
+
+    q0 = a / b;
+    r0 = a % b;
+
+    if (r0 != 0 && ((r0 > 0) != (b > 0))) {
+        r0 = wrap_add_i128(r0, b);
+        q0 = wrap_sub_i128(q0, 1);
+    }
+
+    *q = q0;
+    *r = r0;
+    return true;
+}
+
+static bool normalize_shift_count(PyObject *obj, long *count)
+{
+    long i;
+
+    if (!PyLong_Check(obj)) {
+        PyErr_SetString(PyExc_TypeError, "shift count must be an integer");
+        return false;
+    }
+
+    i = PyLong_AsLong(obj);
+    if (i == -1 && PyErr_Occurred()) {
+        return false;
+    }
+
+    if (i < 0) {
+        PyErr_SetString(PyExc_ValueError, "negative shift count");
+        return false;
+    }
+
+    *count = i;
+    return true;
+}
+
+static PyObject *
+QuadIObject_true_divide(PyObject * o1, PyObject * o2 ){
+    QuadIObject q1, q2;
+
+    if(!PyObject_to_QuadIObject(o1, &q1, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if(!PyObject_to_QuadIObject(o2, &q2, true)){
+        Py_RETURN_NOTIMPLEMENTED;
+    }
+
+    if (q2.value == 0) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "division by zero");
+        return NULL;
+    }
+
+    return PyFloat_FromDouble((double)q1.value / (double)q2.value);
+}
+
+static PyObject *
+QuadIObject_inplace_true_divide(PyObject * o1, PyObject * o2 ){
+    return QuadIObject_true_divide(o1, o2);
+}
+
 
 
 static PyObject *
@@ -12,7 +103,7 @@ QuadIObject_repr(QuadIObject * obj)
     char buf[QUAD_INT_STR_BUF];
 
     if(int128_to_str(obj->value, buf, QUAD_INT_STR_BUF, 10)){
-        return PyUnicode_FromFormat("qint('%s')",buf);
+        return PyUnicode_FromFormat("qint(%s)",buf);
     } else {
         return PyUnicode_FromFormat("Bad qint",buf);
     }
@@ -41,17 +132,19 @@ QuadIObject_binary_op1(const int op, PyObject * o1){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    alloc_QuadIType(&result);
-
     switch(op){
         case OP_negative:
-            result.value= -1*(q1.value);
+            result.value = wrap_sub_i128(0, q1.value);
             break;
         case OP_positive:
-            result.value= 1*q1.value;
+            result.value = q1.value;
             break;
         case OP_absolute:
-            result.value= fabs(q1.value);
+            if (q1.value < 0) {
+                result.value = wrap_sub_i128(0, q1.value);
+            } else {
+                result.value = q1.value;
+            }
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -74,27 +167,34 @@ QuadIObject_binary_op2(const int op, PyObject * o1, PyObject * o2 ){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    alloc_QuadIType(&result);
-
     switch(op){
         case OP_add:
-            result.value = q1.value + q2.value;
+            result.value = wrap_add_i128(q1.value, q2.value);
             break;
         case OP_sub:
-            result.value = q1.value - q2.value;
+            result.value = wrap_sub_i128(q1.value, q2.value);
             break;
         case OP_mult:
-            result.value = q1.value * q2.value;
+            result.value = wrap_mul_i128(q1.value, q2.value);
             break;
-        case OP_remainder:
-            result.value = remainder(q1.value, q2.value);
+        case OP_remainder: {
+            __int128 q;
+            __int128 r;
+            if (!floor_divmod_i128(q1.value, q2.value, &q, &r)) {
+                return NULL;
+            }
+            result.value = r;
             break;
-        case OP_floor_divide:
-            result.value = floor(q1.value/q2.value);
+        }
+        case OP_floor_divide: {
+            __int128 q;
+            __int128 r;
+            if (!floor_divmod_i128(q1.value, q2.value, &q, &r)) {
+                return NULL;
+            }
+            result.value = q;
             break;
-        case OP_true_divide:
-            result.value = q1.value/q2.value;
-            break;
+        }
         default:
             Py_RETURN_NOTIMPLEMENTED;
     }
@@ -118,23 +218,32 @@ QuadIObject_binary_inplace_op2(const int op, PyObject * o1, PyObject * o2 ){
 
     switch(op){
         case OP_add:
-            q1.value = q1.value + q2.value;
+            q1.value = wrap_add_i128(q1.value, q2.value);
             break;
         case OP_sub:
-            q1.value = q1.value - q2.value;
+            q1.value = wrap_sub_i128(q1.value, q2.value);
             break;
         case OP_mult:
-            q1.value = q1.value * q2.value;
+            q1.value = wrap_mul_i128(q1.value, q2.value);
             break;
-        case OP_remainder:
-            q1.value = remainder(q1.value, q2.value);
+        case OP_remainder: {
+            __int128 q;
+            __int128 r;
+            if (!floor_divmod_i128(q1.value, q2.value, &q, &r)) {
+                return NULL;
+            }
+            q1.value = r;
             break;
-        case OP_floor_divide:
-            q1.value = floor(q1.value/q2.value);
+        }
+        case OP_floor_divide: {
+            __int128 q;
+            __int128 r;
+            if (!floor_divmod_i128(q1.value, q2.value, &q, &r)) {
+                return NULL;
+            }
+            q1.value = q;
             break;
-        case OP_true_divide:
-            q1.value = q1.value/q2.value;
-            break;
+        }
         default:
             Py_RETURN_NOTIMPLEMENTED;
     }
@@ -145,36 +254,46 @@ QuadIObject_binary_inplace_op2(const int op, PyObject * o1, PyObject * o2 ){
 static PyObject *
 QuadIObject_binary_op2_int(const int op, PyObject * o1, PyObject * o2 ){
 
-    QuadIObject q1, result;
+    QuadIObject q1, q2, result;
     long int i;
 
     if(!PyObject_to_QuadIObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(!PyLong_Check(o2)){
+    if(!PyObject_to_QuadIObject(o2, &q2, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    alloc_QuadIType(&result);
-
-    i = PyLong_AsLong(o2);
-
     switch(op){
         case OP_lshift:
-            result.value = q1.value << i;
+            if (!normalize_shift_count(o2, &i)) {
+                return NULL;
+            }
+            if (i >= 128) {
+                result.value = 0;
+            } else {
+                result.value = (__int128)(u128_from_i128(q1.value) << i);
+            }
             break;
         case OP_rshift:
-            result.value = q1.value >> i;
+            if (!normalize_shift_count(o2, &i)) {
+                return NULL;
+            }
+            if (i >= 128) {
+                result.value = (q1.value < 0) ? -1 : 0;
+            } else {
+                result.value = q1.value >> i;
+            }
             break;
         case OP_and:
-            result.value = q1.value & i;
+            result.value = q1.value & q2.value;
             break;
         case OP_xor:
-            result.value = q1.value ^ i;
+            result.value = q1.value ^ q2.value;
             break;
         case OP_or:
-            result.value = q1.value | i;
+            result.value = q1.value | q2.value;
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -213,34 +332,46 @@ QuadIObject_or(PyObject * o1, PyObject * o2 ){
 static PyObject *
 QuadIObject_binary_inplace_op2_int(const int op, PyObject * o1, PyObject * o2 ){
 
-    QuadIObject q1;
+    QuadIObject q1, q2;
     long int i;
 
     if(!PyObject_to_QuadIObject(o1, &q1, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(!PyLong_Check(o2)){
+    if(!PyObject_to_QuadIObject(o2, &q2, true)){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    i = PyLong_AsLong(o2);
-
     switch(op){
         case OP_inplace_lshift:
-            q1.value <<= i;
+            if (!normalize_shift_count(o2, &i)) {
+                return NULL;
+            }
+            if (i >= 128) {
+                q1.value = 0;
+            } else {
+                q1.value = (__int128)(u128_from_i128(q1.value) << i);
+            }
             break;
         case OP_inplace_rshift:
-            q1.value >>= i;
+            if (!normalize_shift_count(o2, &i)) {
+                return NULL;
+            }
+            if (i >= 128) {
+                q1.value = (q1.value < 0) ? -1 : 0;
+            } else {
+                q1.value >>= i;
+            }
             break;
         case OP_inplace_and:
-            q1.value &= i;
+            q1.value &= q2.value;
             break;
         case OP_inplace_xor:
-            q1.value ^= i;
+            q1.value ^= q2.value;
             break;
         case OP_inplace_or:
-            q1.value |= i;
+            q1.value |= q2.value;
             break;
         default:
             Py_RETURN_NOTIMPLEMENTED;
@@ -252,27 +383,27 @@ QuadIObject_binary_inplace_op2_int(const int op, PyObject * o1, PyObject * o2 ){
 
 static PyObject *
 QuadIObject_inplace_lshift(PyObject * o1, PyObject * o2 ){
-    return QuadIObject_binary_inplace_op2_int(OP_lshift, o1, o2);
+    return QuadIObject_binary_inplace_op2_int(OP_inplace_lshift, o1, o2);
 }
 
 static PyObject *
 QuadIObject_inplace_rshift(PyObject * o1, PyObject * o2 ){
-    return QuadIObject_binary_inplace_op2_int(OP_rshift, o1, o2);
+    return QuadIObject_binary_inplace_op2_int(OP_inplace_rshift, o1, o2);
 }
 
 static PyObject *
 QuadIObject_inplace_and(PyObject * o1, PyObject * o2 ){
-    return QuadIObject_binary_inplace_op2_int(OP_and, o1, o2);
+    return QuadIObject_binary_inplace_op2_int(OP_inplace_and, o1, o2);
 }
 
 static PyObject *
 QuadIObject_inplace_xor(PyObject * o1, PyObject * o2 ){
-    return QuadIObject_binary_inplace_op2_int(OP_xor, o1, o2);
+    return QuadIObject_binary_inplace_op2_int(OP_inplace_xor, o1, o2);
 }
 
 static PyObject *
 QuadIObject_inplace_or(PyObject * o1, PyObject * o2 ){
-    return QuadIObject_binary_inplace_op2_int(OP_or, o1, o2);
+    return QuadIObject_binary_inplace_op2_int(OP_inplace_or, o1, o2);
 }
 
 
@@ -302,10 +433,20 @@ QuadIObject_remainder(PyObject * o1, PyObject * o2 ){
 
 static PyObject *
 QuadIObject_divmod(PyObject * o1, PyObject * o2 ){
-    return Py_BuildValue("(OO)", \
-           QuadIObject_binary_op2(OP_floor_divide, o1, o2), \
-           QuadIObject_binary_op2(OP_remainder, o1, o2) \
-    );
+    PyObject *q = QuadIObject_binary_op2(OP_floor_divide, o1, o2);
+    PyObject *r;
+
+    if (q == NULL) {
+        return NULL;
+    }
+
+    r = QuadIObject_binary_op2(OP_remainder, o1, o2);
+    if (r == NULL) {
+        Py_DECREF(q);
+        return NULL;
+    }
+
+    return Py_BuildValue("(NN)", q, r);
 }
 
 static PyObject *
@@ -320,15 +461,23 @@ QuadIObject_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    alloc_QuadIType(&result);
+    if (q2.value < 0 && o3 != Py_None) {
+        PyErr_SetString(PyExc_ValueError, "pow() 2nd argument cannot be negative when 3rd argument specified");
+        return NULL;
+    }
 
-    result.value = powq(q1.value, q2.value);
+    result.value = (__int128)powq((__float128)q1.value, (__float128)q2.value);
 
     if(o3 != Py_None) {
-        if(!PyObject_to_QuadIObject(o2, &q3, true))
+        __int128 q;
+        __int128 r;
+        if(!PyObject_to_QuadIObject(o3, &q3, true))
             Py_RETURN_NOTIMPLEMENTED;
 
-        result.value = fmodq(result.value, q3.value);
+        if (!floor_divmod_i128(result.value, q3.value, &q, &r)) {
+            return NULL;
+        }
+        result.value = r;
     }
 
     return QuadIObject_to_PyObject(result);
@@ -388,14 +537,16 @@ QuadIObject_int(PyObject * o1){
         Py_RETURN_NOTIMPLEMENTED;
     }
 
-    if(q1.value <= LLONG_MAX && q1.value >= LLONG_MIN){
-        result = PyLong_FromLongLong(q1.value);
-        if(PyErr_Occurred()){
+    {
+        char buf[QUAD_INT_STR_BUF];
+        if (!int128_to_str(q1.value, buf, QUAD_INT_STR_BUF, 10)) {
+            PyErr_SetString(PyExc_ValueError, "Could not convert qint to python int.");
             return NULL;
         }
-    } else {
-        PyErr_SetString(PyExc_ValueError, "Value too large for a python int.");
-        return NULL;
+        result = PyLong_FromString(buf, NULL, 10);
+        if (result == NULL) {
+            return NULL;
+        }
     }
 
    return result;
@@ -454,13 +605,23 @@ QuadIObject_inplace_pow(PyObject * o1, PyObject * o2, PyObject * o3 ){
     }
 
 
-    q1.value = powq(q1.value, q2.value);
+    if (q2.value < 0 && o3 != Py_None) {
+        PyErr_SetString(PyExc_ValueError, "pow() 2nd argument cannot be negative when 3rd argument specified");
+        return NULL;
+    }
+
+    q1.value = (__int128)powq((__float128)q1.value, (__float128)q2.value);
 
     if(o3 != Py_None) {
-        if(!PyObject_to_QuadIObject(o2, &q3,true))
+        __int128 q;
+        __int128 r;
+        if(!PyObject_to_QuadIObject(o3, &q3,true))
             Py_RETURN_NOTIMPLEMENTED;
 
-        q1.value = fmodq(q1.value, q3.value);
+        if (!floor_divmod_i128(q1.value, q3.value, &q, &r)) {
+            return NULL;
+        }
+        q1.value = r;
     }
 
     return QuadIObject_to_PyObject(q1);
@@ -473,18 +634,8 @@ QuadIObject_floor_divide(PyObject * o1, PyObject * o2 ){
 }
 
 static PyObject *
-QuadIObject_true_divide(PyObject * o1, PyObject * o2 ){
-    return QuadIObject_binary_op2(OP_true_divide, o1, o2);
-}
-
-static PyObject *
 QuadIObject_inplace_floor_divide(PyObject * o1, PyObject * o2 ){
     return QuadIObject_binary_inplace_op2(OP_floor_divide, o1, o2);
-}
-
-static PyObject *
-QuadIObject_inplace_true_divide(PyObject * o1, PyObject * o2 ){
-    return QuadIObject_binary_inplace_op2(OP_true_divide, o1, o2);
 }
 
 
@@ -540,8 +691,6 @@ static PyObject * QuadIObject_from_bytes(PyTypeObject *type, PyObject * arg){
     // Gets the type object not an instance in type
     // As its METH_O we dont need to unpack arg
     QuadIObject  res;
-
-    alloc_QuadIType(&res);
 
     if(PyBytes_Size(arg) == sizeof(res.bytes)){
         memcpy(res.bytes, PyBytes_AsString(arg), PyBytes_Size(arg));
@@ -599,8 +748,9 @@ QuadIObject___setstate__(QuadIObject *self, PyObject *state) {
     /* Version check. */
     /* Borrowed reference but no need to increment as we create a C long
      * from it. */
-    PyObject *temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat(PICKLE_VERSION_KEY));
+    PyObject *temp = PyDict_GetItemString(state, PICKLE_VERSION_KEY);
     if (temp == NULL) {
+        PyErr_SetString(PyExc_KeyError, "No pickle version in pickled dict.");
         return NULL;
     }
     int pickle_version = (int) PyLong_AsLong(temp);
@@ -611,7 +761,7 @@ QuadIObject___setstate__(QuadIObject *self, PyObject *state) {
         return NULL;
     }
 
-    temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat("bytes"));
+    temp = PyDict_GetItemString(state, "bytes");
 
     if (temp == NULL) {
         PyErr_Format(PyExc_KeyError, "No bytes in pickled dict.");
@@ -630,9 +780,16 @@ QuadIObject___setstate__(QuadIObject *self, PyObject *state) {
 
 
 Py_hash_t QuadIObject_hash(QuadIObject *self){
-    // Note this wont have the nice property that Python has with numeric values being equal 
-    // hash to the same value i.e hash(1) == hash(1.0)
-    return PyObject_Hash(QuadIObject_to_bytes(self, NULL));
+    PyObject *as_int = QuadIObject_int((PyObject *)self);
+    Py_hash_t h;
+
+    if (as_int == NULL) {
+        return -1;
+    }
+
+    h = PyObject_Hash(as_int);
+    Py_DECREF(as_int);
+    return h;
 }
 
 
@@ -719,7 +876,7 @@ static PyNumberMethods QuadI_math_methods = {
     (binaryfunc) QuadIObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
     (binaryfunc) QuadIObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
 
-    0,//(unaryfunc) QuadIObject_int,//  unaryfunc nb_index;
+    (unaryfunc) QuadIObject_int,//  unaryfunc nb_index;
 
     0,//  binaryfunc nb_matrix_multiply;
     0,//  binaryfunc nb_inplace_matrix_multiply;
@@ -756,7 +913,6 @@ Quad_qinit(QuadIObject *self, PyObject *args, PyObject *kwds)
     PyObject * obj;
 
     if (!PyArg_ParseTuple(args, "O:", &obj)){
-        PyErr_Print();
         return -1;
     }
         
@@ -815,8 +971,7 @@ static __int128 QuadIObject_int128(QuadIObject * out) {
 bool
 PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
 {
-    if(alloc)
-        alloc_QuadIType(out);
+    (void)alloc;
 
     if(QuadIObject_Check(in)){
         // Is a quad
@@ -829,13 +984,12 @@ PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
         Py_ssize_t size;
         const char *buf = PyUnicode_AsUTF8AndSize(in,&size);
         if (buf==NULL){
-            PyErr_Print();
             return false;
         }
 
         if(!str_to_int128(buf, size, &out->value)){
             PyErr_SetString(PyExc_ValueError, "Overflow error");
-            return NULL;
+            return false;
         }
 
         return true;
@@ -850,14 +1004,17 @@ PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
             Py_ssize_t len;
             const char *buf = PyUnicode_AsUTF8AndSize(str, &len);
             if (buf==NULL){
-                PyErr_Print();
+                Py_XDECREF(str);
                 return false;
             }
 
             if(!str_to_int128(buf,len,&out->value)){
+                Py_DECREF(str);
                 PyErr_SetString(PyExc_TypeError, "Could not convert int to integer quad precision.");
                 return false;
             }
+
+            Py_DECREF(str);
 
             return true;
         }
@@ -873,7 +1030,7 @@ static bool QuadIObject_Check(PyObject * obj){
 
 
 static void alloc_QuadIType(QuadIObject * result){
-	result = (QuadIObject*) PyType_GenericAlloc(&QuadIType, 0);
+    result->value = 0;
 }
 
 PyMODINIT_FUNC
@@ -922,95 +1079,99 @@ PyInit_qmint(void)
 
 // TODO: Handle hex values?
 bool str_to_int128(const char *str, Py_ssize_t length, __int128 *result){
-    __int128 count=1;
-    char sym;
-    int sign=0;
-    bool sign_set=false;
+    Py_ssize_t i = 0;
+    int sign = 1;
+    __uint128_t acc = 0;
+    bool has_digit = false;
+    __uint128_t max_abs = (((__uint128_t)1) << 127);
+    __uint128_t limit = max_abs - 1u;
 
-    __int128 c,sum,r;
-
-    *result=0;
-
-    if(length == 0)
+    if (length == 0)
         return false;
 
-    sign = 1;
-    for(int i=length;i>=0;i--){
-        sym = str[i];
+    while (i < length && isspace((unsigned char)str[i]))
+        i++;
 
-        if(isspace(sym))
-            continue;
-
-        if(!sign_set){
-            if(sym=='-' || sym =='+'){
-                sign_set = true;
-                if(sym=='-')
-                    sign=-1;
-            }
-        }
-
-        if(isalpha(sym)){
-            return false;
-        }
-
-        if(isdigit(sym)){
-            // Compute result+= (sym - '0')*count;count*=10
-
-            // we are working from back of the string forwards
-            // so each time count increases by a factor 10 we are 
-            // shifting to the next digit in base 10
-
-            if(__builtin_mul_overflow(sym - '0', count, &sum))
-                return false;
-
-            if(__builtin_add_overflow(sum, *result, &r))
-                return false;
-            else
-                *result = r;
-
-            // Peak ahead to see if there is more still to process
-            // otherwise we may overflow and error even though we 
-            // dont need count again if we are close to max __int128
-            if(i>0){
-                if(isdigit(str[i-1])){
-                    if(__builtin_mul_overflow(count, 10, &c))
-                        return false;
-                    else
-                        count = c;
-                }
-            }
-        }
-
+    if (i < length && (str[i] == '+' || str[i] == '-')) {
+        sign = (str[i] == '-') ? -1 : 1;
+        i++;
     }
-    *result *= sign;
+
+    if (sign < 0) {
+        limit = max_abs;
+    }
+
+    while (i < length && isspace((unsigned char)str[i]))
+        i++;
+
+    for (; i < length; i++) {
+        unsigned char c = (unsigned char)str[i];
+        if (isspace(c)) {
+            while (i < length && isspace((unsigned char)str[i]))
+                i++;
+            if (i != length)
+                return false;
+            break;
+        }
+        if (!isdigit(c))
+            return false;
+
+        has_digit = true;
+
+        if (acc > (limit / 10u))
+            return false;
+        if (acc == (limit / 10u) && (unsigned)(c - '0') > (unsigned)(limit % 10u))
+            return false;
+
+        acc = acc * 10u + (unsigned)(c - '0');
+        if (acc > limit)
+            return false;
+    }
+
+    if (!has_digit)
+        return false;
+
+    if (sign > 0) {
+        *result = (__int128)acc;
+    } else if (acc == max_abs) {
+        *result = (__int128)max_abs;
+    } else {
+        *result = -(__int128)acc;
+    }
+
     return true;
 }
 
 bool int128_to_str(__int128 num, char* str, int len, int base)
 {
-	__int128 sum = num;
 	int i = 0,k=0;
 	int digit;
     bool neg=false;
     char temp;
+    __uint128_t usum;
 	if (len == 0)
 		return false;
 
-    if(sum<0){
-        sum=-1*sum;
+    if (base < 2 || base > 36)
+        return false;
+
+    if(num<0){
+        usum = (__uint128_t)(-(num + 1)) + 1u;
         neg=true;
+    } else {
+        usum = (__uint128_t)num;
     }
 	do
 	{
-		digit = (sum % base);
+        digit = (int)(usum % (unsigned)base);
 		if (digit < 10)
 			str[i++] = '0' + digit;
 		else
 			str[i++] = 'A' + digit - 10;
 
-		sum /= base;
-	}while (sum && (i < (len - 1)));
-	if (i == (len - 1) && sum)
+        usum /= (unsigned)base;
+    }while (usum && (i < (len - 1)));
+    if (i == (len - 1) && usum)
 		return false;
     if(neg){
         str[i] = '-';
