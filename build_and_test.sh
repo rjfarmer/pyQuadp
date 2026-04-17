@@ -1,8 +1,8 @@
 #!/bin/bash
 
-export CC=${CC:-gcc}
-export CXX=${CXX:-g++}
-export FC=${FC:-gfortran}
+export CC=gcc
+export CXX=g++
+export FC=gfortran
 
 rm -rf build dist
 python -m build

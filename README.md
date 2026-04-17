@@ -9,6 +9,9 @@
 Python interface to gcc's libquadmath for quad (128-bit) precision maths.
 
 ## Build
+This project must be compiled with GCC/GFortran toolchain (`gcc`, `g++`, `gfortran`).
+Do not use `clang` for builds.
+
 ````bash
 CC=gcc CXX=g++ FC=gfortran python -m build
 python -m pip install .
