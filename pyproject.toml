@@ -62,16 +62,6 @@ concurrency = ["multiprocessing", "thread"]
 
 
 [tool.setuptools]
-ext-modules = [
-    {name='pyquadp.qmathc', sources=["pyquadp/qfloat.c", "pyquadp/qmathc.c"], libraries=['quadmath']},
-    {name='pyquadp.qcmathc', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c", "pyquadp/qcmathc.c"], libraries=['quadmath']},
-    {name='pyquadp.qmfloat', sources=["pyquadp/qfloat.c"], libraries=['quadmath']},
-    {name='pyquadp.qmcmplx', sources=["pyquadp/qfloat.c", "pyquadp/qcmplx.c"], libraries=['quadmath']},
-    {name='pyquadp.qmint', sources=["pyquadp/qint.c"], libraries=['quadmath']},
-    {name='pyquadp.qarray', sources=["pyquadp/qfloatarray.c"], include-dirs=["pyquadp"], libraries=['quadmath']},
-    {name='pyquadp.qcarray', sources=["pyquadp/qcarray.c"], include-dirs=["pyquadp"], libraries=['quadmath']},
-    {name='pyquadp.qiarray', sources=["pyquadp/qiarray.c"], include-dirs=["pyquadp"], libraries=['quadmath']},
-]
 packages = ["pyquadp"]
 
 
