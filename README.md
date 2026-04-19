@@ -168,7 +168,16 @@ q = pyquadp.qcmplx('1','1')
 q = pyquadp.qcmplx(pyquadp.qfloat(1), pyquadp.qfloat('1'))
 ````
 
-Note that strings must be split into two components. There is no support for ``1+1j`` (unless passed via complex('1+1j'))
+``qcmplx`` also accepts a single complex string in Python complex notation:
+
+````python
+q = pyquadp.qcmplx('1+1j')
+q = pyquadp.qcmplx('1-1j')
+q = pyquadp.qcmplx('-2.5j')
+q = pyquadp.qcmplx('3.25')
+````
+
+Both one-string and two-argument forms are supported.
 
 
 <!-- A ``qcmplx`` implements Python's NumberProtocol, thus it can be used like any other number, either with basic math operations or in rich comparisons:

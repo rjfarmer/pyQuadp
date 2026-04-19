@@ -148,3 +148,26 @@ class TestQFloat:
         # Check dict lookup
         x = {q1: "abc"}
         assert x[q1] == "abc"
+
+    def test_string_creation(self):
+        q1 = pq.qcmplx("1.234567890+9.87654321j")
+        assert q1 == pq.qcmplx("1.234567890", "9.87654321")
+
+        q2 = pq.qcmplx("1.234567890-9.87654321j")
+        assert q2 == pq.qcmplx("1.234567890", "-9.87654321")
+
+        q3 = pq.qcmplx("-1.234567890+9.87654321j")
+        assert q3 == pq.qcmplx("-1.234567890", "9.87654321")
+
+        q4 = pq.qcmplx("-9.87654321j")
+        assert q4 == pq.qcmplx("0", "-9.87654321")
+
+        q5 = pq.qcmplx("1.234567890")
+        assert q5 == pq.qcmplx("1.234567890", "0")
+
+        # Keep exact string assertion for values exactly representable in binary.
+        q6 = pq.qcmplx("1.5+2.5j")
+        assert (
+            str(q6)
+            == "(1.500000000000000000000000000000000000e+00+2.500000000000000000000000000000000000e+00j)"
+        )

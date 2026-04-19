@@ -641,6 +641,89 @@ PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
         return true;
     }
 
+    if(PyUnicode_Check(in)){
+        // Is a string
+        const char *buf = PyUnicode_AsUTF8AndSize(in, NULL);
+        if (buf==NULL){
+            PyErr_Print();
+            return false;
+        }
+        char *sp = NULL;
+        char *sp2 = NULL;
+        char *buf2 = strdup(buf);
+        char *p = NULL;
+        char *split_sign = NULL;
+        char *real_str = NULL;
+        char *imag_str = NULL;
+        size_t len = 0;
+
+        if (buf2 == NULL) {
+            PyErr_NoMemory();
+            return false;
+        }
+
+        out->value = 0 + 0*I;
+
+        // Trim trailing spaces to reliably detect a terminal j/J.
+        len = strlen(buf2);
+        while (len > 0 && (buf2[len - 1] == ' ' || buf2[len - 1] == '\t')) {
+            buf2[len - 1] = '\0';
+            len--;
+        }
+
+        if (len > 0 && (buf2[len - 1] == 'j' || buf2[len - 1] == 'J')) {
+            // Complex string with explicit imaginary component.
+            buf2[len - 1] = '\0';
+
+            // Find split sign between real and imag, ignoring exponent signs.
+            p = buf2 + 1;
+            while (*p) {
+                if ((*p == '+' || *p == '-') && *(p - 1) != 'e' && *(p - 1) != 'E') {
+                    split_sign = p;
+                }
+                p++;
+            }
+
+            if (split_sign) {
+                size_t real_len = (size_t)(split_sign - buf2);
+                real_str = (char *)malloc(real_len + 1);
+                if (real_str == NULL) {
+                    free(buf2);
+                    PyErr_NoMemory();
+                    return false;
+                }
+                memcpy(real_str, buf2, real_len);
+                real_str[real_len] = '\0';
+
+                imag_str = strdup(split_sign);
+                if (imag_str == NULL) {
+                    free(real_str);
+                    free(buf2);
+                    PyErr_NoMemory();
+                    return false;
+                }
+
+                __real__ out->value = strtoflt128(real_str, &sp);
+                __imag__ out->value = strtoflt128(imag_str, &sp2);
+
+                free(real_str);
+                free(imag_str);
+            } else {
+                // Imaginary-only string, e.g. "-9.87j".
+                __real__ out->value = 0;
+                __imag__ out->value = strtoflt128(buf2, &sp2);
+            }
+        } else {
+            // Real-only string.
+            __real__ out->value = strtoflt128(buf2, &sp);
+            __imag__ out->value = 0;
+        }
+
+        free(buf2);
+        return true;
+    }
+
+
     return false;
 
 }
