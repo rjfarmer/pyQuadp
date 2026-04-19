@@ -79,9 +79,7 @@ class TestQArrayConstructors:
         assert isinstance(arr, np.ndarray)
         assert arr.shape == (4,)
         assert arr.dtype == qarray.dtype
-        # NumPy ABI/version can expose custom dtype name as either legacy
-        # registration name (qfloat) or module type name (qarray).
-        assert arr.dtype.name in {"qfloat", "qarray"}
+        assert arr.dtype.name == 'qfloat'
 
     def test_ones_constructor(self):
         qarray = pytest.importorskip("pyquadp.qarray")

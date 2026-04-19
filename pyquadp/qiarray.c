@@ -19,7 +19,7 @@ static int QuadIArrayTypeNum = -1;
 
 static PyArray_ArrFuncs QuadIArrayFuncs;
 static PyArray_Descr *QuadIArrayDescr;
-static PyArray_DescrProto QuadIArrayDescrProto;
+static PyArray_DescrProto QuadIArrayDescrProto = {PyObject_HEAD_INIT(NULL)};
 
 static int QuadIArray_setitem(PyObject *item, __int128 *data, void *array);
 
@@ -1365,6 +1365,9 @@ PyInit_qiarray(void)
     .metadata = NULL,
     .c_metadata = NULL,
   };
+
+  Py_SET_TYPE(&QuadIArrayDescrProto, &PyArrayDescr_Type);
+
 
   Py_INCREF(&QuadIType);
   qiarrayNum = PyArray_RegisterDataType(&QuadIArrayDescrProto);

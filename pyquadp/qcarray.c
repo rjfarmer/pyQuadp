@@ -22,7 +22,7 @@ static int QuadArrayTypeNum = -1;
 
 static PyArray_ArrFuncs QuadCArrayFuncs;
 static PyArray_Descr *QuadCArrayDescr;
-static PyArray_DescrProto QuadCArrayDescrProto;
+static PyArray_DescrProto QuadCArrayDescrProto = {PyObject_HEAD_INIT(NULL)};
 
 static inline __complex128
 qcomplex_from_cdouble(npy_cdouble z)
@@ -1380,6 +1380,9 @@ PyInit_qcarray(void)
         .metadata = NULL,
         .c_metadata = NULL,
     };
+
+    Py_SET_TYPE(&QuadCArrayDescrProto, &PyArrayDescr_Type);
+
 
     Py_INCREF(&QuadCType);
     qcarrayNum = PyArray_RegisterDataType(&QuadCArrayDescrProto);
