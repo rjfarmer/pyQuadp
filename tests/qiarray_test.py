@@ -58,7 +58,7 @@ class TestQIArrayConstructors:
         assert full.dtype == qiarray.dtype
         assert zeros.dtype == qiarray.dtype
         assert ones.dtype == qiarray.dtype
-        assert zeros.dtype.name == 'qint'
+        assert zeros.dtype.name == "qint"
         np.testing.assert_array_equal(
             np.asarray(full, dtype=np.int64), np.array([-2, -2, -2, -2], dtype=np.int64)
         )
