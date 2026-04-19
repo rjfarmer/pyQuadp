@@ -249,7 +249,6 @@ class Testqint:
         assert x[q1] == "abc"
         assert hash(pq.qint(1)) == hash(1)
 
-    @pytest.mark.skip
     def test_hex(self):
         q = pq.qint("1234567899999")
 
@@ -258,6 +257,16 @@ class Testqint:
         q2 = pq.qint.fromhex("0x11f71fb2b5f")
 
         assert q2 == q
+
+        q3 = pq.qint.fromhex("11f71fb2b5f")
+        assert q3 == q
+
+        qn = pq.qint("-255")
+        assert pq.qint.fromhex("-0xff") == qn
+        assert pq.qint.fromhex("-ff") == qn
+
+        with pytest.raises(ValueError):
+            pq.qint.fromhex("nothex")
 
     def test_shifts(self):
         q1 = pq.qint(5)

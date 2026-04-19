@@ -806,34 +806,28 @@ static PyObject * QuadIObject_to_hex(QuadIObject * self, PyObject * args){
 
 
 static PyObject * QuadIObject_from_hex(PyTypeObject *type, PyObject * arg){
-    // Gets the type object not an instance in type
-    // As its METH_O we dont need to unpack arg
-    // QuadIObject res;
+    QuadIObject res;
+    PyObject *as_int;
 
-    // alloc_QuadIType(&res);
+    (void)type;
 
-    // if(PyUnicode_Check(arg)){
-    //     // Is a string
-    //     const char *buf = PyUnicode_AsUTF8AndSize(arg, NULL);
-    //     if (buf==NULL){
-    //         PyErr_Print();
-    //         return NULL;
-    //     }
+    if(!PyUnicode_Check(arg)){
+        PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+        return NULL;
+    }
 
-    //     char *sp=NULL;
-    //     res.value = strtoflt128(buf, NULL);
-    //     if(sp!=NULL){
-    //         if(strcmp(sp,"")!=0){
-    //             PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
-    //             return NULL;
-    //         }
-    //     }
-    //     return QuadIObject_to_PyObject(res);
-    // } else {
-    //     PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
-    //     return NULL;
-    // }
-    Py_RETURN_NOTIMPLEMENTED;
+    as_int = PyLong_FromUnicodeObject(arg, 16);
+    if (as_int == NULL) {
+        return NULL;
+    }
+
+    if(!PyObject_to_QuadIObject(as_int, &res, true)){
+        Py_DECREF(as_int);
+        return NULL;
+    }
+
+    Py_DECREF(as_int);
+    return QuadIObject_to_PyObject(res);
 }
 
 
