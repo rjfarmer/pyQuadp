@@ -106,6 +106,40 @@ class TestQArrayConstructors:
         assert arr.shape == (2, 2)
         assert arr.dtype == qarray.dtype
 
+    def test_array_and_asarray_aliases(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        src = np.array([[1.25, 2.5], [3.75, 4.0]], dtype=np.float64)
+
+        arr1 = qarray.array(src)
+        arr2 = qarray.asarray(src)
+
+        assert arr1.dtype == qarray.dtype
+        assert arr2.dtype == qarray.dtype
+        assert arr1.shape == src.shape
+        assert arr2.shape == src.shape
+
+    def test_like_constructors(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        src = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
+
+        empty = qarray.empty_like(src)
+        zeros = qarray.zeros_like(src)
+        ones = qarray.ones_like(src)
+        full = qarray.full_like(src, "-2.5")
+
+        assert empty.dtype == qarray.dtype
+        assert zeros.dtype == qarray.dtype
+        assert ones.dtype == qarray.dtype
+        assert full.dtype == qarray.dtype
+        assert empty.shape == src.shape
+        assert zeros.shape == src.shape
+        assert ones.shape == src.shape
+        assert full.shape == src.shape
+
+        assert np.allclose(np.asarray(zeros, dtype=np.float64), np.zeros_like(src))
+        assert np.allclose(np.asarray(ones, dtype=np.float64), np.ones_like(src))
+        assert np.allclose(np.asarray(full, dtype=np.float64), np.full_like(src, -2.5))
+
 
 @pytest.mark.qarray
 class TestQArrayInterop:

@@ -90,6 +90,40 @@ class TestQIArrayConstructors:
         assert arr.dtype == qiarray.dtype
         np.testing.assert_array_equal(np.asarray(arr, dtype=np.int64), src)
 
+    def test_array_and_asarray_aliases(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        src = np.array([[1, 2], [3, 4]], dtype=np.int64)
+
+        arr1 = qiarray.array(src)
+        arr2 = qiarray.asarray(src)
+
+        assert arr1.dtype == qiarray.dtype
+        assert arr2.dtype == qiarray.dtype
+        assert arr1.shape == src.shape
+        assert arr2.shape == src.shape
+
+    def test_like_constructors(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        src = np.array([[1, 2], [3, 4]], dtype=np.int64)
+
+        empty = qiarray.empty_like(src)
+        zeros = qiarray.zeros_like(src)
+        ones = qiarray.ones_like(src)
+        full = qiarray.full_like(src, "-2")
+
+        assert empty.dtype == qiarray.dtype
+        assert zeros.dtype == qiarray.dtype
+        assert ones.dtype == qiarray.dtype
+        assert full.dtype == qiarray.dtype
+        assert empty.shape == src.shape
+        assert zeros.shape == src.shape
+        assert ones.shape == src.shape
+        assert full.shape == src.shape
+
+        np.testing.assert_array_equal(np.asarray(zeros, dtype=np.int64), np.zeros_like(src))
+        np.testing.assert_array_equal(np.asarray(ones, dtype=np.int64), np.ones_like(src))
+        np.testing.assert_array_equal(np.asarray(full, dtype=np.int64), np.full_like(src, -2))
+
 
 @pytest.mark.qiarray
 class TestQIArrayInterop:

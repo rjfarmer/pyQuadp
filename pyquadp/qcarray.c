@@ -1111,6 +1111,121 @@ qcarray_from_array(PyObject *NPY_UNUSED(self), PyObject *args)
     return (PyObject *)arr;
 }
 
+static PyObject *
+qcarray_asarray(PyObject *self, PyObject *args)
+{
+    return qcarray_from_array(self, args);
+}
+
+static PyObject *
+qcarray_array(PyObject *self, PyObject *args)
+{
+    return qcarray_from_array(self, args);
+}
+
+static PyObject *
+qcarray_empty_like(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+    PyObject *obj;
+    PyArrayObject *input;
+    PyArrayObject *arr;
+
+    if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return NULL;
+    }
+
+    input = (PyArrayObject *)PyArray_FROM_O(obj);
+    if (input == NULL) {
+        return NULL;
+    }
+
+    arr = QuadCArray_new_empty(PyArray_NDIM(input), PyArray_DIMS(input));
+    Py_DECREF(input);
+    if (arr == NULL) {
+        return NULL;
+    }
+
+    return (PyObject *)arr;
+}
+
+static PyObject *
+qcarray_zeros_like(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+    PyArrayObject *arr = (PyArrayObject *)qcarray_empty_like(NULL, args);
+    if (arr == NULL) {
+        return NULL;
+    }
+
+    memset(PyArray_DATA(arr), 0, (size_t)PyArray_NBYTES(arr));
+    return (PyObject *)arr;
+}
+
+static PyObject *
+qcarray_full_like(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+    PyObject *obj;
+    PyObject *value;
+    PyArrayObject *input;
+    PyArrayObject *arr;
+    __complex128 *data;
+    npy_intp i;
+    npy_intp n;
+
+    if (!PyArg_ParseTuple(args, "OO", &obj, &value)) {
+        return NULL;
+    }
+
+    input = (PyArrayObject *)PyArray_FROM_O(obj);
+    if (input == NULL) {
+        return NULL;
+    }
+
+    arr = QuadCArray_new_empty(PyArray_NDIM(input), PyArray_DIMS(input));
+    Py_DECREF(input);
+    if (arr == NULL) {
+        return NULL;
+    }
+
+    data = (__complex128 *)PyArray_DATA(arr);
+    n = PyArray_SIZE(arr);
+    for (i = 0; i < n; ++i) {
+        if (QuadCArray_setitem(value, &data[i], arr) < 0) {
+            Py_DECREF(arr);
+            return NULL;
+        }
+    }
+
+    return (PyObject *)arr;
+}
+
+static PyObject *
+qcarray_ones_like(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+    PyObject *obj;
+    PyObject *value;
+    PyObject *arg_tuple;
+    PyObject *ret;
+
+    if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return NULL;
+    }
+
+    value = PyComplex_FromDoubles(1.0, 0.0);
+    if (value == NULL) {
+        return NULL;
+    }
+
+    arg_tuple = Py_BuildValue("(OO)", obj, value);
+    Py_DECREF(value);
+    if (arg_tuple == NULL) {
+        return NULL;
+    }
+
+    ret = qcarray_full_like(NULL, arg_tuple);
+    Py_DECREF(arg_tuple);
+    return ret;
+}
+
 static PyMethodDef QuadCArrayMethods[] = {
     {"linspace", qcarray_linspace, METH_VARARGS, "Create a 1-D qcarray with evenly spaced samples over an interval."},
     {"empty", qcarray_empty, METH_VARARGS, "Create a 1-D uninitialized qcarray."},
@@ -1119,6 +1234,12 @@ static PyMethodDef QuadCArrayMethods[] = {
     {"ones", qcarray_ones, METH_VARARGS, "Create a 1-D qcarray of ones."},
     {"from_list", qcarray_from_list, METH_VARARGS, "Create a qcarray from a Python sequence."},
     {"from_array", qcarray_from_array, METH_VARARGS, "Create a qcarray from an array-like object."},
+    {"asarray", qcarray_asarray, METH_VARARGS, "Create a qcarray from an array-like object."},
+    {"array", qcarray_array, METH_VARARGS, "Create a qcarray from an array-like object."},
+    {"empty_like", qcarray_empty_like, METH_VARARGS, "Create an empty qcarray with the same shape as input."},
+    {"zeros_like", qcarray_zeros_like, METH_VARARGS, "Create a zero-filled qcarray with the same shape as input."},
+    {"ones_like", qcarray_ones_like, METH_VARARGS, "Create a one-filled qcarray with the same shape as input."},
+    {"full_like", qcarray_full_like, METH_VARARGS, "Create a qcarray filled with a value and the same shape as input."},
     {NULL, NULL, 0, NULL},
 };
 

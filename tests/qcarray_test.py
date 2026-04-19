@@ -106,6 +106,43 @@ class TestQCArrayConstructors:
         assert arr.dtype == qcarray.dtype
         np.testing.assert_allclose(np.asarray(arr, dtype=np.complex128), src)
 
+    def test_array_and_asarray_aliases(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        src = np.array([[1.0 + 2.0j, -3.0 + 0.5j]], dtype=np.complex128)
+
+        arr1 = qcarray.array(src)
+        arr2 = qcarray.asarray(src)
+
+        assert arr1.dtype == qcarray.dtype
+        assert arr2.dtype == qcarray.dtype
+        assert arr1.shape == src.shape
+        assert arr2.shape == src.shape
+
+    def test_like_constructors(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        src = np.array([[1.0 + 2.0j, -3.0 + 0.5j]], dtype=np.complex128)
+
+        empty = qcarray.empty_like(src)
+        zeros = qcarray.zeros_like(src)
+        ones = qcarray.ones_like(src)
+        full = qcarray.full_like(src, "1.5-0.25j")
+
+        assert empty.dtype == qcarray.dtype
+        assert zeros.dtype == qcarray.dtype
+        assert ones.dtype == qcarray.dtype
+        assert full.dtype == qcarray.dtype
+        assert empty.shape == src.shape
+        assert zeros.shape == src.shape
+        assert ones.shape == src.shape
+        assert full.shape == src.shape
+
+        np.testing.assert_allclose(np.asarray(zeros, dtype=np.complex128), np.zeros_like(src))
+        np.testing.assert_allclose(np.asarray(ones, dtype=np.complex128), np.ones_like(src))
+        np.testing.assert_allclose(
+            np.asarray(full, dtype=np.complex128),
+            np.full_like(src, 1.5 - 0.25j),
+        )
+
 
 @pytest.mark.qcarray
 class TestQCArrayInterop:
