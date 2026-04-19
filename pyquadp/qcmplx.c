@@ -727,6 +727,7 @@ PyInit_qmcmplx(void)
     PyQcmplx_API[PyQcmplx_q2py_NUM] = (void *)QuadCObject_to_PyObject;
     PyQcmplx_API[PyQcmplx_py2q_NUM] = (void *)PyObject_to_QuadCObject;
     PyQcmplx_API[PyQcmplx_alloc_NUM] = (void *)alloc_QuadCType;
+    PyQcmplx_API[PyQcmplx_type_NUM] = (void *)&QuadCType;
 
     Py_INCREF(&QuadCType);
     if (PyModule_AddObject(m, "qcmplx", (PyObject *) &QuadCType) < 0) {

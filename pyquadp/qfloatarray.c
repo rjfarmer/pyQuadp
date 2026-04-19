@@ -18,14 +18,6 @@
 #include "qfloat.h"
 
 static int QuadArrayTypeNum = -1;
-
-static PyTypeObject QuadArrayType = {
-  PyVarObject_HEAD_INIT(NULL, 0)
-  .tp_name = "pyquadp.qarray",
-  .tp_basicsize = sizeof(PyObject),
-  .tp_flags = Py_TPFLAGS_DEFAULT,
-  .tp_doc = "NumPy custom dtype support for quad precision values",
-};
 PyArray_ArrFuncs QuadArrayFuncs;
 PyArray_Descr* QuadArrayDescr;
 PyArray_DescrProto QuadArrayDescrProto;
@@ -1117,7 +1109,7 @@ static PyModuleDef QuadArrayModule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "qarray",
     .m_doc = "Quad precision module for array quad's.",
-  .m_methods = QuadArrayMethods,
+    .m_methods = QuadArrayMethods,
     .m_size = -1,
 };
 
@@ -1324,14 +1316,6 @@ PyInit_qarray(void)
         return NULL;
     }
 
-    QuadArrayType.tp_base = &PyGenericArrType_Type;
-    if (PyType_Ready(&QuadArrayType) < 0) {
-        PyErr_Print();
-        PyErr_SetString(PyExc_SystemError, "Could not initialize QuadArrayType.");
-      Py_DECREF(m);
-        return NULL;
-    }
-
     PyArray_InitArrFuncs(&QuadArrayFuncs);
     QuadArrayFuncs.nonzero = (PyArray_NonzeroFunc*) QuadArray_nonzero;
     QuadArrayFuncs.copyswap = (PyArray_CopySwapFunc*) QuadArray_copyswap;
@@ -1344,26 +1328,24 @@ PyInit_qarray(void)
     QuadArrayFuncs.fillwithscalar = (PyArray_FillWithScalarFunc*) QuadArray_fillwithscalar;
 
 
-    Py_SET_TYPE(&QuadArrayDescrProto, &PyArrayDescr_Type);
-    QuadArrayDescrProto.typeobj = &QuadArrayType;
-    QuadArrayDescrProto.kind = 'V';
-    QuadArrayDescrProto.type = 'f';
-    QuadArrayDescrProto.byteorder = '=';
-    QuadArrayDescrProto.flags = NPY_NEEDS_PYAPI | NPY_USE_GETITEM | NPY_USE_SETITEM;
-    QuadArrayDescrProto.type_num = 0; // assigned at registration
-    QuadArrayDescrProto.elsize = sizeof(__float128);
-    QuadArrayDescrProto.alignment = alignof(__float128);
-    QuadArrayDescrProto.f = &QuadArrayFuncs;
-#if NPY_ABI_VERSION < 0x02000000
-    QuadArrayDescrProto.name = "qfloat";
-#endif
-    QuadArrayDescrProto.subarray = NULL;
-    QuadArrayDescrProto.fields = NULL;
-    QuadArrayDescrProto.names = NULL;
-    QuadArrayDescrProto.metadata = NULL;
-    QuadArrayDescrProto.c_metadata = NULL;
+    QuadArrayDescrProto = (PyArray_DescrProto){
+      .typeobj = &QuadType,
+      .kind = 'V',
+      .type = 'f',
+      .byteorder = '=',
+      .flags = NPY_NEEDS_PYAPI | NPY_USE_GETITEM | NPY_USE_SETITEM,
+      .type_num = 0, // assigned at registration
+      .elsize = sizeof(__float128),
+      .alignment = alignof(__float128),
+      .f = &QuadArrayFuncs,
+      .subarray = NULL,
+      .fields = NULL,
+      .names = NULL,
+      .metadata = NULL,
+      .c_metadata = NULL,
+    };
 
-    Py_INCREF(&QuadArrayType);
+    Py_INCREF(&QuadType);
     qarrayNum = PyArray_RegisterDataType(&QuadArrayDescrProto);
 
     if (qarrayNum < 0) {
@@ -1387,7 +1369,8 @@ PyInit_qarray(void)
       return NULL;
     }
 
-    if (PyModule_AddObject(m, "qarray", (PyObject *)&QuadArrayType) < 0) {
+    Py_INCREF(&QuadType);
+    if (PyModule_AddObject(m, "qarray", (PyObject *)&QuadType) < 0) {
       Py_DECREF(m);
       return NULL;
     }

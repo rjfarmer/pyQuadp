@@ -789,6 +789,7 @@ PyInit_qmfloat(void)
     PyQfloat_API[PyQfloat_check_NUM] = (void *)QuadObject_Check;
     PyQfloat_API[PyQfloat_dble_NUM] = (void *)QuadObject_to_double;
     PyQfloat_API[PyQfloat_f_to_dble_NUM] = (void *) __float128_to_double;
+    PyQfloat_API[PyQfloat_type_NUM] = (void *)&QuadType;
 
 
     Py_INCREF(&QuadType);

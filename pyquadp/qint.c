@@ -1054,6 +1054,7 @@ PyInit_qmint(void)
     PyQInt_API[PyQInt_alloc_NUM] = (void *)alloc_QuadIType;
     PyQInt_API[PyQInt_int128_NUM] = (void *)QuadIObject_int128;
     PyQInt_API[PyQInt_check_NUM] = (void *)QuadIObject_Check;
+    PyQInt_API[PyQInt_type_NUM] = (void *)&QuadIType;
 
 
     Py_INCREF(&QuadIType);

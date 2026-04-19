@@ -17,14 +17,6 @@
 
 static int QuadIArrayTypeNum = -1;
 
-static PyTypeObject QuadIArrayType = {
-  PyVarObject_HEAD_INIT(NULL, 0)
-  .tp_name = "pyquadp.qiarray",
-  .tp_basicsize = sizeof(PyObject),
-  .tp_flags = Py_TPFLAGS_DEFAULT,
-  .tp_doc = "NumPy custom dtype support for signed __int128 values",
-};
-
 static PyArray_ArrFuncs QuadIArrayFuncs;
 static PyArray_Descr *QuadIArrayDescr;
 static PyArray_DescrProto QuadIArrayDescrProto;
@@ -1346,14 +1338,6 @@ PyInit_qiarray(void)
     return NULL;
   }
 
-  QuadIArrayType.tp_base = &PyGenericArrType_Type;
-  if (PyType_Ready(&QuadIArrayType) < 0) {
-    PyErr_Print();
-    PyErr_SetString(PyExc_SystemError, "Could not initialize QuadIArrayType.");
-    Py_DECREF(m);
-    return NULL;
-  }
-
   PyArray_InitArrFuncs(&QuadIArrayFuncs);
   QuadIArrayFuncs.nonzero = (PyArray_NonzeroFunc *)QuadIArray_nonzero;
   QuadIArrayFuncs.copyswap = (PyArray_CopySwapFunc *)QuadIArray_copyswap;
@@ -1365,26 +1349,24 @@ PyInit_qiarray(void)
   QuadIArrayFuncs.argmin = (PyArray_ArgFunc *)QuadIArray_argmin;
   QuadIArrayFuncs.fillwithscalar = (PyArray_FillWithScalarFunc *)QuadIArray_fillwithscalar;
 
-  Py_SET_TYPE(&QuadIArrayDescrProto, &PyArrayDescr_Type);
-  QuadIArrayDescrProto.typeobj = &QuadIArrayType;
-  QuadIArrayDescrProto.kind = 'V';
-  QuadIArrayDescrProto.type = 'i';
-  QuadIArrayDescrProto.byteorder = '=';
-  QuadIArrayDescrProto.flags = NPY_NEEDS_PYAPI | NPY_USE_GETITEM | NPY_USE_SETITEM;
-  QuadIArrayDescrProto.type_num = 0;
-  QuadIArrayDescrProto.elsize = sizeof(__int128);
-  QuadIArrayDescrProto.alignment = alignof(__int128);
-  QuadIArrayDescrProto.f = &QuadIArrayFuncs;
-#if NPY_ABI_VERSION < 0x02000000
-  QuadIArrayDescrProto.name = "qint";
-#endif
-  QuadIArrayDescrProto.subarray = NULL;
-  QuadIArrayDescrProto.fields = NULL;
-  QuadIArrayDescrProto.names = NULL;
-  QuadIArrayDescrProto.metadata = NULL;
-  QuadIArrayDescrProto.c_metadata = NULL;
+  QuadIArrayDescrProto = (PyArray_DescrProto){
+    .typeobj = &QuadIType,
+    .kind = 'V',
+    .type = 'i',
+    .byteorder = '=',
+    .flags = NPY_NEEDS_PYAPI | NPY_USE_GETITEM | NPY_USE_SETITEM,
+    .type_num = 0,
+    .elsize = sizeof(__int128),
+    .alignment = alignof(__int128),
+    .f = &QuadIArrayFuncs,
+    .subarray = NULL,
+    .fields = NULL,
+    .names = NULL,
+    .metadata = NULL,
+    .c_metadata = NULL,
+  };
 
-  Py_INCREF(&QuadIArrayType);
+  Py_INCREF(&QuadIType);
   qiarrayNum = PyArray_RegisterDataType(&QuadIArrayDescrProto);
   if (qiarrayNum < 0) {
     Py_DECREF(m);
@@ -1408,7 +1390,8 @@ PyInit_qiarray(void)
     return NULL;
   }
 
-  if (PyModule_AddObject(m, "qiarray", (PyObject *)&QuadIArrayType) < 0) {
+  Py_INCREF(&QuadIType);
+  if (PyModule_AddObject(m, "qiarray", (PyObject *)&QuadIType) < 0) {
     Py_DECREF(m);
     return NULL;
   }

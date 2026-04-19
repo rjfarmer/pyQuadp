@@ -20,14 +20,6 @@
 static int QuadCArrayTypeNum = -1;
 static int QuadArrayTypeNum = -1;
 
-static PyTypeObject QuadCArrayType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "pyquadp.qcarray",
-    .tp_basicsize = sizeof(PyObject),
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_doc = "NumPy custom dtype support for quad precision complex values",
-};
-
 static PyArray_ArrFuncs QuadCArrayFuncs;
 static PyArray_Descr *QuadCArrayDescr;
 static PyArray_DescrProto QuadCArrayDescrProto;
@@ -1361,14 +1353,6 @@ PyInit_qcarray(void)
         return NULL;
     }
 
-    QuadCArrayType.tp_base = &PyGenericArrType_Type;
-    if (PyType_Ready(&QuadCArrayType) < 0) {
-        PyErr_Print();
-        PyErr_SetString(PyExc_SystemError, "Could not initialize QuadCArrayType.");
-        Py_DECREF(m);
-        return NULL;
-    }
-
     PyArray_InitArrFuncs(&QuadCArrayFuncs);
     QuadCArrayFuncs.nonzero = (PyArray_NonzeroFunc *)QuadCArray_nonzero;
     QuadCArrayFuncs.copyswap = (PyArray_CopySwapFunc *)QuadCArray_copyswap;
@@ -1380,26 +1364,24 @@ PyInit_qcarray(void)
     QuadCArrayFuncs.argmin = (PyArray_ArgFunc *)QuadCArray_argmin;
     QuadCArrayFuncs.fillwithscalar = (PyArray_FillWithScalarFunc *)QuadCArray_fillwithscalar;
 
-    Py_SET_TYPE(&QuadCArrayDescrProto, &PyArrayDescr_Type);
-    QuadCArrayDescrProto.typeobj = &QuadCArrayType;
-    QuadCArrayDescrProto.kind = 'V';
-    QuadCArrayDescrProto.type = 'c';
-    QuadCArrayDescrProto.byteorder = '=';
-    QuadCArrayDescrProto.flags = NPY_NEEDS_PYAPI | NPY_USE_GETITEM | NPY_USE_SETITEM;
-    QuadCArrayDescrProto.type_num = 0;
-    QuadCArrayDescrProto.elsize = sizeof(__complex128);
-    QuadCArrayDescrProto.alignment = alignof(__complex128);
-    QuadCArrayDescrProto.f = &QuadCArrayFuncs;
-#if NPY_ABI_VERSION < 0x02000000
-    QuadCArrayDescrProto.name = "qcarray";
-#endif
-    QuadCArrayDescrProto.subarray = NULL;
-    QuadCArrayDescrProto.fields = NULL;
-    QuadCArrayDescrProto.names = NULL;
-    QuadCArrayDescrProto.metadata = NULL;
-    QuadCArrayDescrProto.c_metadata = NULL;
+    QuadCArrayDescrProto = (PyArray_DescrProto){
+        .typeobj = &QuadCType,
+        .kind = 'V',
+        .type = 'c',
+        .byteorder = '=',
+        .flags = NPY_NEEDS_PYAPI | NPY_USE_GETITEM | NPY_USE_SETITEM,
+        .type_num = 0,
+        .elsize = sizeof(__complex128),
+        .alignment = alignof(__complex128),
+        .f = &QuadCArrayFuncs,
+        .subarray = NULL,
+        .fields = NULL,
+        .names = NULL,
+        .metadata = NULL,
+        .c_metadata = NULL,
+    };
 
-    Py_INCREF(&QuadCArrayType);
+    Py_INCREF(&QuadCType);
     qcarrayNum = PyArray_RegisterDataType(&QuadCArrayDescrProto);
 
     if (qcarrayNum < 0) {
@@ -1423,7 +1405,8 @@ PyInit_qcarray(void)
         return NULL;
     }
 
-    if (PyModule_AddObject(m, "qcarray", (PyObject *)&QuadCArrayType) < 0) {
+    Py_INCREF(&QuadCType);
+    if (PyModule_AddObject(m, "qcarray", (PyObject *)&QuadCType) < 0) {
         Py_DECREF(m);
         return NULL;
     }

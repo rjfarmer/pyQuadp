@@ -16,9 +16,10 @@ extern "C" {
 #define PyQInt_alloc_NUM 2
 #define PyQInt_int128_NUM 3
 #define PyQInt_check_NUM 4
+#define PyQInt_type_NUM 5
 
 /* Total number of C API pointers */
-#define PyQInt_API_pointers 5
+#define PyQInt_API_pointers 6
 
 
 #define OP_add 1
@@ -105,6 +106,9 @@ static void **PyQInt_API;
 
 #define QuadIObject_Check \
 (*(bool (*)(PyObject *)) PyQInt_API[PyQInt_check_NUM])
+
+#define QuadIType \
+(*(PyTypeObject *) PyQInt_API[PyQInt_type_NUM])
 
 
 /* Return -1 on error, 0 on success.

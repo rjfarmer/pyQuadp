@@ -16,9 +16,10 @@ extern "C" {
 #define PyQfloat_check_NUM 4
 #define PyQfloat_dble_NUM 5
 #define PyQfloat_f_to_dble_NUM 6
+#define PyQfloat_type_NUM 7
 
 /* Total number of C API pointers */
-#define PyQfloat_API_pointers 7
+#define PyQfloat_API_pointers 8
 
 
 
@@ -110,6 +111,9 @@ static void **PyQfloat_API;
 
 #define __float128_to_double \
 (*(double (*)(__float128)) PyQfloat_API[PyQfloat_f_to_dble_NUM])
+
+#define QuadType \
+(*(PyTypeObject *) PyQfloat_API[PyQfloat_type_NUM])
 
 /* Return -1 on error, 0 on success.
  * PyCapsule_Import will set an exception if there's an error.
