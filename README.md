@@ -152,7 +152,7 @@ np.bitwise_and(arr, np.array([1, 1, 1], dtype=np.int64))
 np.asarray(arr, dtype=np.int64)
 ````
 
-The v1 surface is intentionally narrow: constructors, casts to and from signed fixed-width integer dtypes, and core arithmetic, division, shift, and bitwise ufuncs.
+The surface includes constructors, casts to and from signed fixed-width integer dtypes, and core arithmetic, division, shift, and bitwise ufuncs.
 
 ### qcmplx
 

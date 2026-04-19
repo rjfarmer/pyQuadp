@@ -529,6 +529,88 @@ static PyObject * QuadObject_from_hex(PyTypeObject *type, PyObject * arg){
 }
 
 
+static PyObject *
+QuadObject_round(QuadObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = {"ndigits", NULL};
+    PyObject *ndigits_obj = NULL;
+    long long ndigits = 0;
+    QuadObject result;
+    __float128 scale;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O:__round__", kwlist, &ndigits_obj)) {
+        return NULL;
+    }
+
+    if (ndigits_obj != NULL && ndigits_obj != Py_None) {
+        ndigits = PyLong_AsLongLong(ndigits_obj);
+        if (PyErr_Occurred()) {
+            return NULL;
+        }
+    }
+
+    alloc_QuadType(&result);
+    if (ndigits_obj == NULL || ndigits_obj == Py_None) {
+        result.value = roundq(self->value);
+        return QuadObject_to_PyObject(result);
+    }
+
+    scale = powq(10.0Q, (__float128)ndigits);
+    if (!finiteq(scale) || scale == 0.0Q) {
+        PyErr_SetString(PyExc_OverflowError, "ndigits is out of range for qfloat round");
+        return NULL;
+    }
+
+    result.value = roundq(self->value * scale) / scale;
+    return QuadObject_to_PyObject(result);
+}
+
+
+static PyObject *
+QuadObject_trunc(QuadObject *self, PyObject *Py_UNUSED(ignored))
+{
+    QuadObject result;
+    alloc_QuadType(&result);
+    result.value = truncq(self->value);
+    return QuadObject_to_PyObject(result);
+}
+
+
+static PyObject *
+QuadObject_floor_method(QuadObject *self, PyObject *Py_UNUSED(ignored))
+{
+    QuadObject result;
+    alloc_QuadType(&result);
+    result.value = floorq(self->value);
+    return QuadObject_to_PyObject(result);
+}
+
+
+static PyObject *
+QuadObject_ceil_method(QuadObject *self, PyObject *Py_UNUSED(ignored))
+{
+    QuadObject result;
+    alloc_QuadType(&result);
+    result.value = ceilq(self->value);
+    return QuadObject_to_PyObject(result);
+}
+
+
+static PyObject *
+QuadObject_is_integer(QuadObject *self, PyObject *Py_UNUSED(ignored))
+{
+    if (!finiteq(self->value)) {
+        Py_RETURN_FALSE;
+    }
+
+    if (truncq(self->value) == self->value) {
+        Py_RETURN_TRUE;
+    }
+
+    Py_RETURN_FALSE;
+}
+
+
 
 // Header data
 
@@ -570,7 +652,12 @@ static PyMethodDef Quad_methods[] = {
     {"__getstate__", (PyCFunction) QuadObject___getstate__, METH_NOARGS, "Pickle a quad object object" },
     {"__setstate__", (PyCFunction) QuadObject___setstate__, METH_O,"Un-pickle a quad object object"},
     {"hex", (PyCFunction) QuadObject_to_hex, METH_NOARGS, "to_hex"},
-    {"fromhex", (PyCFunction) QuadObject_from_hex, METH_CLASS|METH_O, "from_hex"},    
+    {"fromhex", (PyCFunction) QuadObject_from_hex, METH_CLASS|METH_O, "from_hex"},
+    {"__round__", (PyCFunction) QuadObject_round, METH_VARARGS|METH_KEYWORDS, "Round qfloat and return qfloat."},
+    {"__trunc__", (PyCFunction) QuadObject_trunc, METH_NOARGS, "Truncate qfloat and return qfloat."},
+    {"__floor__", (PyCFunction) QuadObject_floor_method, METH_NOARGS, "Floor qfloat and return qfloat."},
+    {"__ceil__", (PyCFunction) QuadObject_ceil_method, METH_NOARGS, "Ceil qfloat and return qfloat."},
+    {"is_integer", (PyCFunction) QuadObject_is_integer, METH_NOARGS, "Return True if qfloat has no fractional component."},
     
     {NULL}  /* Sentinel */
 };

@@ -259,3 +259,30 @@ class TestQFloat:
         q2 = pq.qfloat.fromhex("0x1.6a09e667f3bcc908b2fb1366ea95p+0")
 
         assert q2 == q
+
+    def test_rounding_methods_return_qfloat(self):
+        q = pq.qfloat("1.75")
+
+        r0 = round(q)
+        r1 = round(q, 1)
+        t = q.__trunc__()
+        f = q.__floor__()
+        c = q.__ceil__()
+
+        assert isinstance(r0, pq.qfloat)
+        assert isinstance(r1, pq.qfloat)
+        assert isinstance(t, pq.qfloat)
+        assert isinstance(f, pq.qfloat)
+        assert isinstance(c, pq.qfloat)
+
+        assert r0 == pq.qfloat("2")
+        assert r1 == pq.qfloat("1.8")
+        assert t == pq.qfloat("1")
+        assert f == pq.qfloat("1")
+        assert c == pq.qfloat("2")
+
+    def test_is_integer(self):
+        assert pq.qfloat("2.0").is_integer()
+        assert not pq.qfloat("2.25").is_integer()
+        assert not pq.qfloat("inf").is_integer()
+        assert not pq.qfloat("nan").is_integer()
