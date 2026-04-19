@@ -232,6 +232,11 @@ class TestQFloat:
 
         assert q1 == q2
 
+    def test_from_param_returns_bytes(self):
+        b = pq.qfloat.from_param("1.25")
+        assert isinstance(b, bytes)
+        assert pq.qfloat.from_bytes(b) == pq.qfloat("1.25")
+
     def test_pickle(self):
         q1 = pq.qfloat("1.234567890")
         pickled_value = pickle.dumps(q1)
@@ -286,3 +291,15 @@ class TestQFloat:
         assert not pq.qfloat("2.25").is_integer()
         assert not pq.qfloat("inf").is_integer()
         assert not pq.qfloat("nan").is_integer()
+
+    def test_as_integer_ratio(self):
+        assert pq.qfloat("0").as_integer_ratio() == (0, 1)
+        assert pq.qfloat("1.5").as_integer_ratio() == (3, 2)
+        assert pq.qfloat("-2.25").as_integer_ratio() == (-9, 4)
+
+    def test_as_integer_ratio_special_values(self):
+        with pytest.raises(OverflowError):
+            pq.qfloat("inf").as_integer_ratio()
+
+        with pytest.raises(ValueError):
+            pq.qfloat("nan").as_integer_ratio()

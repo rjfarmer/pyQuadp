@@ -529,6 +529,210 @@ static PyObject * QuadObject_from_hex(PyTypeObject *type, PyObject * arg){
 }
 
 
+static int
+hex_digit_value(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'a' && c <= 'f') {
+        return 10 + (c - 'a');
+    }
+    if (c >= 'A' && c <= 'F') {
+        return 10 + (c - 'A');
+    }
+    return -1;
+}
+
+
+static PyObject *
+u128_to_pylong(__uint128_t v)
+{
+    unsigned long long lo = (unsigned long long)v;
+    unsigned long long hi = (unsigned long long)(v >> 64);
+    PyObject *lo_obj;
+
+    lo_obj = PyLong_FromUnsignedLongLong(lo);
+    if (lo_obj == NULL) {
+        return NULL;
+    }
+
+    if (hi == 0ULL) {
+        return lo_obj;
+    }
+
+    {
+        PyObject *hi_obj = PyLong_FromUnsignedLongLong(hi);
+        PyObject *shift_obj = PyLong_FromLong(64);
+        PyObject *hi_shifted;
+        PyObject *res;
+
+        if (hi_obj == NULL || shift_obj == NULL) {
+            Py_XDECREF(hi_obj);
+            Py_XDECREF(shift_obj);
+            Py_DECREF(lo_obj);
+            return NULL;
+        }
+
+        hi_shifted = PyNumber_Lshift(hi_obj, shift_obj);
+        Py_DECREF(hi_obj);
+        Py_DECREF(shift_obj);
+        if (hi_shifted == NULL) {
+            Py_DECREF(lo_obj);
+            return NULL;
+        }
+
+        res = PyNumber_Add(hi_shifted, lo_obj);
+        Py_DECREF(hi_shifted);
+        Py_DECREF(lo_obj);
+        return res;
+    }
+}
+
+
+static PyObject *
+QuadObject_as_integer_ratio(QuadObject *self, PyObject *Py_UNUSED(ignored))
+{
+    char buf[QUAD_BUF];
+    char *p_exp;
+    char *p;
+    long exp2;
+    long frac_nibbles = 0;
+    long shift_exp;
+    long den_shift;
+    int seen_dot = 0;
+    int neg = signbitq(self->value);
+    __uint128_t mant = 0;
+    PyObject *num_obj;
+    PyObject *den_obj;
+    PyObject *tuple_obj;
+
+    if (isnanq(self->value)) {
+        PyErr_SetString(PyExc_ValueError, "cannot convert NaN to integer ratio");
+        return NULL;
+    }
+    if (isinfq(self->value)) {
+        PyErr_SetString(PyExc_OverflowError, "cannot convert Infinity to integer ratio");
+        return NULL;
+    }
+    if (self->value == 0.0Q) {
+        return Py_BuildValue("(ii)", 0, 1);
+    }
+
+    if (quadmath_snprintf(buf, sizeof buf, "%Qa", fabsq(self->value)) <= 0) {
+        PyErr_SetString(PyExc_ValueError, "failed to convert qfloat to hexadecimal form");
+        return NULL;
+    }
+
+    p_exp = strchr(buf, 'p');
+    if (p_exp == NULL) {
+        PyErr_SetString(PyExc_ValueError, "unexpected hexadecimal form for qfloat");
+        return NULL;
+    }
+
+    exp2 = strtol(p_exp + 1, NULL, 10);
+
+    p = buf;
+    if (p[0] == '-') {
+        p++;
+    }
+    if (p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
+        p += 2;
+    }
+
+    while (p < p_exp) {
+        int d;
+        if (*p == '.') {
+            seen_dot = 1;
+            p++;
+            continue;
+        }
+        d = hex_digit_value(*p);
+        if (d < 0) {
+            PyErr_SetString(PyExc_ValueError, "unexpected hexadecimal digit in qfloat");
+            return NULL;
+        }
+        mant = (mant << 4) | (__uint128_t)d;
+        if (seen_dot) {
+            frac_nibbles++;
+        }
+        p++;
+    }
+
+    shift_exp = exp2 - (4 * frac_nibbles);
+    if (shift_exp < 0) {
+        den_shift = -shift_exp;
+        while (den_shift > 0 && (mant & 1U) == 0) {
+            mant >>= 1;
+            den_shift--;
+        }
+    } else {
+        den_shift = 0;
+    }
+
+    num_obj = u128_to_pylong(mant);
+    if (num_obj == NULL) {
+        return NULL;
+    }
+
+    if (shift_exp > 0) {
+        PyObject *shift_obj = PyLong_FromLong(shift_exp);
+        PyObject *shifted;
+        if (shift_obj == NULL) {
+            Py_DECREF(num_obj);
+            return NULL;
+        }
+        shifted = PyNumber_Lshift(num_obj, shift_obj);
+        Py_DECREF(shift_obj);
+        Py_DECREF(num_obj);
+        if (shifted == NULL) {
+            return NULL;
+        }
+        num_obj = shifted;
+    }
+
+    if (neg) {
+        PyObject *tmp = PyNumber_Negative(num_obj);
+        Py_DECREF(num_obj);
+        if (tmp == NULL) {
+            return NULL;
+        }
+        num_obj = tmp;
+    }
+
+    if (den_shift == 0) {
+        den_obj = PyLong_FromLong(1);
+    } else {
+        PyObject *one = PyLong_FromLong(1);
+        PyObject *shift_obj = PyLong_FromLong(den_shift);
+        if (one == NULL || shift_obj == NULL) {
+            Py_XDECREF(one);
+            Py_XDECREF(shift_obj);
+            Py_DECREF(num_obj);
+            return NULL;
+        }
+        den_obj = PyNumber_Lshift(one, shift_obj);
+        Py_DECREF(one);
+        Py_DECREF(shift_obj);
+    }
+
+    if (den_obj == NULL) {
+        Py_DECREF(num_obj);
+        return NULL;
+    }
+
+    tuple_obj = PyTuple_New(2);
+    if (tuple_obj == NULL) {
+        Py_DECREF(num_obj);
+        Py_DECREF(den_obj);
+        return NULL;
+    }
+    PyTuple_SET_ITEM(tuple_obj, 0, num_obj);
+    PyTuple_SET_ITEM(tuple_obj, 1, den_obj);
+    return tuple_obj;
+}
+
+
 static PyObject *
 QuadObject_round(QuadObject *self, PyObject *args, PyObject *kwargs)
 {
@@ -653,6 +857,7 @@ static PyMethodDef Quad_methods[] = {
     {"__setstate__", (PyCFunction) QuadObject___setstate__, METH_O,"Un-pickle a quad object object"},
     {"hex", (PyCFunction) QuadObject_to_hex, METH_NOARGS, "to_hex"},
     {"fromhex", (PyCFunction) QuadObject_from_hex, METH_CLASS|METH_O, "from_hex"},
+    {"as_integer_ratio", (PyCFunction) QuadObject_as_integer_ratio, METH_NOARGS, "Return (numerator, denominator) exact ratio for finite qfloat."},
     {"__round__", (PyCFunction) QuadObject_round, METH_VARARGS|METH_KEYWORDS, "Round qfloat and return qfloat."},
     {"__trunc__", (PyCFunction) QuadObject_trunc, METH_NOARGS, "Truncate qfloat and return qfloat."},
     {"__floor__", (PyCFunction) QuadObject_floor_method, METH_NOARGS, "Floor qfloat and return qfloat."},

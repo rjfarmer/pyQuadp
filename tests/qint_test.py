@@ -224,6 +224,11 @@ class Testqint:
 
         assert q1 == q2
 
+    def test_from_param_returns_bytes(self):
+        b = pq.qint.from_param("12345")
+        assert isinstance(b, bytes)
+        assert pq.qint.from_bytes(b) == pq.qint("12345")
+
     def test_pickle(self):
         q1 = pq.qint("1234567890")
         pickled_value = pickle.dumps(q1)
@@ -296,3 +301,15 @@ class Testqint:
         q1 = pq.qint(2)
         data = [10, 20, 30, 40]
         assert data[q1] == 30
+
+    def test_bit_methods(self):
+        assert pq.qint(0).bit_length() == 0
+        assert pq.qint(0).bit_count() == 0
+        assert pq.qint(13).bit_length() == 4
+        assert pq.qint(13).bit_count() == 3
+        assert pq.qint(-13).bit_length() == 4
+        assert pq.qint(-13).bit_count() == 3
+
+    def test_index_method(self):
+        q1 = pq.qint(7)
+        assert q1.__index__() == 7

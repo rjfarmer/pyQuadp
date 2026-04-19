@@ -130,6 +130,11 @@ class TestQFloat:
 
         assert q1 == q2
 
+    def test_from_param_returns_bytes(self):
+        b = pq.qcmplx.from_param("1.25+2.5j")
+        assert isinstance(b, bytes)
+        assert pq.qcmplx.from_bytes(b) == pq.qcmplx("1.25", "2.5")
+
     def test_pickle(self):
         q1 = pq.qcmplx("1.234567890", "9.87654321")
         pickled_value = pickle.dumps(q1)

@@ -837,6 +837,44 @@ static PyObject * QuadIObject_from_hex(PyTypeObject *type, PyObject * arg){
 }
 
 
+static __uint128_t
+qint_abs_u128(__int128 v)
+{
+    __uint128_t u = (__uint128_t)v;
+    if (v < 0) {
+        return (~u) + 1;
+    }
+    return u;
+}
+
+
+static PyObject *
+QuadIObject_bit_length(QuadIObject *self, PyObject *Py_UNUSED(ignored))
+{
+    __uint128_t mag = qint_abs_u128(self->value);
+    long bits = 0;
+
+    while (mag != 0) {
+        mag >>= 1;
+        bits++;
+    }
+
+    return PyLong_FromLong(bits);
+}
+
+
+static PyObject *
+QuadIObject_bit_count(QuadIObject *self, PyObject *Py_UNUSED(ignored))
+{
+    __uint128_t mag = qint_abs_u128(self->value);
+    unsigned long long lo = (unsigned long long)mag;
+    unsigned long long hi = (unsigned long long)(mag >> 64);
+    unsigned long count = (unsigned long)__builtin_popcountll(lo) + (unsigned long)__builtin_popcountll(hi);
+
+    return PyLong_FromUnsignedLong(count);
+}
+
+
 // Header data
 
 static PyNumberMethods QuadI_math_methods = {
@@ -896,7 +934,9 @@ static PyMethodDef QuadI_methods[] = {
     {"__getstate__", (PyCFunction) QuadIObject___getstate__, METH_NOARGS, "Pickle a quad object object" },
     {"__setstate__", (PyCFunction) QuadIObject___setstate__, METH_O,"Un-pickle a quad object object"},
     {"hex", (PyCFunction) QuadIObject_to_hex, METH_NOARGS, "to_hex"},
-    {"fromhex", (PyCFunction) QuadIObject_from_hex, METH_CLASS|METH_O, "from_hex"},    
+    {"fromhex", (PyCFunction) QuadIObject_from_hex, METH_CLASS|METH_O, "from_hex"},
+    {"bit_length", (PyCFunction) QuadIObject_bit_length, METH_NOARGS, "Return number of bits needed to represent absolute value."},
+    {"bit_count", (PyCFunction) QuadIObject_bit_count, METH_NOARGS, "Return number of set bits in absolute value."},
     
     {NULL}  /* Sentinel */
 };

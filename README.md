@@ -73,6 +73,44 @@ q1 == q2 # False
 str(q) # "1.000000000000000000000000000000000000e+00"
 ````
 
+Scalar utility methods are also available:
+
+````python
+q = pyquadp.qfloat("1.5")
+
+q.as_integer_ratio()  # (3, 2)
+q.is_integer()        # False
+round(q)              # qfloat('2')
+q.__floor__()         # qfloat('1')
+q.__ceil__()          # qfloat('2')
+q.__trunc__()         # qfloat('1')
+````
+
+For ``ctypes`` compatibility, scalar ``from_param`` methods return packed bytes:
+
+````python
+param = pyquadp.qfloat.from_param("1.25")
+isinstance(param, bytes)  # True
+````
+
+
+### qint
+
+``qint`` is a signed 128-bit integer scalar type with full arithmetic and bitwise operators.
+
+````python
+import pyquadp
+
+x = pyquadp.qint("13")
+
+x.bit_length()   # 4
+x.bit_count()    # 3
+x.__index__()    # 13
+
+param = pyquadp.qint.from_param(x)
+isinstance(param, bytes)  # True
+````
+
 ### qarray
 
 ``qarray`` provides NumPy-compatible arrays of quad-precision (128-bit) values. It registers a custom NumPy dtype so arrays behave like any other NumPy array where supported.
@@ -178,6 +216,8 @@ q = pyquadp.qcmplx('3.25')
 ````
 
 Both one-string and two-argument forms are supported.
+
+For ``ctypes`` compatibility, ``qcmplx.from_param`` returns packed bytes.
 
 
 <!-- A ``qcmplx`` implements Python's NumberProtocol, thus it can be used like any other number, either with basic math operations or in rich comparisons:
