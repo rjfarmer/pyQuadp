@@ -136,8 +136,12 @@ class TestQCArrayConstructors:
         assert ones.shape == src.shape
         assert full.shape == src.shape
 
-        np.testing.assert_allclose(np.asarray(zeros, dtype=np.complex128), np.zeros_like(src))
-        np.testing.assert_allclose(np.asarray(ones, dtype=np.complex128), np.ones_like(src))
+        np.testing.assert_allclose(
+            np.asarray(zeros, dtype=np.complex128), np.zeros_like(src)
+        )
+        np.testing.assert_allclose(
+            np.asarray(ones, dtype=np.complex128), np.ones_like(src)
+        )
         np.testing.assert_allclose(
             np.asarray(full, dtype=np.complex128),
             np.full_like(src, 1.5 - 0.25j),

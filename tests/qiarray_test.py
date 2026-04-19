@@ -120,9 +120,15 @@ class TestQIArrayConstructors:
         assert ones.shape == src.shape
         assert full.shape == src.shape
 
-        np.testing.assert_array_equal(np.asarray(zeros, dtype=np.int64), np.zeros_like(src))
-        np.testing.assert_array_equal(np.asarray(ones, dtype=np.int64), np.ones_like(src))
-        np.testing.assert_array_equal(np.asarray(full, dtype=np.int64), np.full_like(src, -2))
+        np.testing.assert_array_equal(
+            np.asarray(zeros, dtype=np.int64), np.zeros_like(src)
+        )
+        np.testing.assert_array_equal(
+            np.asarray(ones, dtype=np.int64), np.ones_like(src)
+        )
+        np.testing.assert_array_equal(
+            np.asarray(full, dtype=np.int64), np.full_like(src, -2)
+        )
 
 
 @pytest.mark.qiarray
