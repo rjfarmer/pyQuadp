@@ -631,6 +631,40 @@ class TestQMathPy:
             assert not np.isfinite(x)
 
     @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_fmax(self, x, y):
+        z = qm.fmax(x, y)
+        if qm.isnan(x) and qm.isnan(y):
+            assert qm.isnan(z)
+        elif qm.isnan(x):
+            assert z == y
+        elif qm.isnan(y):
+            assert z == x
+        elif x >= y:
+            assert z == x
+        else:
+            assert z == y
+
+    @given(
+        floats(allow_infinity=False, allow_nan=False),
+        floats(allow_infinity=False, allow_nan=False),
+    )
+    def test_fmin(self, x, y):
+        z = qm.fmin(x, y)
+        if qm.isnan(x) and qm.isnan(y):
+            assert qm.isnan(z)
+        elif qm.isnan(x):
+            assert z == y
+        elif qm.isnan(y):
+            assert z == x
+        elif x <= y:
+            assert z == x
+        else:
+            assert z == y
+
+    @given(
         floats(min_value=1),
         floats(min_value=1),
     )
@@ -671,6 +705,10 @@ class TestQMathPy:
     @given(floats())
     def test_isnan(self, x):
         assert qm.isnan(x) == math.isnan(x)
+
+    @given(floats())
+    def test_isfinite(self, x):
+        assert qm.isfinite(x) == np.isfinite(x)
 
     @given(
         floats(max_value=1e100, min_value=-1e100),

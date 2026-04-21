@@ -119,7 +119,12 @@ import_qmint(void)
 {
     PyQInt_API = (void **)PyCapsule_Import("pyquadp.qmint._C_API", 0);
     if (PyQInt_API == NULL) {
-        PyErr_Clear();
+        if (PyErr_ExceptionMatches(PyExc_ImportError) ||
+            PyErr_ExceptionMatches(PyExc_AttributeError)) {
+            PyErr_Clear();
+        } else {
+            return -1;
+        }
         PyQInt_API = (void **)PyCapsule_Import("qmint._C_API", 0);
     }
     return (PyQInt_API != NULL) ? 0 : -1;

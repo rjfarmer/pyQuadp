@@ -429,15 +429,15 @@ def floor(x):
     return res
 
 
-def fmax(x):
-    res = qmathc._fmax(x)
+def fmax(x, y):
+    res = qmathc._fmax(x, y)
     if not qmathc._finite(res):
         raise ValueError("math domain error")
     return res
 
 
-def fmin(x):
-    res = qmathc._fmin(x)
+def fmin(x, y):
+    res = qmathc._fmin(x, y)
     if not qmathc._finite(res):
         raise ValueError("math domain error")
     return res
@@ -620,7 +620,7 @@ def isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0):
 
 
 def isfinite(x):
-    return qmathc._finitecq(x)
+    return qmathc._finite(x)
 
 
 def isqrt(n):

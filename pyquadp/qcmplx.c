@@ -410,9 +410,16 @@ static PyObject * QuadCObject_from_param(PyTypeObject *type, PyObject * arg){
 //Pickling
 static PyObject *
 QuadCObject___getstate__(QuadCObject *self, PyObject *Py_UNUSED(ignored)) {
-    PyObject *ret = Py_BuildValue("{sisO}",
-                                  PICKLE_VERSION_KEY, PICKLE_VERSION,
-                                  "bytes", QuadCObject_to_bytes(self, NULL));
+    PyObject *bytes_obj = QuadCObject_to_bytes(self, NULL);
+    PyObject *ret;
+
+    if (bytes_obj == NULL) {
+        return NULL;
+    }
+
+    ret = Py_BuildValue("{sisN}",
+                        PICKLE_VERSION_KEY, PICKLE_VERSION,
+                        "bytes", bytes_obj);
     return ret;
 }
 
@@ -430,8 +437,19 @@ QuadCObject___setstate__(QuadCObject *self, PyObject *state) {
     /* Version check. */
     /* Borrowed reference but no need to increment as we create a C long
      * from it. */
-    PyObject *temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat(PICKLE_VERSION_KEY));
+    PyObject *key = PyUnicode_FromString(PICKLE_VERSION_KEY);
+    PyObject *temp;
+
+    if (key == NULL) {
+        return NULL;
+    }
+
+    temp = PyDict_GetItemWithError(state, key);
+    Py_DECREF(key);
     if (temp == NULL) {
+        if (!PyErr_Occurred()) {
+            PyErr_SetString(PyExc_KeyError, "No pickle version in pickled dict.");
+        }
         return NULL;
     }
     int pickle_version = (int) PyLong_AsLong(temp);
@@ -442,9 +460,18 @@ QuadCObject___setstate__(QuadCObject *self, PyObject *state) {
         return NULL;
     }
 
-    temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat("bytes"));
+    key = PyUnicode_FromString("bytes");
+    if (key == NULL) {
+        return NULL;
+    }
+
+    temp = PyDict_GetItemWithError(state, key);
+    Py_DECREF(key);
 
     if (temp == NULL) {
+        if (!PyErr_Occurred()) {
+            PyErr_SetString(PyExc_KeyError, "No bytes in pickled dict.");
+        }
         return NULL;
     }
 
@@ -461,7 +488,16 @@ QuadCObject___setstate__(QuadCObject *self, PyObject *state) {
 Py_hash_t QuadCObject_hash(QuadCObject *self){
     // Note this wont have the nice property that Python has with numeric values being equal 
     // hash to the same value i.e hash(1) == hash(1.0)
-    return PyObject_Hash(QuadCObject_to_bytes(self, NULL));
+    PyObject *bytes_obj = QuadCObject_to_bytes(self, NULL);
+    Py_hash_t h;
+
+    if (bytes_obj == NULL) {
+        return -1;
+    }
+
+    h = PyObject_Hash(bytes_obj);
+    Py_DECREF(bytes_obj);
+    return h;
 }
 
 
@@ -495,6 +531,7 @@ int
 Quad_cinit(QuadCObject *self, PyObject *args, PyObject *kwds)
 {
     PyObject * obj1=NULL,*obj2=NULL;
+    (void)kwds;
 
     if(PyArg_ParseTuple(args, "OO:", &obj1, &obj2)){
         if(!PyObject_to_QuadCObject2(obj1, obj2, self, true)){
@@ -504,8 +541,12 @@ Quad_cinit(QuadCObject *self, PyObject *args, PyObject *kwds)
             return 0;
         }
     } else {
-        // Ignore error, might be 1 argument form
-        PyErr_Clear();
+        // Ignore only parse mismatch for the 2-arg form; propagate other errors.
+        if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+            PyErr_Clear();
+        } else {
+            return -1;
+        }
     }
 
 
@@ -645,7 +686,6 @@ PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
         // Is a string
         const char *buf = PyUnicode_AsUTF8AndSize(in, NULL);
         if (buf==NULL){
-            PyErr_Print();
             return false;
         }
         char *sp = NULL;
@@ -799,9 +839,6 @@ PyInit_qmcmplx(void)
     PyObject *c_api_object;
 
 
-    if (PyType_Ready(&QuadCType) < 0)
-        return NULL;
-
     m = PyModule_Create(&QuadCModule);
     if (m == NULL)
         return NULL;
@@ -812,9 +849,7 @@ PyInit_qmcmplx(void)
     PyQcmplx_API[PyQcmplx_alloc_NUM] = (void *)alloc_QuadCType;
     PyQcmplx_API[PyQcmplx_type_NUM] = (void *)&QuadCType;
 
-    Py_INCREF(&QuadCType);
-    if (PyModule_AddObject(m, "qcmplx", (PyObject *) &QuadCType) < 0) {
-        Py_DECREF(&QuadCType);
+    if (PyModule_AddType(m, &QuadCType) < 0) {
         Py_DECREF(m);
         return NULL;
     }

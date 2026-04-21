@@ -428,9 +428,16 @@ static PyObject* _as_parameter_(PyObject * self, void * y){
 //Pickling
 static PyObject *
 QuadObject___getstate__(QuadObject *self, PyObject *Py_UNUSED(ignored)) {
-    PyObject *ret = Py_BuildValue("{sisO}",
-                                  PICKLE_VERSION_KEY, PICKLE_VERSION,
-                                  "bytes", QuadObject_to_bytes(self, NULL));
+    PyObject *bytes_obj = QuadObject_to_bytes(self, NULL);
+    PyObject *ret;
+
+    if (bytes_obj == NULL) {
+        return NULL;
+    }
+
+    ret = Py_BuildValue("{sisN}",
+                        PICKLE_VERSION_KEY, PICKLE_VERSION,
+                        "bytes", bytes_obj);
     return ret;
 }
 
@@ -448,8 +455,19 @@ QuadObject___setstate__(QuadObject *self, PyObject *state) {
     /* Version check. */
     /* Borrowed reference but no need to increment as we create a C long
      * from it. */
-    PyObject *temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat(PICKLE_VERSION_KEY));
+    PyObject *key = PyUnicode_FromString(PICKLE_VERSION_KEY);
+    PyObject *temp;
+
+    if (key == NULL) {
+        return NULL;
+    }
+
+    temp = PyDict_GetItemWithError(state, key);
+    Py_DECREF(key);
     if (temp == NULL) {
+        if (!PyErr_Occurred()) {
+            PyErr_SetString(PyExc_KeyError, "No pickle version in pickled dict.");
+        }
         return NULL;
     }
     int pickle_version = (int) PyLong_AsLong(temp);
@@ -460,9 +478,18 @@ QuadObject___setstate__(QuadObject *self, PyObject *state) {
         return NULL;
     }
 
-    temp = PyDict_GetItemWithError(state, PyUnicode_FromFormat("bytes"));
+    key = PyUnicode_FromString("bytes");
+    if (key == NULL) {
+        return NULL;
+    }
+
+    temp = PyDict_GetItemWithError(state, key);
+    Py_DECREF(key);
 
     if (temp == NULL) {
+        if (!PyErr_Occurred()) {
+            PyErr_SetString(PyExc_KeyError, "No bytes in pickled dict.");
+        }
         return NULL;
     }
 
@@ -480,7 +507,16 @@ QuadObject___setstate__(QuadObject *self, PyObject *state) {
 Py_hash_t QuadObject_hash(QuadObject *self){
     // Note this wont have the nice property that Python has with numeric values being equal 
     // hash to the same value i.e hash(1) == hash(1.0)
-    return PyObject_Hash(QuadObject_to_bytes(self, NULL));
+    PyObject *bytes_obj = QuadObject_to_bytes(self, NULL);
+    Py_hash_t h;
+
+    if (bytes_obj == NULL) {
+        return -1;
+    }
+
+    h = PyObject_Hash(bytes_obj);
+    Py_DECREF(bytes_obj);
+    return h;
 }
 
 
@@ -508,7 +544,6 @@ static PyObject * QuadObject_from_hex(PyTypeObject *type, PyObject * arg){
         // Is a string
         const char *buf = PyUnicode_AsUTF8AndSize(arg, NULL);
         if (buf==NULL){
-            PyErr_Print();
             return NULL;
         }
 
@@ -877,9 +912,9 @@ int
 Quad_init(QuadObject *self, PyObject *args, PyObject *kwds)
 {
     PyObject * obj;
+    (void)kwds;
 
     if (!PyArg_ParseTuple(args, "O:", &obj)){
-        PyErr_Print();
         return -1;
     }
         
@@ -951,7 +986,6 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
         // Is a string
         const char *buf = PyUnicode_AsUTF8AndSize(in, NULL);
         if (buf==NULL){
-            PyErr_Print();
             return false;
         }
 
@@ -980,7 +1014,11 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
         // Is a number
         if(PyLong_Check(in)){
             // int
-            out->value = (__float128) PyLong_AsLong(in);
+            long v = PyLong_AsLong(in);
+            if (v == -1 && PyErr_Occurred()) {
+                return false;
+            }
+            out->value = (__float128) v;
             return true;
         }
 
@@ -1066,9 +1104,6 @@ PyInit_qmfloat(void)
     PyObject *c_api_object;
 
 
-    if (PyType_Ready(&QuadType) < 0)
-        return NULL;
-
     m = PyModule_Create(&QuadModule);
     if (m == NULL)
         return NULL;
@@ -1084,9 +1119,7 @@ PyInit_qmfloat(void)
     PyQfloat_API[PyQfloat_type_NUM] = (void *)&QuadType;
 
 
-    Py_INCREF(&QuadType);
-    if (PyModule_AddObject(m, "qfloat", (PyObject *) &QuadType) < 0) {
-        Py_DECREF(&QuadType);
+    if (PyModule_AddType(m, &QuadType) < 0) {
         Py_DECREF(m);
         return NULL;
     }

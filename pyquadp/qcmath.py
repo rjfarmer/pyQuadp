@@ -112,7 +112,7 @@ def polar(x):
 
 
 def rect(r, phi):
-    return qcmathc._polar(r, phi)
+    return qcmathc._rect(r, phi)
 
 
 def acos(x):

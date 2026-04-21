@@ -728,9 +728,16 @@ static PyObject* _as_parameter_(PyObject * self, void * y){
 //Pickling
 static PyObject *
 QuadIObject___getstate__(QuadIObject *self, PyObject *Py_UNUSED(ignored)) {
-    PyObject *ret = Py_BuildValue("{sisO}",
-                                  PICKLE_VERSION_KEY, PICKLE_VERSION,
-                                  "bytes", QuadIObject_to_bytes(self, NULL));
+    PyObject *bytes_obj = QuadIObject_to_bytes(self, NULL);
+    PyObject *ret;
+
+    if (bytes_obj == NULL) {
+        return NULL;
+    }
+
+    ret = Py_BuildValue("{sisN}",
+                        PICKLE_VERSION_KEY, PICKLE_VERSION,
+                        "bytes", bytes_obj);
     return ret;
 }
 
@@ -1035,10 +1042,13 @@ PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
             // int
             // Convert to string as we may be to big for PyLong
             PyObject * str = PyUnicode_FromFormat("%S",in);
+            if (str == NULL) {
+                return false;
+            }
             Py_ssize_t len;
             const char *buf = PyUnicode_AsUTF8AndSize(str, &len);
             if (buf==NULL){
-                Py_XDECREF(str);
+                Py_DECREF(str);
                 return false;
             }
 
@@ -1075,9 +1085,6 @@ PyInit_qmint(void)
     PyObject *c_api_object;
 
 
-    if (PyType_Ready(&QuadIType) < 0)
-        return NULL;
-
     m = PyModule_Create(&QuadIModule);
     if (m == NULL)
         return NULL;
@@ -1091,9 +1098,7 @@ PyInit_qmint(void)
     PyQInt_API[PyQInt_type_NUM] = (void *)&QuadIType;
 
 
-    Py_INCREF(&QuadIType);
-    if (PyModule_AddObject(m, "qint", (PyObject *) &QuadIType) < 0) {
-        Py_DECREF(&QuadIType);
+    if (PyModule_AddType(m, &QuadIType) < 0) {
         Py_DECREF(m);
         return NULL;
     }

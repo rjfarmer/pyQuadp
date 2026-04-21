@@ -1529,8 +1529,7 @@ PyInit_qcarray(void)
         return NULL;
     }
 
-    Py_INCREF(&QuadCType);
-    if (PyModule_AddObject(m, "qcarray", (PyObject *)&QuadCType) < 0) {
+    if (PyModule_AddObjectRef(m, "qcarray", (PyObject *)&QuadCType) < 0) {
         Py_DECREF(m);
         return NULL;
     }
@@ -1538,9 +1537,7 @@ PyInit_qcarray(void)
         Py_DECREF(m);
         return NULL;
     }
-    Py_INCREF(QuadCArrayDescr);
-    if (PyModule_AddObject(m, "dtype", (PyObject *)QuadCArrayDescr) < 0) {
-        Py_DECREF(QuadCArrayDescr);
+    if (PyModule_AddObjectRef(m, "dtype", (PyObject *)QuadCArrayDescr) < 0) {
         Py_DECREF(m);
         return NULL;
     }

@@ -1507,8 +1507,7 @@ PyInit_qiarray(void)
     return NULL;
   }
 
-  Py_INCREF(&QuadIType);
-  if (PyModule_AddObject(m, "qiarray", (PyObject *)&QuadIType) < 0) {
+  if (PyModule_AddObjectRef(m, "qiarray", (PyObject *)&QuadIType) < 0) {
     Py_DECREF(m);
     return NULL;
   }
@@ -1516,9 +1515,7 @@ PyInit_qiarray(void)
     Py_DECREF(m);
     return NULL;
   }
-  Py_INCREF(QuadIArrayDescr);
-  if (PyModule_AddObject(m, "dtype", (PyObject *)QuadIArrayDescr) < 0) {
-    Py_DECREF(QuadIArrayDescr);
+  if (PyModule_AddObjectRef(m, "dtype", (PyObject *)QuadIArrayDescr) < 0) {
     Py_DECREF(m);
     return NULL;
   }

@@ -213,3 +213,29 @@ class TestQCMathPy:
     @given(complex_numbers(min_magnitude=0, max_magnitude=100))
     def test_ctanh(self, x):
         assert complex(qcm.tanh(x)) == pytest.approx(cmath.tanh(x), nan_ok=True)
+
+    @given(complex_numbers(min_magnitude=0, max_magnitude=100))
+    def test_polar(self, x):
+        r, phi = qcm.polar(x)
+        rr, pphi = cmath.polar(x)
+        assert float(r) == pytest.approx(rr, nan_ok=True)
+        assert float(phi) == pytest.approx(pphi, nan_ok=True)
+
+    @given(complex_numbers(min_magnitude=0, max_magnitude=100))
+    def test_phase(self, x):
+        z = complex(qcm.phase(x))
+        assert z.real == pytest.approx(float(qcm.cargq(x)), nan_ok=True)
+        assert z.imag == pytest.approx(0.0, nan_ok=True)
+
+    @given(
+        floats(min_value=0, max_value=100),
+        floats(min_value=-np.pi, max_value=np.pi),
+    )
+    def test_rect(self, r, phi):
+        assert complex(qcm.rect(r, phi)) == pytest.approx(
+            cmath.rect(r, phi), nan_ok=True
+        )
+
+    @given(complex_numbers())
+    def test_isfinite(self, x):
+        assert qcm.isfinite(x) == cmath.isfinite(x)
