@@ -4,6 +4,8 @@
 #define QINT_MODULE
 #include "qint.h"
 
+static PyTypeObject *QuadIType = NULL;
+
 static __uint128_t u128_from_i128(__int128 v)
 {
     return (__uint128_t)v;
@@ -878,49 +880,6 @@ QuadIObject_bit_count(QuadIObject *self, PyObject *Py_UNUSED(ignored))
 
 // Header data
 
-static PyNumberMethods QuadI_math_methods = {
-    (binaryfunc) QuadIObject_add,
-    (binaryfunc) QuadIObject_subtract,
-    (binaryfunc) QuadIObject_mult,
-    (binaryfunc) QuadIObject_remainder,
-    (binaryfunc) QuadIObject_divmod,
-    (ternaryfunc) QuadIObject_pow,
-    (unaryfunc) QuadIObject_neg,
-    (unaryfunc) QuadIObject_pos,
-    (unaryfunc) QuadIObject_abs,
-    (inquiry) QuadIObject_bool,
-    (unaryfunc) QuadIObject_invert,//  unaryfunc nb_invert;
-    (binaryfunc) QuadIObject_lshift,//  binaryfunc nb_lshift;
-    (binaryfunc) QuadIObject_rshift,//  binaryfunc nb_rshift;
-    (binaryfunc) QuadIObject_and,//  binaryfunc nb_and;
-    (binaryfunc) QuadIObject_xor,//  binaryfunc nb_xor;
-    (binaryfunc) QuadIObject_or,//  binaryfunc nb_or;
-    (unaryfunc) QuadIObject_int,
-    0,//  void *nb_reserved;
-    (unaryfunc) QuadIObject_float,
-
-    (binaryfunc) QuadIObject_inplace_add,
-    (binaryfunc) QuadIObject_inplace_subtract,
-    (binaryfunc) QuadIObject_inplace_mult,
-    (binaryfunc) QuadIObject_inplace_remainder,
-    (ternaryfunc) QuadIObject_inplace_pow,
-    (binaryfunc) QuadIObject_inplace_lshift,//  binaryfunc nb_inplace_lshift;
-    (binaryfunc) QuadIObject_inplace_rshift,//  binaryfunc nb_inplace_rshift;
-    (binaryfunc) QuadIObject_inplace_and,//  binaryfunc nb_inplace_and;
-    (binaryfunc) QuadIObject_inplace_xor,//  binaryfunc nb_inplace_xor;
-    (binaryfunc) QuadIObject_inplace_or,//  binaryfunc nb_inplace_or;
-
-    (binaryfunc) QuadIObject_floor_divide,//  binaryfunc nb_floor_divide;
-    (binaryfunc) QuadIObject_true_divide,//  binaryfunc nb_true_divide;
-    (binaryfunc) QuadIObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
-    (binaryfunc) QuadIObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
-
-    (unaryfunc) QuadIObject_int,//  unaryfunc nb_index;
-
-    0,//  binaryfunc nb_matrix_multiply;
-    0,//  binaryfunc nb_inplace_matrix_multiply;
-};
-
 // attributes
 static PyMemberDef QuadI_members[] = {
     {NULL}  /* Sentinel */
@@ -966,23 +925,62 @@ Quad_qinit(QuadIObject *self, PyObject *args, PyObject *kwds)
 }
 
 
-static PyTypeObject QuadIType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "qint",
-    .tp_doc = PyDoc_STR("A single integer quad precision variable"),
-    .tp_basicsize = sizeof(QuadIObject),
-    .tp_itemsize = 0,
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_new = PyType_GenericNew,
-    .tp_repr = (reprfunc) QuadIObject_repr,
-    .tp_str = (reprfunc) QuadIObject_str,
-    .tp_members = QuadI_members,
-    .tp_methods = QuadI_methods,
-    .tp_init = (initproc) Quad_qinit,
-    .tp_as_number = &QuadI_math_methods,
-    .tp_getset = QuadI_cgetset,
-    .tp_richcompare = (richcmpfunc) QuadIType_RichCompare,
-    .tp_hash = (hashfunc) QuadIObject_hash,
+static PyType_Slot QuadIType_slots[] = {
+    {Py_tp_doc, (void *)PyDoc_STR("A single integer quad precision variable")},
+    {Py_tp_new, (void *)PyType_GenericNew},
+    {Py_tp_repr, (void *)QuadIObject_repr},
+    {Py_tp_str, (void *)QuadIObject_str},
+    {Py_tp_members, (void *)QuadI_members},
+    {Py_tp_methods, (void *)QuadI_methods},
+    {Py_tp_init, (void *)Quad_qinit},
+    {Py_tp_getset, (void *)QuadI_cgetset},
+    {Py_tp_richcompare, (void *)QuadIType_RichCompare},
+    {Py_tp_hash, (void *)QuadIObject_hash},
+
+    {Py_nb_add, (void *)QuadIObject_add},
+    {Py_nb_subtract, (void *)QuadIObject_subtract},
+    {Py_nb_multiply, (void *)QuadIObject_mult},
+    {Py_nb_remainder, (void *)QuadIObject_remainder},
+    {Py_nb_divmod, (void *)QuadIObject_divmod},
+    {Py_nb_power, (void *)QuadIObject_pow},
+    {Py_nb_negative, (void *)QuadIObject_neg},
+    {Py_nb_positive, (void *)QuadIObject_pos},
+    {Py_nb_absolute, (void *)QuadIObject_abs},
+    {Py_nb_bool, (void *)QuadIObject_bool},
+    {Py_nb_invert, (void *)QuadIObject_invert},
+    {Py_nb_lshift, (void *)QuadIObject_lshift},
+    {Py_nb_rshift, (void *)QuadIObject_rshift},
+    {Py_nb_and, (void *)QuadIObject_and},
+    {Py_nb_xor, (void *)QuadIObject_xor},
+    {Py_nb_or, (void *)QuadIObject_or},
+    {Py_nb_int, (void *)QuadIObject_int},
+    {Py_nb_float, (void *)QuadIObject_float},
+
+    {Py_nb_inplace_add, (void *)QuadIObject_inplace_add},
+    {Py_nb_inplace_subtract, (void *)QuadIObject_inplace_subtract},
+    {Py_nb_inplace_multiply, (void *)QuadIObject_inplace_mult},
+    {Py_nb_inplace_remainder, (void *)QuadIObject_inplace_remainder},
+    {Py_nb_inplace_power, (void *)QuadIObject_inplace_pow},
+    {Py_nb_inplace_lshift, (void *)QuadIObject_inplace_lshift},
+    {Py_nb_inplace_rshift, (void *)QuadIObject_inplace_rshift},
+    {Py_nb_inplace_and, (void *)QuadIObject_inplace_and},
+    {Py_nb_inplace_xor, (void *)QuadIObject_inplace_xor},
+    {Py_nb_inplace_or, (void *)QuadIObject_inplace_or},
+
+    {Py_nb_floor_divide, (void *)QuadIObject_floor_divide},
+    {Py_nb_true_divide, (void *)QuadIObject_true_divide},
+    {Py_nb_inplace_floor_divide, (void *)QuadIObject_inplace_floor_divide},
+    {Py_nb_inplace_true_divide, (void *)QuadIObject_inplace_true_divide},
+    {Py_nb_index, (void *)QuadIObject_int},
+    {0, NULL}
+};
+
+static PyType_Spec QuadIType_spec = {
+    .name = "pyquadp.qmint.qint",
+    .basicsize = sizeof(QuadIObject),
+    .itemsize = 0,
+    .flags = Py_TPFLAGS_DEFAULT,
+    .slots = QuadIType_slots,
 };
 
 static PyModuleDef QuadIModule = {
@@ -994,7 +992,14 @@ static PyModuleDef QuadIModule = {
 
 PyObject* 
 QuadIObject_to_PyObject(QuadIObject out) {
-	QuadIObject* ret = (QuadIObject*) PyType_GenericAlloc(&QuadIType, 0);
+	QuadIObject* ret;
+
+    if (QuadIType == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "qint type not initialized");
+        return NULL;
+    }
+
+	ret = (QuadIObject*) PyType_GenericAlloc(QuadIType, 0);
     
 	if (ret != NULL) {
 		ret->value = out.value;
@@ -1069,7 +1074,7 @@ PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
 }
 
 static bool QuadIObject_Check(PyObject * obj){
-    return PyObject_TypeCheck(obj, &QuadIType);
+    return QuadIType != NULL && PyObject_TypeCheck(obj, QuadIType);
 }
 
 
@@ -1083,11 +1088,34 @@ PyInit_qmint(void)
     PyObject *m;
     static void *PyQInt_API[PyQInt_API_pointers];
     PyObject *c_api_object;
+    PyObject *quadi_type_obj;
+    PyObject *module_name_obj;
 
 
     m = PyModule_Create(&QuadIModule);
     if (m == NULL)
         return NULL;
+
+    quadi_type_obj = PyType_FromSpec(&QuadIType_spec);
+    if (quadi_type_obj == NULL) {
+        Py_DECREF(m);
+        return NULL;
+    }
+    module_name_obj = PyUnicode_FromString("pyquadp.qmint");
+    if (module_name_obj == NULL) {
+        Py_DECREF(quadi_type_obj);
+        Py_DECREF(m);
+        return NULL;
+    }
+    if (PyObject_SetAttrString(quadi_type_obj, "__module__", module_name_obj) < 0) {
+        Py_DECREF(module_name_obj);
+        Py_DECREF(quadi_type_obj);
+        Py_DECREF(m);
+        return NULL;
+    }
+    Py_DECREF(module_name_obj);
+
+    QuadIType = (PyTypeObject *)quadi_type_obj;
 
     /* Initialize the C API pointer array */
     PyQInt_API[PyQInt_q2py_NUM] = (void *)QuadIObject_to_PyObject;
@@ -1095,10 +1123,11 @@ PyInit_qmint(void)
     PyQInt_API[PyQInt_alloc_NUM] = (void *)alloc_QuadIType;
     PyQInt_API[PyQInt_int128_NUM] = (void *)QuadIObject_int128;
     PyQInt_API[PyQInt_check_NUM] = (void *)QuadIObject_Check;
-    PyQInt_API[PyQInt_type_NUM] = (void *)&QuadIType;
+    PyQInt_API[PyQInt_type_NUM] = (void *)QuadIType;
 
 
-    if (PyModule_AddType(m, &QuadIType) < 0) {
+    if (PyModule_AddObject(m, "qint", quadi_type_obj) < 0) {
+        Py_DECREF(quadi_type_obj);
         Py_DECREF(m);
         return NULL;
     }
@@ -1109,6 +1138,11 @@ PyInit_qmint(void)
 
     if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
         Py_XDECREF(c_api_object);
+        Py_DECREF(m);
+        return NULL;
+    }
+
+    if (PyDict_SetItemString(PyImport_GetModuleDict(), "qmint", m) < 0) {
         Py_DECREF(m);
         return NULL;
     }
