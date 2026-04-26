@@ -429,29 +429,41 @@ static PyMethodDef QMathCMethods[] = {
 };
 
 
+static int
+QMathC_exec(PyObject *m)
+{
+    if (PyModule_AddFunctions(m, QMathCMethods) < 0) {
+        return -1;
+    }
+
+    if (import_qmfloat() < 0) {
+        return -1;
+    }
+
+    if (import_qmcmplx() < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+static PyModuleDef_Slot QMathCSlots[] = {
+    {Py_mod_exec, QMathC_exec},
+    {0, NULL}
+};
+
+
 PyModuleDef QMathCModule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "qcmathc",
     .m_doc = PyDoc_STR("Quad precision complex math library."),
-    .m_size = -1,
-    .m_methods = QMathCMethods,
+    .m_size = 0,
+    .m_slots = QMathCSlots,
 };
 
 PyMODINIT_FUNC
 PyInit_qcmathc(void)
 {
-
-    PyObject *m;
-
-    m = PyModule_Create(&QMathCModule);
-    if (m == NULL)
-        return NULL;
-
-    if (import_qmfloat() < 0)
-        return NULL;
-
-    if (import_qmcmplx() < 0)
-        return NULL;
-
-    return m;
+    return PyModuleDef_Init(&QMathCModule);
 }
