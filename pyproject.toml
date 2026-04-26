@@ -83,3 +83,9 @@ no_implicit_optional = true
 test-sources = ["tests"]
 test-requires = ['pytest','pytest-xdist[psutil]','hypothesis',"scipy"]
 test-command = "pytest {project}/tests"
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = [
+  "auditwheel repair -w {dest_dir} {wheel}",
+  "pipx run abi3audit --strict --report {wheel}",
+]

@@ -11,12 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest, macos-14]
-        toolchain:
-          - {compiler: gcc, version: 12}
-
-    env:
-        MACOSX_DEPLOYMENT_TARGET: 14.0
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-14]
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -26,22 +21,27 @@ jobs:
       - uses: fortran-lang/setup-fortran@2a1b9c55897d827a9dfeb114408f3615e53b2b72 # v1
         id: setup-fortran
         with:
-          compiler: ${{ matrix.toolchain.compiler }}
-          version: ${{ matrix.toolchain.version }}
+          compiler: gcc
+          version: 12
+
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip==25.2
-          python -m pip install build wheel pip-tools
+          python -m pip install build wheel pip-tools auditwheel pipx
           pip-compile -o requirements.txt --extra test --strip-extras
           python -m pip install -r requirements.txt
           python -m pip install numpy==2.0.0
 
       - name: Build wheels
         uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084 # v3.4.1
+        env:
+          # Py_LIMITED_API / abi3 wheels are not supported on free-threaded CPython yet.
+          CIBW_SKIP: "cp3??t-*"
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.os == 'macos-14' && '14.0' || '' }}
 
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
@@ -54,23 +54,18 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: fortran-lang/setup-fortran@2a1b9c55897d827a9dfeb114408f3615e53b2b72 # v1
-        id: setup-fortran
-        with:
-          compiler: ${{ matrix.toolchain.compiler }}
-          version: ${{ matrix.toolchain.version }}
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip==25.2
-          python -m pip install build wheel pip-tools
+          python -m pip install build wheel pip-tools auditwheel pipx
           pip-compile -o requirements.txt --extra test --strip-extras
           python -m pip install -r requirements.txt
+          python -m pip install numpy==2.0.0
 
       - name: Build sdist
         run: python3 -m build --sdist
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: cibw-sdist
           path: dist/*.tar.gz
@@ -94,3 +89,4 @@ jobs:
           merge-multiple: true
 
       - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+
