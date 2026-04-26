@@ -12,6 +12,8 @@
 #include "qcmplx.h"
 #include "qfloat.h"
 
+static PyTypeObject *QuadCType = NULL;
+
 
 static PyObject *
 QuadCObject_repr(QuadCObject * obj)
@@ -269,23 +271,6 @@ QuadCObject_inplace_true_divide(PyObject * o1, PyObject * o2 ){
 
 
 // Header data
-
-static PyNumberMethods Quad_cmath_methods = {
-    .nb_add = (binaryfunc) QuadCObject_add,
-    .nb_subtract = (binaryfunc) QuadCObject_subtract,
-    .nb_multiply = (binaryfunc) QuadCObject_mult,
-    .nb_power = (ternaryfunc) QuadCObject_pow,
-    .nb_negative = (unaryfunc) QuadCObject_neg,
-    .nb_positive = (unaryfunc) QuadCObject_pos,
-    .nb_absolute = (unaryfunc) QuadCObject_abs,
-    .nb_bool = (inquiry) QuadCObject_bool,
-    .nb_inplace_add = (binaryfunc) QuadCObject_inplace_add,
-    .nb_inplace_subtract = (binaryfunc) QuadCObject_inplace_subtract,
-    .nb_inplace_multiply = (binaryfunc) QuadCObject_inplace_mult,
-    .nb_inplace_power = (ternaryfunc) QuadCObject_inplace_pow,
-    .nb_true_divide = (binaryfunc) QuadCObject_true_divide,//  binaryfunc nb_true_divide;
-    .nb_inplace_true_divide = (binaryfunc) QuadCObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
-};
 
 
 PyObject* get_real(PyObject * x, void * y){
@@ -599,23 +584,41 @@ QuadCType_RichCompare(PyObject * o1, PyObject * o2, int opid){
 
 
 
-static PyTypeObject QuadCType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "qcmplx",
-    .tp_doc = PyDoc_STR("A single quad precision complex variable"),
-    .tp_basicsize = sizeof(QuadCObject),
-    .tp_itemsize = 0,
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_new = PyType_GenericNew,
-    .tp_repr = (reprfunc) QuadCObject_repr,
-    .tp_str = (reprfunc) QuadCObject_str,
-    .tp_members = Quad_cmembers,
-    .tp_methods = Quad_cmethods,
-    .tp_init = (initproc) Quad_cinit,
-    .tp_as_number = &Quad_cmath_methods,
-    .tp_getset = Quad_cgetset,
-    .tp_richcompare = (richcmpfunc) QuadCType_RichCompare,
-    .tp_hash = (hashfunc) QuadCObject_hash,
+static PyType_Slot QuadCType_slots[] = {
+    {Py_tp_doc, (void *)PyDoc_STR("A single quad precision complex variable")},
+    {Py_tp_new, (void *)PyType_GenericNew},
+    {Py_tp_repr, (void *)QuadCObject_repr},
+    {Py_tp_str, (void *)QuadCObject_str},
+    {Py_tp_members, (void *)Quad_cmembers},
+    {Py_tp_methods, (void *)Quad_cmethods},
+    {Py_tp_init, (void *)Quad_cinit},
+    {Py_tp_getset, (void *)Quad_cgetset},
+    {Py_tp_richcompare, (void *)QuadCType_RichCompare},
+    {Py_tp_hash, (void *)QuadCObject_hash},
+
+    {Py_nb_add, (void *)QuadCObject_add},
+    {Py_nb_subtract, (void *)QuadCObject_subtract},
+    {Py_nb_multiply, (void *)QuadCObject_mult},
+    {Py_nb_power, (void *)QuadCObject_pow},
+    {Py_nb_negative, (void *)QuadCObject_neg},
+    {Py_nb_positive, (void *)QuadCObject_pos},
+    {Py_nb_absolute, (void *)QuadCObject_abs},
+    {Py_nb_bool, (void *)QuadCObject_bool},
+    {Py_nb_inplace_add, (void *)QuadCObject_inplace_add},
+    {Py_nb_inplace_subtract, (void *)QuadCObject_inplace_subtract},
+    {Py_nb_inplace_multiply, (void *)QuadCObject_inplace_mult},
+    {Py_nb_inplace_power, (void *)QuadCObject_inplace_pow},
+    {Py_nb_true_divide, (void *)QuadCObject_true_divide},
+    {Py_nb_inplace_true_divide, (void *)QuadCObject_inplace_true_divide},
+    {0, NULL}
+};
+
+static PyType_Spec QuadCType_spec = {
+    .name = "pyquadp.qmcmplx.qcmplx",
+    .basicsize = sizeof(QuadCObject),
+    .itemsize = 0,
+    .flags = Py_TPFLAGS_DEFAULT,
+    .slots = QuadCType_slots,
 };
 
 static PyModuleDef QuadCModule = {
@@ -627,7 +630,14 @@ static PyModuleDef QuadCModule = {
 
 PyObject* 
 QuadCObject_to_PyObject(QuadCObject out) {
-	QuadCObject* ret = (QuadCObject*) PyType_GenericAlloc(&QuadCType, 0);
+	QuadCObject* ret;
+
+    if (QuadCType == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "qcmplx type not initialized");
+        return NULL;
+    }
+
+	ret = (QuadCObject*) PyType_GenericAlloc(QuadCType, 0);
 
 	if (ret != NULL) {
 		ret->value = crealq(out.value) + cimagq(out.value)*I;
@@ -656,7 +666,7 @@ PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
     if(alloc)
         alloc_QuadCType(out);
 
-    if(PyObject_TypeCheck(in, &QuadCType)){
+    if(QuadCType != NULL && PyObject_TypeCheck(in, QuadCType)){
         // Is a complex quad
         out->value = QuadCObject_complex128((QuadCObject *)in);
         return true;
@@ -828,7 +838,10 @@ void qcprintf(QuadCObject * out){
 #pragma GCC diagnostic pop
 
 static void alloc_QuadCType(QuadCObject * result){
-	result = (QuadCObject*) PyType_GenericAlloc(&QuadCType, 0);
+    if (QuadCType == NULL) {
+        return;
+    }
+    result = (QuadCObject*) PyType_GenericAlloc(QuadCType, 0);
 }
 
 PyMODINIT_FUNC
@@ -837,19 +850,43 @@ PyInit_qmcmplx(void)
     PyObject *m;
     static void *PyQcmplx_API[PyQcmplx_API_pointers];
     PyObject *c_api_object;
+    PyObject *quadc_type_obj;
+    PyObject *module_name_obj;
 
 
     m = PyModule_Create(&QuadCModule);
     if (m == NULL)
         return NULL;
 
+    quadc_type_obj = PyType_FromSpec(&QuadCType_spec);
+    if (quadc_type_obj == NULL) {
+        Py_DECREF(m);
+        return NULL;
+    }
+    module_name_obj = PyUnicode_FromString("pyquadp.qmcmplx");
+    if (module_name_obj == NULL) {
+        Py_DECREF(quadc_type_obj);
+        Py_DECREF(m);
+        return NULL;
+    }
+    if (PyObject_SetAttrString(quadc_type_obj, "__module__", module_name_obj) < 0) {
+        Py_DECREF(module_name_obj);
+        Py_DECREF(quadc_type_obj);
+        Py_DECREF(m);
+        return NULL;
+    }
+    Py_DECREF(module_name_obj);
+
+    QuadCType = (PyTypeObject *)quadc_type_obj;
+
     /* Initialize the C API pointer array */
     PyQcmplx_API[PyQcmplx_q2py_NUM] = (void *)QuadCObject_to_PyObject;
     PyQcmplx_API[PyQcmplx_py2q_NUM] = (void *)PyObject_to_QuadCObject;
     PyQcmplx_API[PyQcmplx_alloc_NUM] = (void *)alloc_QuadCType;
-    PyQcmplx_API[PyQcmplx_type_NUM] = (void *)&QuadCType;
+    PyQcmplx_API[PyQcmplx_type_NUM] = (void *)QuadCType;
 
-    if (PyModule_AddType(m, &QuadCType) < 0) {
+    if (PyModule_AddObject(m, "qcmplx", quadc_type_obj) < 0) {
+        Py_DECREF(quadc_type_obj);
         Py_DECREF(m);
         return NULL;
     }
@@ -860,6 +897,11 @@ PyInit_qmcmplx(void)
 
     if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
         Py_XDECREF(c_api_object);
+        Py_DECREF(m);
+        return NULL;
+    }
+
+    if (PyDict_SetItemString(PyImport_GetModuleDict(), "qmcmplx", m) < 0) {
         Py_DECREF(m);
         return NULL;
     }
