@@ -35,6 +35,7 @@ jobs:
           python -m pip install build wheel pip-tools
           pip-compile -o requirements.txt --extra test --strip-extras
           python -m pip install -r requirements.txt
+          python -m pip install numpy==2.0.0
 
       - name: Build wheels
         uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084 # v3.4.1
