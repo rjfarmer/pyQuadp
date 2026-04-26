@@ -1032,7 +1032,11 @@ qcarray_from_list(PyObject *NPY_UNUSED(self), PyObject *args)
         return NULL;
     }
 
-    n = PySequence_Fast_GET_SIZE(seq);
+    n = PySequence_Size(seq);
+    if (n < 0) {
+        Py_DECREF(seq);
+        return NULL;
+    }
     dims[0] = (npy_intp)n;
     arr = QuadCArray_new_empty(1, dims);
     if (arr == NULL) {
@@ -1042,12 +1046,19 @@ qcarray_from_list(PyObject *NPY_UNUSED(self), PyObject *args)
 
     data = (__complex128 *)PyArray_DATA(arr);
     for (i = 0; i < n; ++i) {
-        PyObject *item = PySequence_Fast_GET_ITEM(seq, i);
-        if (QuadCArray_setitem(item, &data[i], arr) < 0) {
+        PyObject *item = PySequence_GetItem(seq, i);
+        if (item == NULL) {
             Py_DECREF(arr);
             Py_DECREF(seq);
             return NULL;
         }
+        if (QuadCArray_setitem(item, &data[i], arr) < 0) {
+            Py_DECREF(item);
+            Py_DECREF(arr);
+            Py_DECREF(seq);
+            return NULL;
+        }
+        Py_DECREF(item);
     }
 
     Py_DECREF(seq);

@@ -1006,21 +1006,24 @@ qiarray_arange(PyObject *NPY_UNUSED(self), PyObject *args)
   __int128 *data;
   __int128 current;
 
-  nargs = PyTuple_GET_SIZE(args);
+  nargs = PyTuple_Size(args);
+  if (nargs < 0) {
+    return NULL;
+  }
   if (nargs < 1 || nargs > 3) {
     PyErr_SetString(PyExc_TypeError, "arange expects 1 to 3 positional arguments");
     return NULL;
   }
 
   if (nargs == 1) {
-    stop_obj = PyTuple_GET_ITEM(args, 0);
+    stop_obj = PyTuple_GetItem(args, 0);
   } else if (nargs == 2) {
-    start_obj = PyTuple_GET_ITEM(args, 0);
-    stop_obj = PyTuple_GET_ITEM(args, 1);
+    start_obj = PyTuple_GetItem(args, 0);
+    stop_obj = PyTuple_GetItem(args, 1);
   } else {
-    start_obj = PyTuple_GET_ITEM(args, 0);
-    stop_obj = PyTuple_GET_ITEM(args, 1);
-    step_obj = PyTuple_GET_ITEM(args, 2);
+    start_obj = PyTuple_GetItem(args, 0);
+    stop_obj = PyTuple_GetItem(args, 1);
+    step_obj = PyTuple_GetItem(args, 2);
   }
 
   if (start_obj != NULL && QuadIArray_setitem(start_obj, &start, NULL) < 0) {
@@ -1075,7 +1078,11 @@ qiarray_from_list(PyObject *NPY_UNUSED(self), PyObject *args)
     return NULL;
   }
 
-  n = PySequence_Fast_GET_SIZE(seq);
+  n = PySequence_Size(seq);
+  if (n < 0) {
+    Py_DECREF(seq);
+    return NULL;
+  }
   dims[0] = (npy_intp)n;
   arr = QuadIArray_new_empty(1, dims);
   if (arr == NULL) {
@@ -1085,12 +1092,19 @@ qiarray_from_list(PyObject *NPY_UNUSED(self), PyObject *args)
 
   data = (__int128 *)PyArray_DATA(arr);
   for (i = 0; i < n; ++i) {
-    PyObject *item = PySequence_Fast_GET_ITEM(seq, i);
-    if (QuadIArray_setitem(item, &data[i], arr) < 0) {
+    PyObject *item = PySequence_GetItem(seq, i);
+    if (item == NULL) {
       Py_DECREF(arr);
       Py_DECREF(seq);
       return NULL;
     }
+    if (QuadIArray_setitem(item, &data[i], arr) < 0) {
+      Py_DECREF(item);
+      Py_DECREF(arr);
+      Py_DECREF(seq);
+      return NULL;
+    }
+    Py_DECREF(item);
   }
 
   Py_DECREF(seq);
