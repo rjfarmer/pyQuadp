@@ -817,6 +817,7 @@ static PyObject * QuadIObject_to_hex(QuadIObject * self, PyObject * args){
 static PyObject * QuadIObject_from_hex(PyTypeObject *type, PyObject * arg){
     QuadIObject res;
     PyObject *as_int;
+    const char *buf;
 
     (void)type;
 
@@ -825,7 +826,12 @@ static PyObject * QuadIObject_from_hex(PyTypeObject *type, PyObject * arg){
         return NULL;
     }
 
-    as_int = PyLong_FromUnicodeObject(arg, 16);
+    buf = PyUnicode_AsUTF8AndSize(arg, NULL);
+    if (buf == NULL) {
+        return NULL;
+    }
+
+    as_int = PyLong_FromString((char *)buf, NULL, 16);
     if (as_int == NULL) {
         return NULL;
     }
