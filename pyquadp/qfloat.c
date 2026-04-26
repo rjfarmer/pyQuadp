@@ -4,6 +4,8 @@
 #define QFLOAT_MODULE
 #include "qfloat.h"
 
+static PyTypeObject *QuadType = NULL;
+
 
 
 static PyObject *
@@ -851,30 +853,6 @@ QuadObject_is_integer(QuadObject *self, PyObject *Py_UNUSED(ignored))
 
 // Header data
 
-static PyNumberMethods Quad_math_methods = {
-    .nb_add = (binaryfunc) QuadObject_add,
-    .nb_subtract = (binaryfunc) QuadObject_subtract,
-    .nb_multiply = (binaryfunc) QuadObject_mult,
-    .nb_remainder = (binaryfunc) QuadObject_remainder,
-    .nb_divmod = (binaryfunc) QuadObject_divmod,
-    .nb_power = (ternaryfunc) QuadObject_pow,
-    .nb_negative = (unaryfunc) QuadObject_neg,
-    .nb_positive = (unaryfunc) QuadObject_pos,
-    .nb_absolute = (unaryfunc) QuadObject_abs,
-    .nb_bool = (inquiry) QuadObject_bool,
-    .nb_int = (unaryfunc) QuadObject_int,
-    .nb_float = (unaryfunc) QuadObject_float,
-    .nb_inplace_add = (binaryfunc) QuadObject_inplace_add,
-    .nb_inplace_subtract = (binaryfunc) QuadObject_inplace_subtract,
-    .nb_inplace_multiply = (binaryfunc) QuadObject_inplace_mult,
-    .nb_inplace_remainder = (binaryfunc) QuadObject_inplace_remainder,
-    .nb_inplace_power = (ternaryfunc) QuadObject_inplace_pow,
-    .nb_floor_divide = (binaryfunc) QuadObject_floor_divide,//  binaryfunc nb_floor_divide;
-    .nb_true_divide = (binaryfunc) QuadObject_true_divide,//  binaryfunc nb_true_divide;
-    .nb_inplace_floor_divide = (binaryfunc) QuadObject_inplace_floor_divide,//  binaryfunc nb_inplace_floor_divide;
-    .nb_inplace_true_divide = (binaryfunc) QuadObject_inplace_true_divide,//  binaryfunc nb_inplace_true_divide;
-};
-
 // attributes
 static PyMemberDef Quad_members[] = {
     {NULL}  /* Sentinel */
@@ -925,23 +903,48 @@ Quad_init(QuadObject *self, PyObject *args, PyObject *kwds)
 }
 
 
-static PyTypeObject QuadType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "qfloat",
-    .tp_doc = PyDoc_STR("A single quad precision variable"),
-    .tp_basicsize = sizeof(QuadObject),
-    .tp_itemsize = 0,
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_new = PyType_GenericNew,
-    .tp_repr = (reprfunc) QuadObject_repr,
-    .tp_str = (reprfunc) QuadObject_str,
-    .tp_members = Quad_members,
-    .tp_methods = Quad_methods,
-    .tp_init = (initproc) Quad_init,
-    .tp_as_number = &Quad_math_methods,
-    .tp_getset = Quad_cgetset,
-    .tp_richcompare = (richcmpfunc) QuadType_RichCompare,
-    .tp_hash = (hashfunc) QuadObject_hash,
+static PyType_Slot QuadType_slots[] = {
+    {Py_tp_doc, (void *)PyDoc_STR("A single quad precision variable")},
+    {Py_tp_new, (void *)PyType_GenericNew},
+    {Py_tp_repr, (void *)QuadObject_repr},
+    {Py_tp_str, (void *)QuadObject_str},
+    {Py_tp_members, (void *)Quad_members},
+    {Py_tp_methods, (void *)Quad_methods},
+    {Py_tp_init, (void *)Quad_init},
+    {Py_tp_getset, (void *)Quad_cgetset},
+    {Py_tp_richcompare, (void *)QuadType_RichCompare},
+    {Py_tp_hash, (void *)QuadObject_hash},
+
+    {Py_nb_add, (void *)QuadObject_add},
+    {Py_nb_subtract, (void *)QuadObject_subtract},
+    {Py_nb_multiply, (void *)QuadObject_mult},
+    {Py_nb_remainder, (void *)QuadObject_remainder},
+    {Py_nb_divmod, (void *)QuadObject_divmod},
+    {Py_nb_power, (void *)QuadObject_pow},
+    {Py_nb_negative, (void *)QuadObject_neg},
+    {Py_nb_positive, (void *)QuadObject_pos},
+    {Py_nb_absolute, (void *)QuadObject_abs},
+    {Py_nb_bool, (void *)QuadObject_bool},
+    {Py_nb_int, (void *)QuadObject_int},
+    {Py_nb_float, (void *)QuadObject_float},
+    {Py_nb_inplace_add, (void *)QuadObject_inplace_add},
+    {Py_nb_inplace_subtract, (void *)QuadObject_inplace_subtract},
+    {Py_nb_inplace_multiply, (void *)QuadObject_inplace_mult},
+    {Py_nb_inplace_remainder, (void *)QuadObject_inplace_remainder},
+    {Py_nb_inplace_power, (void *)QuadObject_inplace_pow},
+    {Py_nb_floor_divide, (void *)QuadObject_floor_divide},
+    {Py_nb_true_divide, (void *)QuadObject_true_divide},
+    {Py_nb_inplace_floor_divide, (void *)QuadObject_inplace_floor_divide},
+    {Py_nb_inplace_true_divide, (void *)QuadObject_inplace_true_divide},
+    {0, NULL}
+};
+
+static PyType_Spec QuadType_spec = {
+    .name = "pyquadp.qmfloat.qfloat",
+    .basicsize = sizeof(QuadObject),
+    .itemsize = 0,
+    .flags = Py_TPFLAGS_DEFAULT,
+    .slots = QuadType_slots,
 };
 
 static PyModuleDef QuadModule = {
@@ -953,7 +956,14 @@ static PyModuleDef QuadModule = {
 
 PyObject* 
 QuadObject_to_PyObject(QuadObject out) {
-	QuadObject* ret = (QuadObject*) PyType_GenericAlloc(&QuadType, 0);
+	QuadObject* ret;
+
+    if (QuadType == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "qfloat type not initialized");
+        return NULL;
+    }
+
+	ret = (QuadObject*) PyType_GenericAlloc(QuadType, 0);
     
 	if (ret != NULL) {
 		ret->value = out.value;
@@ -1033,7 +1043,7 @@ PyObject_to_QuadObject(PyObject * in, QuadObject * out, const bool alloc)
 }
 
 static bool QuadObject_Check(PyObject * obj){
-    if(PyObject_TypeCheck(obj, &QuadType))
+    if(QuadType != NULL && PyObject_TypeCheck(obj, QuadType))
         return true;
     return false;
 }
@@ -1091,7 +1101,10 @@ void qprintf(QuadObject * out){
 #pragma GCC diagnostic pop
 
 static void alloc_QuadType(QuadObject * result){
-	result = (QuadObject*) PyType_GenericAlloc(&QuadType, 0);
+    if (QuadType == NULL) {
+        return;
+    }
+    result = (QuadObject*) PyType_GenericAlloc(QuadType, 0);
 }
 
 PyMODINIT_FUNC
@@ -1100,11 +1113,34 @@ PyInit_qmfloat(void)
     PyObject *m;
     static void *PyQfloat_API[PyQfloat_API_pointers];
     PyObject *c_api_object;
+    PyObject *quad_type_obj;
+    PyObject *module_name_obj;
 
 
     m = PyModule_Create(&QuadModule);
     if (m == NULL)
         return NULL;
+
+    quad_type_obj = PyType_FromSpec(&QuadType_spec);
+    if (quad_type_obj == NULL) {
+        Py_DECREF(m);
+        return NULL;
+    }
+    module_name_obj = PyUnicode_FromString("pyquadp.qmfloat");
+    if (module_name_obj == NULL) {
+        Py_DECREF(quad_type_obj);
+        Py_DECREF(m);
+        return NULL;
+    }
+    if (PyObject_SetAttrString(quad_type_obj, "__module__", module_name_obj) < 0) {
+        Py_DECREF(module_name_obj);
+        Py_DECREF(quad_type_obj);
+        Py_DECREF(m);
+        return NULL;
+    }
+    Py_DECREF(module_name_obj);
+
+    QuadType = (PyTypeObject *)quad_type_obj;
 
     /* Initialize the C API pointer array */
     PyQfloat_API[PyQfloat_q2py_NUM] = (void *)QuadObject_to_PyObject;
@@ -1114,10 +1150,10 @@ PyInit_qmfloat(void)
     PyQfloat_API[PyQfloat_check_NUM] = (void *)QuadObject_Check;
     PyQfloat_API[PyQfloat_dble_NUM] = (void *)QuadObject_to_double;
     PyQfloat_API[PyQfloat_f_to_dble_NUM] = (void *) __float128_to_double;
-    PyQfloat_API[PyQfloat_type_NUM] = (void *)&QuadType;
+    PyQfloat_API[PyQfloat_type_NUM] = (void *)QuadType;
 
-
-    if (PyModule_AddType(m, &QuadType) < 0) {
+    if (PyModule_AddObject(m, "qfloat", quad_type_obj) < 0) {
+        Py_DECREF(quad_type_obj);
         Py_DECREF(m);
         return NULL;
     }
@@ -1128,6 +1164,11 @@ PyInit_qmfloat(void)
 
     if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
         Py_XDECREF(c_api_object);
+        Py_DECREF(m);
+        return NULL;
+    }
+
+    if (PyDict_SetItemString(PyImport_GetModuleDict(), "qmfloat", m) < 0) {
         Py_DECREF(m);
         return NULL;
     }
