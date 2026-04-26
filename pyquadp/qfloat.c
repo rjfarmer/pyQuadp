@@ -756,14 +756,12 @@ QuadObject_as_integer_ratio(QuadObject *self, PyObject *Py_UNUSED(ignored))
         return NULL;
     }
 
-    tuple_obj = PyTuple_New(2);
+    tuple_obj = PyTuple_Pack(2, num_obj, den_obj);
+    Py_DECREF(num_obj);
+    Py_DECREF(den_obj);
     if (tuple_obj == NULL) {
-        Py_DECREF(num_obj);
-        Py_DECREF(den_obj);
         return NULL;
     }
-    PyTuple_SET_ITEM(tuple_obj, 0, num_obj);
-    PyTuple_SET_ITEM(tuple_obj, 1, den_obj);
     return tuple_obj;
 }
 

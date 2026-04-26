@@ -4,6 +4,7 @@ This repository contains CPython C extensions and Python wrappers. Follow these 
 
 ## C Extension Safety Rules
 
+- Prefer Python's limited API (`Py_LIMITED_API` / abi3-compatible APIs) for new C-extension code when feasible; use non-limited CPython internals only when required and document why.
 - Never call `PyErr_Print()` in library/runtime code paths. Propagate existing exceptions instead.
 - Do not use unguarded `PyErr_Clear()` in parse fallbacks. Clear only expected exceptions via `PyErr_ExceptionMatches(...)`.
 - For functions returning `bool`, return `false`, not `NULL`.
