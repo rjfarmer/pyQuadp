@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-import pytest
 import numpy as np
+import pytest
 
 
 @pytest.mark.qarray

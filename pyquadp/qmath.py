@@ -1,6 +1,8 @@
-from .constant import *
-import pyquadp.qmathc as qmathc
 import math as _math
+
+import pyquadp.qmathc as qmathc
+
+from .constant import *
 
 
 def acosq(x):

@@ -1,5 +1,6 @@
-from .constant import *
 import pyquadp.qcmathc as qcmathc
+
+from .constant import *
 
 
 def cabsq(x):

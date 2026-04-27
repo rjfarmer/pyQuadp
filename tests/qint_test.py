@@ -1,16 +1,16 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-import os, sys
+import os
+import pickle
+import sys
 from pprint import pprint
 
 import numpy as np
 import pytest
-import pickle
+from hypothesis import assume, given
+from hypothesis.strategies import floats, integers
 
 import pyquadp as pq
-
-from hypothesis import given, assume
-from hypothesis.strategies import floats, integers
 
 
 class Testqint:

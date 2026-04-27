@@ -1,9 +1,11 @@
 from types import ModuleType
+from typing import Any
 
 from .constant import *
-from .qmcmplx import qcmplx as qcmplx
-from .qmfloat import qfloat as qfloat
-from .qmint import qint as qint
+
+qfloat: Any
+qint: Any
+qcmplx: Any
 
 qmfloat: ModuleType
 qmint: ModuleType

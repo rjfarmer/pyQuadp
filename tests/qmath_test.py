@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-import os, sys
+import decimal
+import math
+import os
+import sys
 from pprint import pprint
 
 import numpy as np
-import scipy.special
 import pytest
-import math
-import decimal
-
-from hypothesis import given, assume
+import scipy.special
+from hypothesis import assume, given
 from hypothesis.strategies import floats, integers
 
 import pyquadp.qmath as qm

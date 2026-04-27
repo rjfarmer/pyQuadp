@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-import os, sys
+import os
+import pickle
+import sys
 from pprint import pprint
 
 import numpy as np
 import pytest
-import pickle
 
 import pyquadp as pq
 

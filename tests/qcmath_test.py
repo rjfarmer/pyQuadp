@@ -1,20 +1,20 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-import os, sys
+import cmath
+import decimal
+import math
+import os
+import sys
 from pprint import pprint
 
 import numpy as np
-import scipy.special
 import pytest
-import math
-import cmath
-import decimal
+import scipy.special
+from hypothesis import assume, given
+from hypothesis.strategies import complex_numbers, floats
 
-from hypothesis import given, assume
-from hypothesis.strategies import floats, complex_numbers
-
-import pyquadp.qmath as qm
 import pyquadp.qcmath as qcm
+import pyquadp.qmath as qm
 
 
 class TestQCMathFloat:

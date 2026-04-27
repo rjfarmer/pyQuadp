@@ -1,9 +1,9 @@
 import ctypes
 import os
-import select
-from pprint import pprint
-import time
 import platform
+import select
+import time
+from pprint import pprint
 
 import pytest
 

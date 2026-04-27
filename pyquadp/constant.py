@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-from .qmfloat import qfloat
-from .qmcmplx import qcmplx
-from .qmint import qint
 import ctypes as _ctypes
+
+from .qmcmplx import qcmplx
+from .qmfloat import qfloat
+from .qmint import qint
 
 # libquadmath constants
 

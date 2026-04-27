@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0+
 
-import subprocess
 import os
-from packaging.version import Version
-
 import pathlib
+import subprocess
+
 import _pytest.pathlib
+from packaging.version import Version
 
 resolve_pkg_path_orig = _pytest.pathlib.resolve_package_path
 
