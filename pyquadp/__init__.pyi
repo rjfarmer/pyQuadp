@@ -5,8 +5,11 @@ from .qmcmplx import qcmplx as qcmplx
 from .qmfloat import qfloat as qfloat
 from .qmint import qint as qint
 
+qmfloat: ModuleType
+qmint: ModuleType
+qmcmplx: ModuleType
 qarray: ModuleType
 qcarray: ModuleType
 qiarray: ModuleType
 
-__all__: tuple[str, ...]
+__all__: list[str]
