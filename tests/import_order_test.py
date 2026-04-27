@@ -11,6 +11,23 @@ _IMPORT_CHECK_SCRIPT = """
 import importlib
 import json
 import os
+import sys
+
+repo_root = os.path.realpath(os.environ["PYQUADP_REPO_ROOT"])
+checkout_entries = {
+    repo_root,
+    os.path.join(repo_root, "pyquadp"),
+    os.path.join(repo_root, "tests"),
+}
+
+# Ensure this subprocess resolves pyquadp from installed site-packages,
+# not from the checkout tree that may not contain built extension artifacts.
+sys.path[:] = [
+    entry
+    for entry in sys.path
+    if entry
+    and os.path.realpath(entry) not in checkout_entries
+]
 
 order = json.loads(os.environ["PYQUADP_IMPORT_ORDER"])
 for module_name in order:
@@ -42,6 +59,26 @@ assert hasattr(pyquadp, "qmcmplx")
 def test_import_order_independent(import_order):
     env = os.environ.copy()
     env["PYQUADP_IMPORT_ORDER"] = json.dumps(import_order)
+    env["PYQUADP_REPO_ROOT"] = os.path.realpath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+
+    if "PYTHONPATH" in env:
+        cleaned = []
+        repo_root = env["PYQUADP_REPO_ROOT"]
+        checkout_entries = {
+            repo_root,
+            os.path.join(repo_root, "pyquadp"),
+            os.path.join(repo_root, "tests"),
+        }
+        for entry in env["PYTHONPATH"].split(os.pathsep):
+            if not entry:
+                continue
+            real_entry = os.path.realpath(entry)
+            if real_entry in checkout_entries:
+                continue
+            cleaned.append(entry)
+        env["PYTHONPATH"] = os.pathsep.join(cleaned)
 
     result = subprocess.run(
         [sys.executable, "-c", _IMPORT_CHECK_SCRIPT],
