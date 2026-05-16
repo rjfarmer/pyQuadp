@@ -46,6 +46,7 @@ jobs:
           "CC=$gcc" >> $env:GITHUB_ENV
           "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
           "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
+          $gccdir = Split-Path $gcc -Parent
 
           $inc = & $gcc -print-file-name=include
           $libquadmath = & $gcc -print-file-name=libquadmath.dll
@@ -53,7 +54,8 @@ jobs:
 
           "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
           "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
-          "PATH=$libdir;$env:PATH" >> $env:GITHUB_ENV
+          $gccdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $libdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
 
       - name: Build
@@ -67,6 +69,11 @@ jobs:
             throw "No wheel matching pyquadp*.whl found in dist"
           }
           python -m pip install "$wheel"
+
+      - name: Sanity check import
+        shell: pwsh
+        run: |
+          python -c "import pyquadp; print('pyquadp import OK')"
 
   
       - name: Test
