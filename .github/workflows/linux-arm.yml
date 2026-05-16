@@ -9,16 +9,27 @@ jobs:
       fail-fast: true
       matrix:
         os: [ ubuntu-24.04-arm]    
+        python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14'] 
+        toolchain:
+          - {compiler: gcc, version: 13}
+          - {compiler: gcc, version: 14}
+          - {compiler: gcc, version: 15}
 
     steps:
+      - uses: fortran-lang/setup-fortran@2a1b9c55897d827a9dfeb114408f3615e53b2b72 # v1
+        id: setup-fortran
+        with:
+          compiler: ${{ matrix.toolchain.compiler }}
+          version: ${{ matrix.toolchain.version }}
+
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
-      - name: Set up Python 
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: '3.x'
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
       - name: Install dependencies
@@ -28,9 +39,24 @@ jobs:
           pip-compile -o requirements.txt --extra test --strip-extras
           python -m pip install -r requirements.txt
           sudo apt-get update
-          sudo apt-get install -y gcc gfortran libopenblas-dev libquadmath0-amd64-cross
+          sudo apt-get install -y gcc gfortran libopenblas-dev libquadmath0-arm64-cross
 
     
+      - name: Export toolchain paths
+        shell: pwsh
+        run: |
+          $gcc = "${{ steps.setup-fortran.outputs.cc }}"
+          "CC=$gcc" >> $env:GITHUB_ENV
+          "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
+          "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
+
+          $inc = & $gcc -print-file-name=include
+          $libquadmath = & $gcc -print-file-name=libquadmath.so
+          $libdir = Split-Path $libquadmath -Parent
+
+          "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
+          "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
+
       - name: Build
         run: |
           python -m build
