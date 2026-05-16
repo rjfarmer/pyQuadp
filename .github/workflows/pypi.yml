@@ -10,7 +10,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-15-intel, macos-14, macos-15]
+        include:
+          - os: ubuntu-latest
+            deployment-target: ""
+          - os: windows-latest
+            deployment-target: ""
+          - os: macos-15-intel
+            deployment-target: "15"
+          - os: macos-14
+            deployment-target: "14"
+          - os: macos-15
+            deployment-target: "15"
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -51,13 +61,12 @@ jobs:
           "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
           "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
 
-
-
       - name: Build wheels
         uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084 # v3.4.1
         env:
           # Py_LIMITED_API / abi3 wheels are not supported on free-threaded CPython yet.
           CIBW_SKIP: "cp3??t-*"
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.deployment-target || '10.9' }}
           
 
 
