@@ -23,6 +23,7 @@ class BuildExtUsingCC(build_ext):
 
         super().build_extensions()
 
+
 extensions = [
     Extension(
         name="pyquadp.qmathc",
