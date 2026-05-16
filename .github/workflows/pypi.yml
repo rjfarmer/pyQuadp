@@ -44,23 +44,39 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install numpy==2.1.0
 
+      - if: runner.os == 'Windows'
+        name: Install Windows wheel repair tool
+        run: python -m pip install delvewheel
+
 
       - if: runner.os == 'Windows'
         name: Export toolchain paths
         shell: pwsh
         run: |
           $gcc = "${{ steps.setup-fortran.outputs.cc }}"
-          "CC=$gcc" >> $env:GITHUB_ENV
+          if (-not $gcc) {
+            $gcc = "gcc"
+          }
+          $gccPath = (Get-Command $gcc -ErrorAction Stop).Source
+          "CC=$gccPath" >> $env:GITHUB_ENV
           "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
           "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
+          $gccdir = Split-Path $gccPath -Parent
+          "GCC_BIN_DIR=$gccdir" >> $env:GITHUB_ENV
 
-          $inc = & $gcc -print-file-name=include
-          $libquadmath = & $gcc -print-file-name=libquadmath.dll
-          $libdir = Split-Path $libquadmath -Parent
+          $inc = & $gccPath -print-file-name=include
+          $libquadmathImport = & $gccPath -print-file-name=libquadmath.dll.a
+          $libdir = ""
+          if ($libquadmathImport -and $libquadmathImport -ne "libquadmath.dll.a") {
+            $libdir = Split-Path $libquadmathImport -Parent
+          }
 
           "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
-          "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
-          "PATH=$libdir;$env:PATH" >> $env:GITHUB_ENV
+          if ($libdir) {
+            "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
+            $libdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+          $gccdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build wheels
         uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084 # v3.4.1
@@ -68,6 +84,7 @@ jobs:
           # Py_LIMITED_API / abi3 wheels are not supported on free-threaded CPython yet.
           CIBW_SKIP: "cp3??t-*"
           MACOSX_DEPLOYMENT_TARGET: ${{ matrix.deployment-target || '10.9' }}
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: python -m delvewheel repair -w {dest_dir} {wheel}
           
 
 

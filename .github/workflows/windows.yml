@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip==25.2
-          python -m pip install build wheel pip-tools
+          python -m pip install build wheel pip-tools delvewheel
           pip-compile -o requirements.txt --extra test --strip-extras
           python -m pip install -r requirements.txt
     
@@ -43,19 +43,30 @@ jobs:
         shell: pwsh
         run: |
           $gcc = "${{ steps.setup-fortran.outputs.cc }}"
-          "CC=$gcc" >> $env:GITHUB_ENV
+          if (-not $gcc) {
+            $gcc = "gcc"
+          }
+          $gccPath = (Get-Command $gcc -ErrorAction Stop).Source
+          "CC=$gccPath" >> $env:GITHUB_ENV
           "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
           "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
-          $gccdir = Split-Path $gcc -Parent
+          $gccdir = Split-Path $gccPath -Parent
 
-          $inc = & $gcc -print-file-name=include
-          $libquadmath = & $gcc -print-file-name=libquadmath.dll
-          $libdir = Split-Path $libquadmath -Parent
+          $inc = & $gccPath -print-file-name=include
+          $libquadmathImport = & $gccPath -print-file-name=libquadmath.dll.a
+          $libdir = ""
+          if ($libquadmathImport -and $libquadmathImport -ne "libquadmath.dll.a") {
+            $libdir = Split-Path $libquadmathImport -Parent
+          }
 
           "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
-          "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
+          if ($libdir) {
+            "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
+          }
           $gccdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          $libdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          if ($libdir) {
+            $libdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
 
 
       - name: Build
@@ -68,7 +79,26 @@ jobs:
           if (-not $wheel) {
             throw "No wheel matching pyquadp*.whl found in dist"
           }
-          python -m pip install "$wheel"
+
+          $gccPath = (Get-Command $env:CC -ErrorAction Stop).Source
+          $gccdir = Split-Path $gccPath -Parent
+          $repairedDir = Join-Path $env:RUNNER_TEMP "repaired-wheel"
+          if (Test-Path $repairedDir) {
+            Remove-Item -Recurse -Force $repairedDir
+          }
+          New-Item -ItemType Directory -Path $repairedDir | Out-Null
+
+          # Bundle MinGW runtime DLLs into the wheel so Python can load extensions.
+          python -m delvewheel repair --add-path "$gccdir" -w "$repairedDir" "$wheel"
+
+          $repairedWheel = Get-ChildItem -Path $repairedDir -Filter "pyquadp*.whl" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+          if (-not $repairedWheel) {
+            throw "delvewheel did not produce a repaired wheel"
+          }
+
+          python -m pip install "$repairedWheel"
 
       - name: Sanity check import
         shell: pwsh
