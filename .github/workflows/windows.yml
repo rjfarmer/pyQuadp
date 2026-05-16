@@ -56,9 +56,16 @@ jobs:
 
 
       - name: Build
+        shell: pwsh
         run: |
           python -m build
-          python -m pip install dist/pyquadp*.whl
+          $wheel = Get-ChildItem -Path dist -Filter "pyquadp*.whl" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+          if (-not $wheel) {
+            throw "No wheel matching pyquadp*.whl found in dist"
+          }
+          python -m pip install "$wheel"
 
   
       - name: Test
