@@ -53,6 +53,7 @@ jobs:
 
           "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
           "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
+          "PATH=$libdir;$env:PATH" >> $env:GITHUB_ENV
 
 
       - name: Build
