@@ -47,9 +47,22 @@ jobs:
             $gcc = "gcc"
           }
           $gccPath = (Get-Command $gcc -ErrorAction Stop).Source
+
+          $cxx = "${{ steps.setup-fortran.outputs.cxx }}"
+          if (-not $cxx) {
+            $cxx = "g++"
+          }
+          $cxxPath = (Get-Command $cxx -ErrorAction Stop).Source
+
+          $fc = "${{ steps.setup-fortran.outputs.fc }}"
+          if (-not $fc) {
+            $fc = "gfortran"
+          }
+          $fcPath = (Get-Command $fc -ErrorAction Stop).Source
+
           "CC=$gccPath" >> $env:GITHUB_ENV
-          "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
-          "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
+          "CXX=$cxxPath" >> $env:GITHUB_ENV
+          "FC=$fcPath" >> $env:GITHUB_ENV
           $gccdir = Split-Path $gccPath -Parent
 
           $inc = & $gccPath -print-file-name=include
@@ -68,6 +81,30 @@ jobs:
             $libdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           }
 
+
+      - name: Toolchain diagnostics
+        shell: pwsh
+        run: |
+          Write-Host "CC=$env:CC"
+          Write-Host "CXX=$env:CXX"
+          Write-Host "FC=$env:FC"
+          Write-Host "CPPFLAGS=$env:CPPFLAGS"
+          Write-Host "LDFLAGS=$env:LDFLAGS"
+
+          foreach ($tool in @($env:CC, $env:CXX, $env:FC, "gcc", "g++", "gfortran")) {
+            if ($tool) {
+              try {
+                $resolved = (Get-Command $tool -ErrorAction Stop).Source
+                $exists = Test-Path $resolved
+                Write-Host "RESOLVE $tool -> $resolved (exists=$exists)"
+              }
+              catch {
+                Write-Host "RESOLVE $tool -> NOT FOUND"
+              }
+            }
+          }
+
+          python -c "import os, shutil, sys; print('python=', sys.executable); [print(f'{k}={os.environ.get(k)}') for k in ('CC','CXX','FC','CPPFLAGS','LDFLAGS')]; [print(f'which {t} -> {shutil.which(t)}') for t in ('gcc','g++','gfortran')]"
 
       - name: Build
         shell: pwsh

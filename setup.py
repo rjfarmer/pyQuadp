@@ -17,7 +17,9 @@ class BuildExtUsingCC(build_ext):
 
     def build_extensions(self):
         cc = os.environ.get("CC")
-        if cc:
+        # On Windows, let mingw32 compiler templates remain intact. Distutils
+        # already respects the environment compiler choice when available.
+        if cc and os.name != "nt":
             cc_cmd = shlex.split(cc)
 
             def _override_executable(cmd_name):
