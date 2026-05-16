@@ -1,6 +1,27 @@
 #!/usr/bin/env python
 
+import os
+import shlex
+
 from setuptools import Extension, setup
+from setuptools.command.build_ext import build_ext
+
+
+class BuildExtUsingCC(build_ext):
+    def build_extensions(self):
+        cc = os.environ.get("CC")
+        if cc:
+            cc_cmd = shlex.split(cc)
+            self.compiler.set_executable("compiler", cc_cmd)
+            self.compiler.set_executable("compiler_so", cc_cmd)
+            self.compiler.set_executable("compiler_cxx", cc_cmd)
+
+            # Keep link step aligned with CC unless explicitly overridden.
+            if not os.environ.get("LDSHARED"):
+                self.compiler.set_executable("linker_so", cc_cmd + ["-shared"])
+            self.compiler.set_executable("linker_exe", cc_cmd)
+
+        super().build_extensions()
 
 extensions = [
     Extension(
@@ -67,6 +88,7 @@ if __name__ == "__main__":
 
     setup(
         ext_modules=extensions,
+        cmdclass={"build_ext": BuildExtUsingCC},
         package_data={"pyquadp": ["*.pyi", "py.typed"]},
         options={"bdist_wheel": {"py_limited_api": "cp310"}},
     )
