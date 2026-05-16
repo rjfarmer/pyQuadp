@@ -10,8 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest, macos-14]
+        os: [ubuntu-latest, windows-latest, macos-15-intel, macos-latest]
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -22,8 +21,10 @@ jobs:
         id: setup-fortran
         with:
           compiler: gcc
-          version: 12
+          version: 13
 
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v6
 
       - name: Install dependencies
         run: |
@@ -33,12 +34,31 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install numpy==2.0.0
 
+
+      - if: runner.os == 'Windows'
+        name: Export toolchain paths
+        shell: pwsh
+        run: |
+          $gcc = "${{ steps.setup-fortran.outputs.cc }}"
+          "CC=$gcc" >> $env:GITHUB_ENV
+          "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
+          "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
+
+          $inc = & $gcc -print-file-name=include
+          $libquadmath = & $gcc -print-file-name=libquadmath.dll
+          $libdir = Split-Path $libquadmath -Parent
+
+          "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
+          "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
+
+
+
       - name: Build wheels
         uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084 # v3.4.1
         env:
           # Py_LIMITED_API / abi3 wheels are not supported on free-threaded CPython yet.
           CIBW_SKIP: "cp3??t-*"
-          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.os == 'macos-14' && '14.0' || '' }}
+          
 
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
