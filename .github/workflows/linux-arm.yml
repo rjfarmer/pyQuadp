@@ -39,7 +39,7 @@ jobs:
           pip-compile -o requirements.txt --extra test --strip-extras
           python -m pip install -r requirements.txt
           sudo apt-get update
-          sudo apt install --reinstall libquadmath0
+          sudo apt install --reinstall libquadmath0-amd64-cross
 
     
       - name: Export toolchain paths
