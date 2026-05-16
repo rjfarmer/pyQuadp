@@ -110,6 +110,10 @@ jobs:
         shell: pwsh
         run: |
           python -m build
+
+          Write-Host "Contents of dist folder:"
+          Get-ChildItem -Path dist -Recurse | Format-Table -AutoSize
+          
           $wheel = Get-ChildItem -Path dist -Filter "pyquadp*.whl" |
             Sort-Object LastWriteTime -Descending |
             Select-Object -First 1 -ExpandProperty FullName
