@@ -12,14 +12,27 @@ class BuildExtUsingCC(build_ext):
         cc = os.environ.get("CC")
         if cc:
             cc_cmd = shlex.split(cc)
-            self.compiler.set_executable("compiler", cc_cmd)
-            self.compiler.set_executable("compiler_so", cc_cmd)
-            self.compiler.set_executable("compiler_cxx", cc_cmd)
 
-            # Keep link step aligned with CC unless explicitly overridden.
+            def _override_executable(cmd_name):
+                current = getattr(self.compiler, cmd_name, None)
+                if current is None:
+                    return
+                if isinstance(current, str):
+                    current = shlex.split(current)
+                if not current:
+                    return
+                # Replace only the compiler executable, keep setuptools flags (e.g. -fPIC).
+                updated = cc_cmd + current[1:]
+                self.compiler.set_executable(cmd_name, updated)
+
+            _override_executable("compiler")
+            _override_executable("compiler_so")
+            _override_executable("compiler_cxx")
+            _override_executable("linker_exe")
+
+            # Respect explicit LDSHARED if provided by the environment.
             if not os.environ.get("LDSHARED"):
-                self.compiler.set_executable("linker_so", cc_cmd + ["-shared"])
-            self.compiler.set_executable("linker_exe", cc_cmd)
+                _override_executable("linker_so")
 
         super().build_extensions()
 
