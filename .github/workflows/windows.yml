@@ -73,11 +73,19 @@ jobs:
       - name: Sanity check import
         shell: pwsh
         run: |
+          Set-Location $env:RUNNER_TEMP
           python -c "import pyquadp; print('pyquadp import OK')"
 
   
       - name: Test
         # Don't use python -m pytest as that screws up the module loading
+        shell: pwsh
         run: |
-          pytest -v
+          $tmpTests = Join-Path $env:RUNNER_TEMP "pyquadp-tests"
+          if (Test-Path $tmpTests) {
+            Remove-Item -Recurse -Force $tmpTests
+          }
+          Copy-Item -Recurse tests $tmpTests
+          Set-Location $env:RUNNER_TEMP
+          pytest -v $tmpTests
 
