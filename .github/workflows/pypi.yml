@@ -13,8 +13,6 @@ jobs:
         include:
           - os: ubuntu-latest
             deployment-target: ""
-          - os: windows-latest
-            deployment-target: ""
           - os: macos-15-intel
             deployment-target: "15"
           - os: macos-14
@@ -34,7 +32,7 @@ jobs:
           version: 13
 
       # Used to host cibuildwheel
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
 
       - name: Install dependencies
         run: |
@@ -53,14 +51,14 @@ jobs:
         name: Export toolchain paths
         shell: pwsh
         run: |
-          $gcc = "${{ steps.setup-fortran.outputs.cc }}"
+          $gcc = "$env:STEPS_SETUP_FORTRAN_OUTPUTS_CC"
           if (-not $gcc) {
             $gcc = "gcc"
           }
           $gccPath = (Get-Command $gcc -ErrorAction Stop).Source
           "CC=$gccPath" >> $env:GITHUB_ENV
-          "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
-          "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
+          "CXX=$env:STEPS_SETUP_FORTRAN_OUTPUTS_CXX" >> $env:GITHUB_ENV
+          "FC=$env:STEPS_SETUP_FORTRAN_OUTPUTS_FC" >> $env:GITHUB_ENV
           $gccdir = Split-Path $gccPath -Parent
           "GCC_BIN_DIR=$gccdir" >> $env:GITHUB_ENV
 
@@ -77,6 +75,10 @@ jobs:
             $libdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           }
           $gccdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        env:
+          STEPS_SETUP_FORTRAN_OUTPUTS_CC: ${{ steps.setup-fortran.outputs.cc }}
+          STEPS_SETUP_FORTRAN_OUTPUTS_CXX: ${{ steps.setup-fortran.outputs.cxx }}
+          STEPS_SETUP_FORTRAN_OUTPUTS_FC: ${{ steps.setup-fortran.outputs.fc }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084 # v3.4.1
