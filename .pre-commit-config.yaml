@@ -17,7 +17,6 @@ repos:
     rev: v1.20.2
     hooks:
     -   id: mypy
-        args: ["pyquadp/"]
   - repo: https://github.com/pycqa/isort
     rev: 9.0.0a3
     hooks:
