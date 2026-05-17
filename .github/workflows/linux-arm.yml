@@ -45,10 +45,10 @@ jobs:
       - name: Export toolchain paths
         shell: pwsh
         run: |
-          $gcc = "${{ steps.setup-fortran.outputs.cc }}"
+          $gcc = "$env:STEPS_SETUP_FORTRAN_OUTPUTS_CC"
           "CC=$gcc" >> $env:GITHUB_ENV
-          "CXX=${{ steps.setup-fortran.outputs.cxx }}" >> $env:GITHUB_ENV
-          "FC=${{ steps.setup-fortran.outputs.fc }}" >> $env:GITHUB_ENV
+          "CXX=$env:STEPS_SETUP_FORTRAN_OUTPUTS_CXX" >> $env:GITHUB_ENV
+          "FC=$env:STEPS_SETUP_FORTRAN_OUTPUTS_FC" >> $env:GITHUB_ENV
 
           $inc = & $gcc -print-file-name=include
           $libquadmath = & $gcc -print-file-name=libquadmath.so
@@ -56,6 +56,10 @@ jobs:
 
           "CPPFLAGS=-I$inc" >> $env:GITHUB_ENV
           "LDFLAGS=-L$libdir" >> $env:GITHUB_ENV
+        env:
+          STEPS_SETUP_FORTRAN_OUTPUTS_CC: ${{ steps.setup-fortran.outputs.cc }}
+          STEPS_SETUP_FORTRAN_OUTPUTS_CXX: ${{ steps.setup-fortran.outputs.cxx }}
+          STEPS_SETUP_FORTRAN_OUTPUTS_FC: ${{ steps.setup-fortran.outputs.fc }}
 
       - name: Build
         run: |

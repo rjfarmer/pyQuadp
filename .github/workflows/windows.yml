@@ -37,19 +37,19 @@ jobs:
       - name: Export toolchain paths
         shell: pwsh
         run: |
-          $gcc = "${{ steps.setup-fortran.outputs.cc }}"
+          $gcc = "$env:STEPS_SETUP_FORTRAN_OUTPUTS_CC"
           if (-not $gcc) {
             $gcc = "gcc"
           }
           $gccPath = (Get-Command $gcc -ErrorAction Stop).Source
 
-          $cxx = "${{ steps.setup-fortran.outputs.cxx }}"
+          $cxx = "$env:STEPS_SETUP_FORTRAN_OUTPUTS_CXX"
           if (-not $cxx) {
             $cxx = "g++"
           }
           $cxxPath = (Get-Command $cxx -ErrorAction Stop).Source
 
-          $fc = "${{ steps.setup-fortran.outputs.fc }}"
+          $fc = "$env:STEPS_SETUP_FORTRAN_OUTPUTS_FC"
           if (-not $fc) {
             $fc = "gfortran"
           }
@@ -75,6 +75,10 @@ jobs:
           if ($libdir) {
             $libdir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           }
+        env:
+          STEPS_SETUP_FORTRAN_OUTPUTS_CC: ${{ steps.setup-fortran.outputs.cc }}
+          STEPS_SETUP_FORTRAN_OUTPUTS_CXX: ${{ steps.setup-fortran.outputs.cxx }}
+          STEPS_SETUP_FORTRAN_OUTPUTS_FC: ${{ steps.setup-fortran.outputs.fc }}
 
 
       - name: Toolchain diagnostics
