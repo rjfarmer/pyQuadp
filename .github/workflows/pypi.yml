@@ -13,8 +13,6 @@ jobs:
         include:
           - os: ubuntu-latest
             deployment-target: ""
-          - os: windows-latest
-            deployment-target: ""
           - os: macos-15-intel
             deployment-target: "15"
           - os: macos-14
