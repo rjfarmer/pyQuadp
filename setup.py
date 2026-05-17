@@ -1,18 +1,7 @@
 #!/usr/bin/env python
 
-import os
-
 from setuptools import Extension, setup
-from setuptools.command.build_ext import build_ext
 
-
-class BuildExtUsingCC(build_ext):
-    def finalize_options(self):
-        super().finalize_options()
-        # On Windows, setuptools defaults to MSVC unless compiler type is set.
-        # If CC is provided, prefer MinGW toolchain so GCC is actually used.
-        if os.name == "nt" and os.environ.get("CC"):
-            self.compiler = "mingw32"
 
 extensions = [
     Extension(
@@ -79,7 +68,6 @@ if __name__ == "__main__":
 
     setup(
         ext_modules=extensions,
-        cmdclass={"build_ext": BuildExtUsingCC},
         package_data={"pyquadp": ["*.pyi", "py.typed"]},
         options={"bdist_wheel": {"py_limited_api": "cp310"}},
     )
