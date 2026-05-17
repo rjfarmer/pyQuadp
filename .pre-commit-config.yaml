@@ -5,7 +5,6 @@ repos:
     hooks:
       - id: black
         language_version: python3 # Should be a command that runs python3.6+
-        target-version: py314
   - repo: https://github.com/woodruffw/zizmor-pre-commit
     rev: v1.24.1
     hooks:
