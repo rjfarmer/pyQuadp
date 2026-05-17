@@ -2,7 +2,6 @@
 
 from setuptools import Extension, setup
 
-
 extensions = [
     Extension(
         name="pyquadp.qmathc",
