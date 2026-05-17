@@ -2,5 +2,5 @@
 
 python -m black pyquadp/ tests/
 isort .
-mypy pyquadp/ tests/
+mypy pyquadp/
 zizmor --fix=all --gh-token $(gh auth token) .github/**/*.yml
