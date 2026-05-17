@@ -105,7 +105,7 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          python -m build
+          python -m build -vvv
 
           Write-Host "Contents of dist folder:"
           Get-ChildItem -Path dist -Recurse | Format-Table -AutoSize
