@@ -663,6 +663,8 @@ void QuadCObject_to_doubles(QuadCObject c, double *real, double *imag){
 bool
 PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
 {
+    double real;
+
     if(alloc)
         alloc_QuadCType(out);
 
@@ -682,12 +684,24 @@ PyObject_to_QuadCObject(PyObject * in, QuadCObject * out, const bool alloc)
         __real__ out->value = (__float128) PyComplex_RealAsDouble(in);
 
         if(PyErr_Occurred())
-            return NULL;
+            return false;
 
         __imag__ out->value = (__float128) PyComplex_ImagAsDouble(in);
         
         if(PyErr_Occurred())
-            return NULL;
+            return false;
+
+        return true;
+    }
+
+    if (PyFloat_Check(in) || PyLong_Check(in)) {
+        real = PyFloat_AsDouble(in);
+        if (PyErr_Occurred()) {
+            return false;
+        }
+
+        __real__ out->value = (__float128)real;
+        __imag__ out->value = 0;
 
         return true;
     }

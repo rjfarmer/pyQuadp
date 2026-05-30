@@ -69,6 +69,26 @@ class TestQIArrayConstructors:
             np.asarray(ones, dtype=np.int64), np.ones(3, dtype=np.int64)
         )
 
+    def test_shape_tuple_constructors(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+
+        zeros = qiarray.zeros((2, 3))
+        ones = qiarray.ones((2, 1, 2))
+        full = qiarray.full((2, 2), "-7")
+
+        assert zeros.shape == (2, 3)
+        assert ones.shape == (2, 1, 2)
+        assert full.shape == (2, 2)
+        np.testing.assert_array_equal(
+            np.asarray(zeros, dtype=np.int64), np.zeros((2, 3), dtype=np.int64)
+        )
+        np.testing.assert_array_equal(
+            np.asarray(ones, dtype=np.int64), np.ones((2, 1, 2), dtype=np.int64)
+        )
+        np.testing.assert_array_equal(
+            np.asarray(full, dtype=np.int64), np.full((2, 2), -7, dtype=np.int64)
+        )
+
     def test_from_list_constructor(self):
         qiarray = pytest.importorskip("pyquadp.qiarray")
         arr = qiarray.from_list([1, "2", -3])
@@ -126,6 +146,29 @@ class TestQIArrayConstructors:
         np.testing.assert_array_equal(
             np.asarray(arr, dtype=np.int64), np.ravel(src, order="C")
         )
+
+    def test_ravel_order_keyword(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        src = np.array([[1, 2], [3, 4]], dtype=np.int64)
+
+        arr = qiarray.ravel(src, order="F")
+
+        assert arr.dtype == qiarray.dtype
+        np.testing.assert_array_equal(
+            np.asarray(arr, dtype=np.int64), np.ravel(src, order="F")
+        )
+
+    def test_array_asarray_keyword_support(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        src = np.array([1, 2, 3], dtype=np.int64)
+
+        arr = qiarray.array(src, ndmin=2, order="C", copy=True)
+        asarr = qiarray.asarray(src, ndmin=2, order="C", copy=False)
+
+        assert arr.dtype == qiarray.dtype
+        assert asarr.dtype == qiarray.dtype
+        assert arr.shape == (1, 3)
+        assert asarr.shape == (1, 3)
 
     def test_like_constructors(self):
         qiarray = pytest.importorskip("pyquadp.qiarray")
@@ -205,6 +248,60 @@ class TestQIArrayInterop:
         assert out.dtype == np.dtype(dtype)
         np.testing.assert_array_equal(
             out.astype(np.int64), np.array([0, 1, 7], dtype=np.int64)
+        )
+
+    def test_numpy_sum_and_prod_reduce_qiarray(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        values = np.array([[2, -3], [4, 5]], dtype=np.int64)
+        arr = qiarray.from_array(values)
+
+        sum_all = np.sum(arr)
+        sum_axis0 = np.sum(arr, axis=0)
+        prod_axis1 = np.prod(arr, axis=1)
+
+        assert int(sum_all) == int(np.sum(values))
+        np.testing.assert_array_equal(
+            np.asarray(sum_axis0, dtype=np.int64),
+            np.sum(values, axis=0),
+        )
+        np.testing.assert_array_equal(
+            np.asarray(prod_axis1, dtype=np.int64),
+            np.prod(values, axis=1),
+        )
+
+    def test_numpy_concatenate_qiarray_inputs(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        left = qiarray.from_list([1, 2])
+        right = qiarray.from_list([-4, 7])
+
+        out = np.concatenate([left, right])
+
+        assert out.dtype == qiarray.dtype
+        np.testing.assert_array_equal(
+            np.asarray(out, dtype=np.int64),
+            np.concatenate(
+                [
+                    np.asarray(left, dtype=np.int64),
+                    np.asarray(right, dtype=np.int64),
+                ]
+            ),
+        )
+
+    def test_numpy_stack_qiarray_inputs(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        a = qiarray.from_list([1, -3, 2])
+        b = qiarray.from_list([5, 4, -2])
+
+        out = np.stack([a, b], axis=0)
+
+        assert out.dtype == qiarray.dtype
+        assert out.shape == (2, 3)
+        np.testing.assert_array_equal(
+            np.asarray(out, dtype=np.int64),
+            np.stack(
+                [np.asarray(a, dtype=np.int64), np.asarray(b, dtype=np.int64)],
+                axis=0,
+            ),
         )
 
 

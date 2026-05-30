@@ -4,7 +4,7 @@ This repository contains CPython C extensions and Python wrappers. Follow these 
 
 ## C Extension Safety Rules
 
-- Prefer Python's limited API (`Py_LIMITED_API` / abi3-compatible APIs) for new C-extension code when feasible; use non-limited CPython internals only when required and document why.
+- Require Python's limited API (`Py_LIMITED_API` / abi3-compatible APIs).
 - Never call `PyErr_Print()` in library/runtime code paths. Propagate existing exceptions instead.
 - Do not use unguarded `PyErr_Clear()` in parse fallbacks. Clear only expected exceptions via `PyErr_ExceptionMatches(...)`.
 - For functions returning `bool`, return `false`, not `NULL`.
@@ -21,6 +21,7 @@ This repository contains CPython C extensions and Python wrappers. Follow these 
   - If using `"O"`, decref temporary explicitly after build
 - Avoid inline temporary key creation inside dict lookups (creates leaks and hides NULL checks). Create key object, check it, use it, decref it.
 - Do not pass temporaries directly into `PyObject_Hash(...)` when they are new references. Store, hash, decref.
+- Prefer to implement new code via NumPy's ufunc machinery instead of custom C loops for better performance and maintainability.
 
 ## Module Init Ownership Rules
 
@@ -36,7 +37,7 @@ This repository contains CPython C extensions and Python wrappers. Follow these 
 
 ## Required Validation For Relevant Changes
 
-- Run affected tests when touching wrappers or C-extension conversion/pickling/hash paths.
+- Run all tests in the test module(s) that cover the changed wrapper or C-extension path. At minimum, the test categories listed below must pass.
 - Add or update tests for:
   - wrapper arity/name mismatches
   - pickle round-trip (`__getstate__`/`__setstate__`)

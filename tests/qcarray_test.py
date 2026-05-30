@@ -80,6 +80,29 @@ class TestQCArrayConstructors:
         out = np.asarray(arr, dtype=np.complex128)
         assert np.allclose(out, np.array([1 + 0j, 1 + 0j], dtype=np.complex128))
 
+    def test_shape_tuple_constructors(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+
+        zeros = qcarray.zeros((2, 3))
+        ones = qcarray.ones((2, 1, 2))
+        full = qcarray.full((2, 2), 1.5 - 0.25j)
+
+        assert zeros.shape == (2, 3)
+        assert ones.shape == (2, 1, 2)
+        assert full.shape == (2, 2)
+        np.testing.assert_allclose(
+            np.asarray(zeros, dtype=np.complex128),
+            np.zeros((2, 3), dtype=np.complex128),
+        )
+        np.testing.assert_allclose(
+            np.asarray(ones, dtype=np.complex128),
+            np.ones((2, 1, 2), dtype=np.complex128),
+        )
+        np.testing.assert_allclose(
+            np.asarray(full, dtype=np.complex128),
+            np.full((2, 2), 1.5 - 0.25j, dtype=np.complex128),
+        )
+
     def test_from_list_constructor(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
         arr = qcarray.from_list([1 + 2j, complex(0.5, -1.25), 3 + 0j])
@@ -147,6 +170,31 @@ class TestQCArrayConstructors:
             np.asarray(arr, dtype=np.complex128), np.ravel(src, order="C")
         )
 
+    def test_ravel_order_keyword(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        src = np.array(
+            [[1.0 + 2.0j, -3.0 + 0.5j], [0.25 - 4.0j, 5.0 + 0.0j]], dtype=np.complex128
+        )
+
+        arr = qcarray.ravel(src, order="F")
+
+        assert arr.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(arr, dtype=np.complex128), np.ravel(src, order="F")
+        )
+
+    def test_array_asarray_keyword_support(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        src = np.array([1 + 2j, -3 + 0.5j], dtype=np.complex128)
+
+        arr = qcarray.array(src, ndmin=2, order="C", copy=True)
+        asarr = qcarray.asarray(src, ndmin=2, order="C", copy=False)
+
+        assert arr.dtype == qcarray.dtype
+        assert asarr.dtype == qcarray.dtype
+        assert arr.shape == (1, 2)
+        assert asarr.shape == (1, 2)
+
     def test_like_constructors(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
         src = np.array([[1.0 + 2.0j, -3.0 + 0.5j]], dtype=np.complex128)
@@ -195,6 +243,66 @@ class TestQCArrayInterop:
         assert out.dtype == qcarray.dtype
         roundtrip = np.asarray(out, dtype=np.complex128)
         assert np.allclose(roundtrip, src)
+
+    def test_numpy_sum_and_prod_reduce_qcarray(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        values = np.array(
+            [[1 + 2j, -3 + 0.5j], [0.25 - 4j, 5 + 1j]],
+            dtype=np.complex128,
+        )
+        arr = qcarray.from_array(values)
+
+        sum_all = np.sum(arr)
+        sum_axis0 = np.sum(arr, axis=0)
+        prod_axis1 = np.prod(arr, axis=1)
+
+        assert complex(sum_all) == pytest.approx(complex(np.sum(values)))
+        np.testing.assert_allclose(
+            np.asarray(sum_axis0, dtype=np.complex128),
+            np.sum(values, axis=0),
+        )
+        np.testing.assert_allclose(
+            np.asarray(prod_axis1, dtype=np.complex128),
+            np.prod(values, axis=1),
+        )
+
+    def test_numpy_concatenate_qcarray_inputs(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        left = qcarray.from_list([1 + 1j, 2 - 3j])
+        right = qcarray.from_list([-4 + 0.5j, 0.25 + 2j])
+
+        out = np.concatenate([left, right])
+
+        assert out.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out, dtype=np.complex128),
+            np.concatenate(
+                [
+                    np.asarray(left, dtype=np.complex128),
+                    np.asarray(right, dtype=np.complex128),
+                ]
+            ),
+        )
+
+    def test_numpy_stack_qcarray_inputs(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        a = qcarray.from_list([1 + 2j, -3 + 0.5j, 0.25 - 4j])
+        b = qcarray.from_list([0.5 - 1j, 1.5 + 0.25j, -2 + 0j])
+
+        out = np.stack([a, b], axis=0)
+
+        assert out.dtype == qcarray.dtype
+        assert out.shape == (2, 3)
+        np.testing.assert_allclose(
+            np.asarray(out, dtype=np.complex128),
+            np.stack(
+                [
+                    np.asarray(a, dtype=np.complex128),
+                    np.asarray(b, dtype=np.complex128),
+                ],
+                axis=0,
+            ),
+        )
 
 
 @pytest.mark.qcarray
