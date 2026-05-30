@@ -749,74 +749,258 @@ QuadArray_new_empty(int nd, npy_intp *dims)
   return (PyArrayObject *)PyArray_SimpleNewFromDescr(nd, dims, descr);
 }
 
-static PyObject *
-qarray_zeros(PyObject *NPY_UNUSED(self), PyObject *args)
+static int
+qarray_parse_shape(PyObject *shape_obj, int *nd_out, npy_intp **dims_out)
 {
-  Py_ssize_t n;
-  npy_intp dims[1];
+  PyObject *seq;
+  Py_ssize_t nd;
+  npy_intp i;
+  npy_intp *dims;
+
+  if (PyLong_Check(shape_obj)) {
+    Py_ssize_t n = PyLong_AsSsize_t(shape_obj);
+    if (n < 0 && PyErr_Occurred()) {
+      return -1;
+    }
+    if (n < 0) {
+      PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+      return -1;
+    }
+
+    dims = PyMem_Malloc(sizeof(npy_intp));
+    if (dims == NULL) {
+      PyErr_NoMemory();
+      return -1;
+    }
+    dims[0] = (npy_intp)n;
+    *nd_out = 1;
+    *dims_out = dims;
+    return 0;
+  }
+
+  seq = PySequence_Fast(shape_obj, "shape must be an int or a sequence of ints");
+  if (seq == NULL) {
+    return -1;
+  }
+
+  nd = PySequence_Size(seq);
+  if (nd < 0) {
+    Py_DECREF(seq);
+    return -1;
+  }
+  if (nd == 0) {
+    Py_DECREF(seq);
+    *nd_out = 0;
+    *dims_out = NULL;
+    return 0;
+  }
+
+  dims = PyMem_Malloc((size_t)nd * sizeof(npy_intp));
+  if (dims == NULL) {
+    Py_DECREF(seq);
+    PyErr_NoMemory();
+    return -1;
+  }
+
+  for (i = 0; i < (npy_intp)nd; ++i) {
+    PyObject *item = PySequence_GetItem(seq, i);
+    if (item == NULL) {
+      Py_DECREF(seq);
+      PyMem_Free(dims);
+      return -1;
+    }
+    Py_ssize_t n = PyLong_AsSsize_t(item);
+    Py_DECREF(item);
+    if (n < 0 && PyErr_Occurred()) {
+      Py_DECREF(seq);
+      PyMem_Free(dims);
+      return -1;
+    }
+    if (n < 0) {
+      Py_DECREF(seq);
+      PyMem_Free(dims);
+      PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+      return -1;
+    }
+    dims[i] = (npy_intp)n;
+  }
+
+  Py_DECREF(seq);
+  *nd_out = (int)nd;
+  *dims_out = dims;
+
+  return 0;
+}
+
+static int
+qarray_parse_order(PyObject *order_obj, NPY_ORDER *order, NPY_ORDER default_order)
+{
+  Py_UCS4 value;
+
+  if (order_obj == NULL || order_obj == Py_None) {
+    *order = default_order;
+    return 0;
+  }
+  if (!PyUnicode_Check(order_obj) || PyUnicode_GetLength(order_obj) != 1) {
+    PyErr_SetString(PyExc_ValueError, "order must be one of 'C', 'F', 'A', or 'K'");
+    return -1;
+  }
+
+  value = PyUnicode_ReadChar(order_obj, 0);
+  if (value == 'c' || value == 'C') {
+    *order = NPY_CORDER;
+    return 0;
+  }
+  if (value == 'f' || value == 'F') {
+    *order = NPY_FORTRANORDER;
+    return 0;
+  }
+  if (value == 'a' || value == 'A') {
+    *order = NPY_ANYORDER;
+    return 0;
+  }
+  if (value == 'k' || value == 'K') {
+    *order = NPY_KEEPORDER;
+    return 0;
+  }
+
+  PyErr_SetString(PyExc_ValueError, "order must be one of 'C', 'F', 'A', or 'K'");
+  return -1;
+}
+
+static PyObject *
+qarray_from_object(PyObject *obj, int copy, NPY_ORDER order, int ndmin)
+{
+  int requirements;
+  PyArray_Descr *descr;
   PyArrayObject *arr;
 
-  if (!PyArg_ParseTuple(args, "n", &n)) {
-    return NULL;
-  }
-  if (n < 0) {
-    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+  if (ndmin < 0) {
+    PyErr_SetString(PyExc_ValueError, "ndmin must be non-negative");
     return NULL;
   }
 
-  dims[0] = (npy_intp)n;
-  arr = QuadArray_new_empty(1, dims);
+  requirements = NPY_ARRAY_ENSUREARRAY;
+  requirements |= NPY_ARRAY_FORCECAST;
+  if (copy) {
+    requirements |= NPY_ARRAY_ENSURECOPY;
+  }
+  if (order == NPY_CORDER) {
+    requirements |= NPY_ARRAY_C_CONTIGUOUS;
+  } else if (order == NPY_FORTRANORDER) {
+    requirements |= NPY_ARRAY_F_CONTIGUOUS;
+  }
+
+  descr = QuadArrayDescr;
+  Py_INCREF(descr);
+  arr = (PyArrayObject *)PyArray_FromAny(obj, descr, 0, NPY_MAXDIMS, requirements, NULL);
   if (arr == NULL) {
     return NULL;
   }
 
-  memset(PyArray_DATA(arr), 0, (size_t)dims[0] * sizeof(__float128));
+  if (ndmin > PyArray_NDIM(arr)) {
+    int i;
+    int old_nd = PyArray_NDIM(arr);
+    int lead = ndmin - old_nd;
+    npy_intp *new_dims = PyMem_Malloc((size_t)ndmin * sizeof(npy_intp));
+    PyArray_Dims new_shape;
+    PyObject *reshaped;
+
+    if (new_dims == NULL) {
+      Py_DECREF(arr);
+      PyErr_NoMemory();
+      return NULL;
+    }
+    for (i = 0; i < lead; ++i) {
+      new_dims[i] = 1;
+    }
+    for (i = 0; i < old_nd; ++i) {
+      new_dims[lead + i] = PyArray_DIMS(arr)[i];
+    }
+
+    new_shape.ptr = new_dims;
+    new_shape.len = ndmin;
+    reshaped = PyArray_Newshape(arr, &new_shape, NPY_CORDER);
+    PyMem_Free(new_dims);
+    Py_DECREF(arr);
+    return reshaped;
+  }
+
+  return (PyObject *)arr;
+}
+
+static PyObject *
+qarray_zeros(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+  PyObject *shape_obj;
+  int nd;
+  npy_intp *dims = NULL;
+  PyArrayObject *arr;
+
+  if (!PyArg_ParseTuple(args, "O", &shape_obj)) {
+    return NULL;
+  }
+  if (qarray_parse_shape(shape_obj, &nd, &dims) < 0) {
+    return NULL;
+  }
+
+  arr = QuadArray_new_empty(nd, dims);
+  PyMem_Free(dims);
+  if (arr == NULL) {
+    return NULL;
+  }
+
+  memset(PyArray_DATA(arr), 0, (size_t)PyArray_NBYTES(arr));
   return (PyObject *)arr;
 }
 
 static PyObject *
 qarray_empty(PyObject *NPY_UNUSED(self), PyObject *args)
 {
-  Py_ssize_t n;
-  npy_intp dims[1];
+  PyObject *shape_obj;
+  int nd;
+  npy_intp *dims = NULL;
+  PyArrayObject *arr;
 
-  if (!PyArg_ParseTuple(args, "n", &n)) {
+  if (!PyArg_ParseTuple(args, "O", &shape_obj)) {
     return NULL;
   }
-  if (n < 0) {
-    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+  if (qarray_parse_shape(shape_obj, &nd, &dims) < 0) {
     return NULL;
   }
 
-  dims[0] = (npy_intp)n;
-  return (PyObject *)QuadArray_new_empty(1, dims);
+  arr = QuadArray_new_empty(nd, dims);
+  PyMem_Free(dims);
+  return (PyObject *)arr;
 }
 
 static PyObject *
 qarray_ones(PyObject *NPY_UNUSED(self), PyObject *args)
 {
-  Py_ssize_t n;
+  PyObject *shape_obj;
   npy_intp i;
-  npy_intp dims[1];
+  npy_intp size;
+  int nd;
+  npy_intp *dims = NULL;
   PyArrayObject *arr;
   __float128 *data;
 
-  if (!PyArg_ParseTuple(args, "n", &n)) {
+  if (!PyArg_ParseTuple(args, "O", &shape_obj)) {
     return NULL;
   }
-  if (n < 0) {
-    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+  if (qarray_parse_shape(shape_obj, &nd, &dims) < 0) {
     return NULL;
   }
 
-  dims[0] = (npy_intp)n;
-  arr = QuadArray_new_empty(1, dims);
+  arr = QuadArray_new_empty(nd, dims);
+  PyMem_Free(dims);
   if (arr == NULL) {
     return NULL;
   }
 
+  size = PyArray_SIZE(arr);
   data = (__float128 *)PyArray_DATA(arr);
-  for (i = 0; i < dims[0]; ++i) {
+  for (i = 0; i < size; ++i) {
     data[i] = 1.0Q;
   }
   return (PyObject *)arr;
@@ -825,24 +1009,25 @@ qarray_ones(PyObject *NPY_UNUSED(self), PyObject *args)
 static PyObject *
 qarray_full(PyObject *NPY_UNUSED(self), PyObject *args)
 {
+  PyObject *shape_obj;
   PyObject *fill_obj;
-  Py_ssize_t n;
   npy_intp i;
-  npy_intp dims[1];
+  npy_intp size;
+  int nd;
+  npy_intp *dims = NULL;
   PyArrayObject *arr;
   __float128 fill;
   __float128 *data;
 
-  if (!PyArg_ParseTuple(args, "nO", &n, &fill_obj)) {
+  if (!PyArg_ParseTuple(args, "OO", &shape_obj, &fill_obj)) {
     return NULL;
   }
-  if (n < 0) {
-    PyErr_SetString(PyExc_ValueError, "size must be non-negative");
+  if (qarray_parse_shape(shape_obj, &nd, &dims) < 0) {
     return NULL;
   }
 
-  dims[0] = (npy_intp)n;
-  arr = QuadArray_new_empty(1, dims);
+  arr = QuadArray_new_empty(nd, dims);
+  PyMem_Free(dims);
   if (arr == NULL) {
     return NULL;
   }
@@ -852,8 +1037,9 @@ qarray_full(PyObject *NPY_UNUSED(self), PyObject *args)
     return NULL;
   }
 
+  size = PyArray_SIZE(arr);
   data = (__float128 *)PyArray_DATA(arr);
-  for (i = 0; i < dims[0]; ++i) {
+  for (i = 0; i < size; ++i) {
     data[i] = fill;
   }
 
@@ -1054,69 +1240,52 @@ static PyObject *
 qarray_from_array(PyObject *NPY_UNUSED(self), PyObject *args)
 {
   PyObject *obj;
-  PyArrayObject *input;
-  PyArrayObject *arr;
-  PyArrayIterObject *it;
-  npy_intp i;
-  __float128 *data;
 
   if (!PyArg_ParseTuple(args, "O", &obj)) {
     return NULL;
   }
 
-  input = (PyArrayObject *)PyArray_FROM_O(obj);
-  if (input == NULL) {
-    return NULL;
-  }
-
-  arr = QuadArray_new_empty(PyArray_NDIM(input), PyArray_DIMS(input));
-  if (arr == NULL) {
-    Py_DECREF(input);
-    return NULL;
-  }
-
-  it = (PyArrayIterObject *)PyArray_IterNew((PyObject *)input);
-  if (it == NULL) {
-    Py_DECREF(arr);
-    Py_DECREF(input);
-    return NULL;
-  }
-
-  data = (__float128 *)PyArray_DATA(arr);
-  for (i = 0; i < it->size; ++i) {
-    PyObject *item = PyArray_GETITEM(input, it->dataptr);
-    if (item == NULL) {
-      Py_DECREF(it);
-      Py_DECREF(arr);
-      Py_DECREF(input);
-      return NULL;
-    }
-    if (QuadArray_setitem(item, &data[i], arr) < 0) {
-      Py_DECREF(item);
-      Py_DECREF(it);
-      Py_DECREF(arr);
-      Py_DECREF(input);
-      return NULL;
-    }
-    Py_DECREF(item);
-    PyArray_ITER_NEXT(it);
-  }
-
-  Py_DECREF(it);
-  Py_DECREF(input);
-  return (PyObject *)arr;
+  return qarray_from_object(obj, 1, NPY_KEEPORDER, 0);
 }
 
 static PyObject *
-qarray_asarray(PyObject *self, PyObject *args)
+qarray_asarray(PyObject *NPY_UNUSED(self), PyObject *args, PyObject *kwargs)
 {
-  return qarray_from_array(self, args);
+  static char *kwlist[] = {"values", "copy", "order", "ndmin", NULL};
+  PyObject *obj;
+  PyObject *order_obj = NULL;
+  int copy = 0;
+  Py_ssize_t ndmin = 0;
+  NPY_ORDER order;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|pOn", kwlist, &obj, &copy, &order_obj, &ndmin)) {
+    return NULL;
+  }
+  if (qarray_parse_order(order_obj, &order, NPY_KEEPORDER) < 0) {
+    return NULL;
+  }
+
+  return qarray_from_object(obj, copy, order, (int)ndmin);
 }
 
 static PyObject *
-qarray_array(PyObject *self, PyObject *args)
+qarray_array(PyObject *NPY_UNUSED(self), PyObject *args, PyObject *kwargs)
 {
-  return qarray_from_array(self, args);
+  static char *kwlist[] = {"values", "copy", "order", "ndmin", NULL};
+  PyObject *obj;
+  PyObject *order_obj = NULL;
+  int copy = 1;
+  Py_ssize_t ndmin = 0;
+  NPY_ORDER order;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|pOn", kwlist, &obj, &copy, &order_obj, &ndmin)) {
+    return NULL;
+  }
+  if (qarray_parse_order(order_obj, &order, NPY_KEEPORDER) < 0) {
+    return NULL;
+  }
+
+  return qarray_from_object(obj, copy, order, (int)ndmin);
 }
 
 static PyObject *
@@ -1136,17 +1305,28 @@ qarray_asfortranarray(PyObject *self, PyObject *args)
 }
 
 static PyObject *
-qarray_ravel(PyObject *self, PyObject *args)
+qarray_ravel(PyObject *NPY_UNUSED(self), PyObject *args, PyObject *kwargs)
 {
+  static char *kwlist[] = {"values", "order", NULL};
+  PyObject *obj;
+  PyObject *order_obj = NULL;
+  NPY_ORDER order;
   PyObject *arr_obj;
   PyObject *flat_arr;
 
-  arr_obj = qarray_from_array(self, args);
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O", kwlist, &obj, &order_obj)) {
+    return NULL;
+  }
+  if (qarray_parse_order(order_obj, &order, NPY_CORDER) < 0) {
+    return NULL;
+  }
+
+  arr_obj = qarray_from_object(obj, 0, NPY_KEEPORDER, 0);
   if (arr_obj == NULL) {
     return NULL;
   }
 
-  flat_arr = PyArray_Ravel((PyArrayObject *)arr_obj, NPY_CORDER);
+  flat_arr = PyArray_Ravel((PyArrayObject *)arr_obj, order);
   Py_DECREF(arr_obj);
   return flat_arr;
 }
@@ -1256,10 +1436,10 @@ static PyMethodDef QuadArrayMethods[] = {
   {"ones", qarray_ones, METH_VARARGS, "Create a 1-D qarray of ones."},
   {"from_list", qarray_from_list, METH_VARARGS, "Create a qarray from a Python sequence."},
   {"from_array", qarray_from_array, METH_VARARGS, "Create a qarray from an array-like object."},
-  {"asarray", qarray_asarray, METH_VARARGS, "Create a qarray from an array-like object."},
-  {"array", qarray_array, METH_VARARGS, "Create a qarray from an array-like object."},
+  {"asarray", (PyCFunction)qarray_asarray, METH_VARARGS | METH_KEYWORDS, "Create a qarray from an array-like object."},
+  {"array", (PyCFunction)qarray_array, METH_VARARGS | METH_KEYWORDS, "Create a qarray from an array-like object."},
   {"asfortranarray", qarray_asfortranarray, METH_VARARGS, "Create a Fortran-contiguous qarray from an array-like object."},
-  {"ravel", qarray_ravel, METH_VARARGS, "Return a contiguous flattened qarray from an array-like object."},
+  {"ravel", (PyCFunction)qarray_ravel, METH_VARARGS | METH_KEYWORDS, "Return a contiguous flattened qarray from an array-like object."},
   {"empty_like", qarray_empty_like, METH_VARARGS, "Create an empty qarray with the same shape as input."},
   {"zeros_like", qarray_zeros_like, METH_VARARGS, "Create a zero-filled qarray with the same shape as input."},
   {"ones_like", qarray_ones_like, METH_VARARGS, "Create a one-filled qarray with the same shape as input."},

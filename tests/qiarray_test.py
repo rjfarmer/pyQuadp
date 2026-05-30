@@ -69,6 +69,26 @@ class TestQIArrayConstructors:
             np.asarray(ones, dtype=np.int64), np.ones(3, dtype=np.int64)
         )
 
+    def test_shape_tuple_constructors(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+
+        zeros = qiarray.zeros((2, 3))
+        ones = qiarray.ones((2, 1, 2))
+        full = qiarray.full((2, 2), "-7")
+
+        assert zeros.shape == (2, 3)
+        assert ones.shape == (2, 1, 2)
+        assert full.shape == (2, 2)
+        np.testing.assert_array_equal(
+            np.asarray(zeros, dtype=np.int64), np.zeros((2, 3), dtype=np.int64)
+        )
+        np.testing.assert_array_equal(
+            np.asarray(ones, dtype=np.int64), np.ones((2, 1, 2), dtype=np.int64)
+        )
+        np.testing.assert_array_equal(
+            np.asarray(full, dtype=np.int64), np.full((2, 2), -7, dtype=np.int64)
+        )
+
     def test_from_list_constructor(self):
         qiarray = pytest.importorskip("pyquadp.qiarray")
         arr = qiarray.from_list([1, "2", -3])
@@ -126,6 +146,29 @@ class TestQIArrayConstructors:
         np.testing.assert_array_equal(
             np.asarray(arr, dtype=np.int64), np.ravel(src, order="C")
         )
+
+    def test_ravel_order_keyword(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        src = np.array([[1, 2], [3, 4]], dtype=np.int64)
+
+        arr = qiarray.ravel(src, order="F")
+
+        assert arr.dtype == qiarray.dtype
+        np.testing.assert_array_equal(
+            np.asarray(arr, dtype=np.int64), np.ravel(src, order="F")
+        )
+
+    def test_array_asarray_keyword_support(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        src = np.array([1, 2, 3], dtype=np.int64)
+
+        arr = qiarray.array(src, ndmin=2, order="C", copy=True)
+        asarr = qiarray.asarray(src, ndmin=2, order="C", copy=False)
+
+        assert arr.dtype == qiarray.dtype
+        assert asarr.dtype == qiarray.dtype
+        assert arr.shape == (1, 3)
+        assert asarr.shape == (1, 3)
 
     def test_like_constructors(self):
         qiarray = pytest.importorskip("pyquadp.qiarray")

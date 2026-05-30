@@ -89,6 +89,20 @@ class TestQArrayConstructors:
         assert arr.shape == (3,)
         assert arr.dtype == qarray.dtype
 
+    def test_shape_tuple_constructors(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+
+        zeros = qarray.zeros((2, 3))
+        ones = qarray.ones((2, 1, 2))
+        full = qarray.full((2, 2), -2.5)
+
+        assert zeros.shape == (2, 3)
+        assert ones.shape == (2, 1, 2)
+        assert full.shape == (2, 2)
+        assert np.allclose(np.asarray(zeros, dtype=np.float64), np.zeros((2, 3)))
+        assert np.allclose(np.asarray(ones, dtype=np.float64), np.ones((2, 1, 2)))
+        assert np.allclose(np.asarray(full, dtype=np.float64), np.full((2, 2), -2.5))
+
     def test_from_list_constructor(self):
         qarray = pytest.importorskip("pyquadp.qarray")
         arr = qarray.from_list([1, 2.5, "3.5"])
@@ -140,6 +154,27 @@ class TestQArrayConstructors:
         assert arr.shape == (4,)
         assert arr.flags["C_CONTIGUOUS"]
         assert np.allclose(np.asarray(arr, dtype=np.float64), np.ravel(src, order="C"))
+
+    def test_ravel_order_keyword(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        src = np.array([[1.25, 2.5], [3.75, 4.0]], dtype=np.float64)
+
+        arr = qarray.ravel(src, order="F")
+
+        assert arr.dtype == qarray.dtype
+        assert np.allclose(np.asarray(arr, dtype=np.float64), np.ravel(src, order="F"))
+
+    def test_array_asarray_keyword_support(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        src = np.array([1.25, 2.5, 3.75], dtype=np.float64)
+
+        arr = qarray.array(src, ndmin=2, order="C", copy=True)
+        asarr = qarray.asarray(src, ndmin=2, order="C", copy=False)
+
+        assert arr.dtype == qarray.dtype
+        assert asarr.dtype == qarray.dtype
+        assert arr.shape == (1, 3)
+        assert asarr.shape == (1, 3)
 
     def test_like_constructors(self):
         qarray = pytest.importorskip("pyquadp.qarray")
