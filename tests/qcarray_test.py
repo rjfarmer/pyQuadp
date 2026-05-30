@@ -132,6 +132,21 @@ class TestQCArrayConstructors:
         assert not arr.flags["C_CONTIGUOUS"]
         np.testing.assert_allclose(np.asarray(arr, dtype=np.complex128), src)
 
+    def test_ravel_returns_flat_qcarray(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        src = np.array(
+            [[1.0 + 2.0j, -3.0 + 0.5j], [0.25 - 4.0j, 5.0 + 0.0j]], dtype=np.complex128
+        )
+
+        arr = qcarray.ravel(src)
+
+        assert arr.dtype == qcarray.dtype
+        assert arr.shape == (4,)
+        assert arr.flags["C_CONTIGUOUS"]
+        np.testing.assert_allclose(
+            np.asarray(arr, dtype=np.complex128), np.ravel(src, order="C")
+        )
+
     def test_like_constructors(self):
         qcarray = pytest.importorskip("pyquadp.qcarray")
         src = np.array([[1.0 + 2.0j, -3.0 + 0.5j]], dtype=np.complex128)

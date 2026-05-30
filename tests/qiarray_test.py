@@ -114,6 +114,19 @@ class TestQIArrayConstructors:
         assert not arr.flags["C_CONTIGUOUS"]
         np.testing.assert_array_equal(np.asarray(arr, dtype=np.int64), src)
 
+    def test_ravel_returns_flat_qiarray(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        src = np.array([[1, 2], [3, 4]], dtype=np.int64)
+
+        arr = qiarray.ravel(src)
+
+        assert arr.dtype == qiarray.dtype
+        assert arr.shape == (4,)
+        assert arr.flags["C_CONTIGUOUS"]
+        np.testing.assert_array_equal(
+            np.asarray(arr, dtype=np.int64), np.ravel(src, order="C")
+        )
+
     def test_like_constructors(self):
         qiarray = pytest.importorskip("pyquadp.qiarray")
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)
