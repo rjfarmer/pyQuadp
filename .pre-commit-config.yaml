@@ -19,6 +19,7 @@ repos:
     -   id: mypy
         args: ["-p", "pyquadp"]
         pass_filenames: false
+        additional_dependencies: ["numpy>=2.1.0","types-setuptools"]
   - repo: https://github.com/pycqa/isort
     rev: 9.0.0a3
     hooks:
