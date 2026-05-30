@@ -250,6 +250,60 @@ class TestQIArrayInterop:
             out.astype(np.int64), np.array([0, 1, 7], dtype=np.int64)
         )
 
+    def test_numpy_sum_and_prod_reduce_qiarray(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        values = np.array([[2, -3], [4, 5]], dtype=np.int64)
+        arr = qiarray.from_array(values)
+
+        sum_all = np.sum(arr)
+        sum_axis0 = np.sum(arr, axis=0)
+        prod_axis1 = np.prod(arr, axis=1)
+
+        assert int(sum_all) == int(np.sum(values))
+        np.testing.assert_array_equal(
+            np.asarray(sum_axis0, dtype=np.int64),
+            np.sum(values, axis=0),
+        )
+        np.testing.assert_array_equal(
+            np.asarray(prod_axis1, dtype=np.int64),
+            np.prod(values, axis=1),
+        )
+
+    def test_numpy_concatenate_qiarray_inputs(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        left = qiarray.from_list([1, 2])
+        right = qiarray.from_list([-4, 7])
+
+        out = np.concatenate([left, right])
+
+        assert out.dtype == qiarray.dtype
+        np.testing.assert_array_equal(
+            np.asarray(out, dtype=np.int64),
+            np.concatenate(
+                [
+                    np.asarray(left, dtype=np.int64),
+                    np.asarray(right, dtype=np.int64),
+                ]
+            ),
+        )
+
+    def test_numpy_stack_qiarray_inputs(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        a = qiarray.from_list([1, -3, 2])
+        b = qiarray.from_list([5, 4, -2])
+
+        out = np.stack([a, b], axis=0)
+
+        assert out.dtype == qiarray.dtype
+        assert out.shape == (2, 3)
+        np.testing.assert_array_equal(
+            np.asarray(out, dtype=np.int64),
+            np.stack(
+                [np.asarray(a, dtype=np.int64), np.asarray(b, dtype=np.int64)],
+                axis=0,
+            ),
+        )
+
 
 @pytest.mark.qiarray
 class TestQIArrayUfuncs:

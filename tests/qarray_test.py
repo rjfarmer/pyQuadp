@@ -227,6 +227,58 @@ class TestQArrayInterop:
         assert float(out[0]) == pytest.approx(0.5)
         assert float(out[1]) == pytest.approx(1.5)
 
+    def test_numpy_sum_and_prod_reduce_qarray(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        values = np.array([[1.25, -3.0], [0.25, 5.5]], dtype=np.float64)
+        arr = qarray.from_array(values)
+
+        sum_all = np.sum(arr)
+        sum_axis0 = np.sum(arr, axis=0)
+        prod_axis1 = np.prod(arr, axis=1)
+
+        assert float(sum_all) == pytest.approx(float(np.sum(values)))
+        np.testing.assert_allclose(
+            np.asarray(sum_axis0, dtype=np.float64), np.sum(values, axis=0)
+        )
+        np.testing.assert_allclose(
+            np.asarray(prod_axis1, dtype=np.float64), np.prod(values, axis=1)
+        )
+
+    def test_numpy_concatenate_qarray_inputs(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        left = qarray.from_list([1.5, 2.5])
+        right = qarray.from_list([-4.0, 0.25])
+
+        out = np.concatenate([left, right])
+
+        assert out.dtype == qarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out, dtype=np.float64),
+            np.concatenate(
+                [
+                    np.asarray(left, dtype=np.float64),
+                    np.asarray(right, dtype=np.float64),
+                ]
+            ),
+        )
+
+    def test_numpy_stack_qarray_inputs(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        a = qarray.from_list([1.25, -3.0, 0.25])
+        b = qarray.from_list([0.5, 1.5, -2.0])
+
+        out = np.stack([a, b], axis=0)
+
+        assert out.dtype == qarray.dtype
+        assert out.shape == (2, 3)
+        np.testing.assert_allclose(
+            np.asarray(out, dtype=np.float64),
+            np.stack(
+                [np.asarray(a, dtype=np.float64), np.asarray(b, dtype=np.float64)],
+                axis=0,
+            ),
+        )
+
 
 @pytest.mark.qarray
 class TestQArrayUfuncs:

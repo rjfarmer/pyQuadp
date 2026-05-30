@@ -244,6 +244,66 @@ class TestQCArrayInterop:
         roundtrip = np.asarray(out, dtype=np.complex128)
         assert np.allclose(roundtrip, src)
 
+    def test_numpy_sum_and_prod_reduce_qcarray(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        values = np.array(
+            [[1 + 2j, -3 + 0.5j], [0.25 - 4j, 5 + 1j]],
+            dtype=np.complex128,
+        )
+        arr = qcarray.from_array(values)
+
+        sum_all = np.sum(arr)
+        sum_axis0 = np.sum(arr, axis=0)
+        prod_axis1 = np.prod(arr, axis=1)
+
+        assert complex(sum_all) == pytest.approx(complex(np.sum(values)))
+        np.testing.assert_allclose(
+            np.asarray(sum_axis0, dtype=np.complex128),
+            np.sum(values, axis=0),
+        )
+        np.testing.assert_allclose(
+            np.asarray(prod_axis1, dtype=np.complex128),
+            np.prod(values, axis=1),
+        )
+
+    def test_numpy_concatenate_qcarray_inputs(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        left = qcarray.from_list([1 + 1j, 2 - 3j])
+        right = qcarray.from_list([-4 + 0.5j, 0.25 + 2j])
+
+        out = np.concatenate([left, right])
+
+        assert out.dtype == qcarray.dtype
+        np.testing.assert_allclose(
+            np.asarray(out, dtype=np.complex128),
+            np.concatenate(
+                [
+                    np.asarray(left, dtype=np.complex128),
+                    np.asarray(right, dtype=np.complex128),
+                ]
+            ),
+        )
+
+    def test_numpy_stack_qcarray_inputs(self):
+        qcarray = pytest.importorskip("pyquadp.qcarray")
+        a = qcarray.from_list([1 + 2j, -3 + 0.5j, 0.25 - 4j])
+        b = qcarray.from_list([0.5 - 1j, 1.5 + 0.25j, -2 + 0j])
+
+        out = np.stack([a, b], axis=0)
+
+        assert out.dtype == qcarray.dtype
+        assert out.shape == (2, 3)
+        np.testing.assert_allclose(
+            np.asarray(out, dtype=np.complex128),
+            np.stack(
+                [
+                    np.asarray(a, dtype=np.complex128),
+                    np.asarray(b, dtype=np.complex128),
+                ],
+                axis=0,
+            ),
+        )
+
 
 @pytest.mark.qcarray
 class TestQCArrayUfuncs:
