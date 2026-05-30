@@ -539,24 +539,108 @@ static PyObject * QuadObject_from_hex(PyTypeObject *type, PyObject * arg){
     // Gets the type object not an instance in type
     // As its METH_O we dont need to unpack arg
     QuadObject res;
+    const char *buf;
+    Py_ssize_t n;
+    Py_ssize_t start;
+    Py_ssize_t end;
+    Py_ssize_t core_start;
+    Py_ssize_t core_len;
+    int has_sign;
+    int has_prefix;
+    int has_exp;
+    char *norm;
+    Py_ssize_t i;
+    char *sp;
+    Py_ssize_t out = 0;
 
     alloc_QuadType(&res);
 
     if(PyUnicode_Check(arg)){
         // Is a string
-        const char *buf = PyUnicode_AsUTF8AndSize(arg, NULL);
+        buf = PyUnicode_AsUTF8AndSize(arg, &n);
         if (buf==NULL){
             return NULL;
         }
 
-        char *sp=NULL;
-        res.value = strtoflt128(buf, NULL);
-        if(sp!=NULL){
-            if(strcmp(sp,"")!=0){
-                PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
-                return NULL;
+        start = 0;
+        end = n;
+
+        while (start < end) {
+            char c = buf[start];
+            if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v') {
+                start++;
+            } else {
+                break;
             }
         }
+
+        while (end > start) {
+            char c = buf[end - 1];
+            if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v') {
+                end--;
+            } else {
+                break;
+            }
+        }
+
+        if (start == end) {
+            PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+            return NULL;
+        }
+
+        core_start = start;
+        has_sign = (buf[core_start] == '+' || buf[core_start] == '-');
+        if (has_sign) {
+            core_start++;
+        }
+
+        if (core_start >= end) {
+            PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+            return NULL;
+        }
+
+        has_prefix = 0;
+        if ((core_start + 1) < end && buf[core_start] == '0' && (buf[core_start + 1] == 'x' || buf[core_start + 1] == 'X')) {
+            has_prefix = 1;
+        }
+
+        has_exp = 0;
+        for (i = core_start; i < end; i++) {
+            if (buf[i] == 'p' || buf[i] == 'P') {
+                has_exp = 1;
+                break;
+            }
+        }
+
+        core_len = end - core_start;
+        norm = PyMem_Malloc((size_t)core_len + (has_sign ? 1 : 0) + (has_prefix ? 0 : 2) + (has_exp ? 0 : 2) + 1);
+        if (norm == NULL) {
+            return PyErr_NoMemory();
+        }
+
+        if (has_sign) {
+            norm[out++] = buf[start];
+        }
+        if (!has_prefix) {
+            norm[out++] = '0';
+            norm[out++] = 'x';
+        }
+        memcpy(norm + out, buf + core_start, (size_t)core_len);
+        out += core_len;
+        if (!has_exp) {
+            norm[out++] = 'p';
+            norm[out++] = '0';
+        }
+        norm[out] = '\0';
+
+        res.value = strtoflt128(norm, &sp);
+        if (sp == norm || *sp != '\0') {
+            PyMem_Free(norm);
+            PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");
+            return NULL;
+        }
+
+        PyMem_Free(norm);
         return QuadObject_to_PyObject(res);
     } else {
         PyErr_SetString(PyExc_ValueError, "Can not convert value from hex");

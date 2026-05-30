@@ -266,6 +266,14 @@ class TestQFloat:
 
         assert q2 == q
 
+    def test_fromhex_without_prefix(self):
+        q = pq.qfloat.fromhex("0.1")
+        assert q == pq.qfloat.fromhex("0x0.1p0")
+
+    def test_fromhex_without_exponent(self):
+        q = pq.qfloat.fromhex("0x1.8")
+        assert q == pq.qfloat("1.5")
+
     def test_rounding_methods_return_qfloat(self):
         q = pq.qfloat("1.75")
 
