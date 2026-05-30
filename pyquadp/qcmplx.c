@@ -438,6 +438,9 @@ QuadCObject___setstate__(QuadCObject *self, PyObject *state) {
         return NULL;
     }
     int pickle_version = (int) PyLong_AsLong(temp);
+    if ((pickle_version == -1) && PyErr_Occurred()) {
+        return NULL;
+    }
     if (pickle_version != PICKLE_VERSION) {
         PyErr_Format(PyExc_ValueError,
                      "Pickle version mismatch. Got version %d but expected version %d.",
@@ -460,9 +463,14 @@ QuadCObject___setstate__(QuadCObject *self, PyObject *state) {
         return NULL;
     }
 
-    if(PyBytes_Size(temp) == sizeof(self->bytes)){
+    if (!PyBytes_Check(temp)) {
+        PyErr_SetString(PyExc_TypeError, "Pickled bytes value must be a bytes object.");
+        return NULL;
+    }
+
+    if (PyBytes_Size(temp) == sizeof(self->bytes)) {
         memcpy(self->bytes, PyBytes_AsString(temp), PyBytes_Size(temp));
-    } else{
+    } else {
         PyErr_SetString(PyExc_ValueError, "Byte array wrong size for a complex quad");
         return NULL;
     }
@@ -899,21 +907,27 @@ PyInit_qmcmplx(void)
     PyQcmplx_API[PyQcmplx_alloc_NUM] = (void *)alloc_QuadCType;
     PyQcmplx_API[PyQcmplx_type_NUM] = (void *)QuadCType;
 
-    if (PyModule_AddObject(m, "qcmplx", quadc_type_obj) < 0) {
+    if (PyModule_AddObjectRef(m, "qcmplx", quadc_type_obj) < 0) {
         Py_DECREF(quadc_type_obj);
         Py_DECREF(m);
         return NULL;
     }
+    Py_DECREF(quadc_type_obj);
 
 
     /* Create a Capsule containing the API pointer array's address */
     c_api_object = PyCapsule_New((void *)PyQcmplx_API, "pyquadp.qmcmplx._C_API", NULL);
-
-    if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
-        Py_XDECREF(c_api_object);
+    if (c_api_object == NULL) {
         Py_DECREF(m);
         return NULL;
     }
+
+    if (PyModule_AddObjectRef(m, "_C_API", c_api_object) < 0) {
+        Py_DECREF(c_api_object);
+        Py_DECREF(m);
+        return NULL;
+    }
+    Py_DECREF(c_api_object);
 
     if (PyDict_SetItemString(PyImport_GetModuleDict(), "qmcmplx", m) < 0) {
         Py_DECREF(m);

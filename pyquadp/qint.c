@@ -757,12 +757,25 @@ QuadIObject___setstate__(QuadIObject *self, PyObject *state) {
     /* Version check. */
     /* Borrowed reference but no need to increment as we create a C long
      * from it. */
-    PyObject *temp = PyDict_GetItemString(state, PICKLE_VERSION_KEY);
+    PyObject *key = PyUnicode_FromString(PICKLE_VERSION_KEY);
+    PyObject *temp;
+
+    if (key == NULL) {
+        return NULL;
+    }
+
+    temp = PyDict_GetItemWithError(state, key);
+    Py_DECREF(key);
     if (temp == NULL) {
-        PyErr_SetString(PyExc_KeyError, "No pickle version in pickled dict.");
+        if (!PyErr_Occurred()) {
+            PyErr_SetString(PyExc_KeyError, "No pickle version in pickled dict.");
+        }
         return NULL;
     }
     int pickle_version = (int) PyLong_AsLong(temp);
+    if ((pickle_version == -1) && PyErr_Occurred()) {
+        return NULL;
+    }
     if (pickle_version != PICKLE_VERSION) {
         PyErr_Format(PyExc_ValueError,
                      "Pickle version mismatch. Got version %d but expected version %d.",
@@ -770,16 +783,29 @@ QuadIObject___setstate__(QuadIObject *self, PyObject *state) {
         return NULL;
     }
 
-    temp = PyDict_GetItemString(state, "bytes");
-
-    if (temp == NULL) {
-        PyErr_Format(PyExc_KeyError, "No bytes in pickled dict.");
+    key = PyUnicode_FromString("bytes");
+    if (key == NULL) {
         return NULL;
     }
 
-    if(PyBytes_Size(temp) == sizeof(self->bytes)){
+    temp = PyDict_GetItemWithError(state, key);
+    Py_DECREF(key);
+
+    if (temp == NULL) {
+        if (!PyErr_Occurred()) {
+            PyErr_SetString(PyExc_KeyError, "No bytes in pickled dict.");
+        }
+        return NULL;
+    }
+
+    if (!PyBytes_Check(temp)) {
+        PyErr_SetString(PyExc_TypeError, "Pickled bytes value must be a bytes object.");
+        return NULL;
+    }
+
+    if (PyBytes_Size(temp) == sizeof(self->bytes)) {
         memcpy(self->bytes, PyBytes_AsString(temp), PyBytes_Size(temp));
-    } else{
+    } else {
         PyErr_SetString(PyExc_ValueError, "Byte array wrong size for a integer quad");
         return NULL;
     }
@@ -1132,21 +1158,27 @@ PyInit_qmint(void)
     PyQInt_API[PyQInt_type_NUM] = (void *)QuadIType;
 
 
-    if (PyModule_AddObject(m, "qint", quadi_type_obj) < 0) {
+    if (PyModule_AddObjectRef(m, "qint", quadi_type_obj) < 0) {
         Py_DECREF(quadi_type_obj);
         Py_DECREF(m);
         return NULL;
     }
+    Py_DECREF(quadi_type_obj);
 
 
     /* Create a Capsule containing the API pointer array's address */
     c_api_object = PyCapsule_New((void *)PyQInt_API, "pyquadp.qmint._C_API", NULL);
-
-    if (PyModule_AddObject(m, "_C_API", c_api_object) < 0) {
-        Py_XDECREF(c_api_object);
+    if (c_api_object == NULL) {
         Py_DECREF(m);
         return NULL;
     }
+
+    if (PyModule_AddObjectRef(m, "_C_API", c_api_object) < 0) {
+        Py_DECREF(c_api_object);
+        Py_DECREF(m);
+        return NULL;
+    }
+    Py_DECREF(c_api_object);
 
     if (PyDict_SetItemString(PyImport_GetModuleDict(), "qmint", m) < 0) {
         Py_DECREF(m);
