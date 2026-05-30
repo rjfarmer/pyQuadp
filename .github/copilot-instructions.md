@@ -21,6 +21,7 @@ This repository contains CPython C extensions and Python wrappers. Follow these 
   - If using `"O"`, decref temporary explicitly after build
 - Avoid inline temporary key creation inside dict lookups (creates leaks and hides NULL checks). Create key object, check it, use it, decref it.
 - Do not pass temporaries directly into `PyObject_Hash(...)` when they are new references. Store, hash, decref.
+- Prefer to implement new code via NumPy's ufunc machinery instead of custom C loops for better performance and maintainability.
 
 ## Module Init Ownership Rules
 
