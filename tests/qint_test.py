@@ -7,7 +7,7 @@ from pprint import pprint
 
 import numpy as np
 import pytest
-from hypothesis import assume, given
+from hypothesis import given
 from hypothesis.strategies import floats, integers
 
 import pyquadp as pq
@@ -31,11 +31,8 @@ class Testqint:
         with pytest.raises(TypeError) as cm:
             q = pq.qint("abc")
 
-    @given(integers())
+    @given(integers(min_value=-(1 << 127), max_value=(1 << 127) - 1))
     def test_make(self, x):
-        assume(x <= pq.INT128_MAX)
-        assume(x >= pq.INT128_MIN)
-
         assert pq.qint(x) == x
         assert str(pq.qint(str(x))) == str(x)
 
