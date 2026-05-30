@@ -17,6 +17,8 @@ repos:
     rev: v2.1.0
     hooks:
     -   id: mypy
+        args: ["-p", "pyquadp"]
+        pass_filenames: false
   - repo: https://github.com/pycqa/isort
     rev: 9.0.0a3
     hooks:
