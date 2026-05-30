@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 export CC=gcc
 export CXX=g++
