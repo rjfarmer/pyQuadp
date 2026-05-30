@@ -588,6 +588,13 @@ static PyObject * QuadObject_from_hex(PyTypeObject *type, PyObject * arg){
             return NULL;
         }
 
+        for (i = start; i < end; i++) {
+            if (buf[i] == '\0') {
+                PyErr_SetString(PyExc_ValueError, "embedded null character");
+                return NULL;
+            }
+        }
+
         core_start = start;
         has_sign = (buf[core_start] == '+' || buf[core_start] == '-');
         if (has_sign) {
