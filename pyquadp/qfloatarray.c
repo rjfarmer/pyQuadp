@@ -1120,6 +1120,22 @@ qarray_array(PyObject *self, PyObject *args)
 }
 
 static PyObject *
+qarray_asfortranarray(PyObject *self, PyObject *args)
+{
+  PyObject *arr_obj;
+  PyObject *f_arr;
+
+  arr_obj = qarray_from_array(self, args);
+  if (arr_obj == NULL) {
+    return NULL;
+  }
+
+  f_arr = PyArray_NewCopy((PyArrayObject *)arr_obj, NPY_FORTRANORDER);
+  Py_DECREF(arr_obj);
+  return f_arr;
+}
+
+static PyObject *
 qarray_empty_like(PyObject *NPY_UNUSED(self), PyObject *args)
 {
   PyObject *obj;
@@ -1226,6 +1242,7 @@ static PyMethodDef QuadArrayMethods[] = {
   {"from_array", qarray_from_array, METH_VARARGS, "Create a qarray from an array-like object."},
   {"asarray", qarray_asarray, METH_VARARGS, "Create a qarray from an array-like object."},
   {"array", qarray_array, METH_VARARGS, "Create a qarray from an array-like object."},
+  {"asfortranarray", qarray_asfortranarray, METH_VARARGS, "Create a Fortran-contiguous qarray from an array-like object."},
   {"empty_like", qarray_empty_like, METH_VARARGS, "Create an empty qarray with the same shape as input."},
   {"zeros_like", qarray_zeros_like, METH_VARARGS, "Create a zero-filled qarray with the same shape as input."},
   {"ones_like", qarray_ones_like, METH_VARARGS, "Create a one-filled qarray with the same shape as input."},

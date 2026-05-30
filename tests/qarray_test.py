@@ -118,6 +118,18 @@ class TestQArrayConstructors:
         assert arr1.shape == src.shape
         assert arr2.shape == src.shape
 
+    def test_asfortranarray_returns_fortran_contiguous(self):
+        qarray = pytest.importorskip("pyquadp.qarray")
+        src = np.array([[1.25, 2.5], [3.75, 4.0]], dtype=np.float64)
+
+        arr = qarray.asfortranarray(src)
+
+        assert arr.dtype == qarray.dtype
+        assert arr.shape == src.shape
+        assert arr.flags["F_CONTIGUOUS"]
+        assert not arr.flags["C_CONTIGUOUS"]
+        assert np.allclose(np.asarray(arr, dtype=np.float64), src)
+
     def test_like_constructors(self):
         qarray = pytest.importorskip("pyquadp.qarray")
         src = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)

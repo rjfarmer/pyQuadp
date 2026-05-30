@@ -1135,6 +1135,22 @@ qcarray_array(PyObject *self, PyObject *args)
 }
 
 static PyObject *
+qcarray_asfortranarray(PyObject *self, PyObject *args)
+{
+    PyObject *arr_obj;
+    PyObject *f_arr;
+
+    arr_obj = qcarray_from_array(self, args);
+    if (arr_obj == NULL) {
+        return NULL;
+    }
+
+    f_arr = PyArray_NewCopy((PyArrayObject *)arr_obj, NPY_FORTRANORDER);
+    Py_DECREF(arr_obj);
+    return f_arr;
+}
+
+static PyObject *
 qcarray_empty_like(PyObject *NPY_UNUSED(self), PyObject *args)
 {
     PyObject *obj;
@@ -1247,6 +1263,7 @@ static PyMethodDef QuadCArrayMethods[] = {
     {"from_array", qcarray_from_array, METH_VARARGS, "Create a qcarray from an array-like object."},
     {"asarray", qcarray_asarray, METH_VARARGS, "Create a qcarray from an array-like object."},
     {"array", qcarray_array, METH_VARARGS, "Create a qcarray from an array-like object."},
+    {"asfortranarray", qcarray_asfortranarray, METH_VARARGS, "Create a Fortran-contiguous qcarray from an array-like object."},
     {"empty_like", qcarray_empty_like, METH_VARARGS, "Create an empty qcarray with the same shape as input."},
     {"zeros_like", qcarray_zeros_like, METH_VARARGS, "Create a zero-filled qcarray with the same shape as input."},
     {"ones_like", qcarray_ones_like, METH_VARARGS, "Create a one-filled qcarray with the same shape as input."},
