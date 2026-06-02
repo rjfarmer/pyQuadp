@@ -51,6 +51,7 @@ nanj = qcmplx(0.0, qfloat("nan"))
 
 # Ctype data
 c_qfloat = _ctypes.c_byte * 16
+c_qint = _ctypes.c_byte * 16
 
 
 class c_qcmplx(_ctypes.Structure):
