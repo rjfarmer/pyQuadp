@@ -319,3 +319,13 @@ class Testqint:
     def test_index_method(self):
         q1 = pq.qint(7)
         assert q1.__index__() == 7
+
+    def test_np_types(self):
+        q1 = pq.qint(1234567890)
+        q3 = np.int64(1234567890)
+        assert q1 == q3
+        assert hash(q1) == hash(q3)
+
+        assert pq.qint(q3) == q3
+
+        assert pq.qint(np.int32(1234567890)) == q3

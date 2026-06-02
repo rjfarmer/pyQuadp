@@ -1573,18 +1573,41 @@ static int
 QuadIArray_setitem(PyObject *item, __int128 *data, void *array)
 {
   QuadIObject tmp;
+  PyObject *index_obj = NULL;
 
   (void)array;
 
   if (PyObject_to_QuadIObject(item, &tmp, false)) {
     *data = tmp.value;
-  } else {
-    if (!PyErr_Occurred()) {
-      PyErr_SetString(PyExc_TypeError, "Failed to setitem in QuadIArray");
-    }
+    return 0;
+  }
+
+  if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+    PyErr_Clear();
+  } else if (PyErr_Occurred()) {
     return -1;
   }
-  return 0;
+
+  index_obj = PyNumber_Index(item);
+  if (index_obj != NULL) {
+    if (PyObject_to_QuadIObject(index_obj, &tmp, false)) {
+      *data = tmp.value;
+      Py_DECREF(index_obj);
+      return 0;
+    }
+
+    Py_DECREF(index_obj);
+    return -1;
+  }
+
+  if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+    PyErr_Clear();
+    PyErr_SetString(PyExc_TypeError, "Failed to setitem in QuadIArray");
+  } else if (!PyErr_Occurred()) {
+    PyErr_SetString(PyExc_TypeError, "Failed to setitem in QuadIArray");
+  }
+
+  return -1;
 }
 
 static PyObject *

@@ -100,6 +100,28 @@ class TestQIArrayConstructors:
             np.asarray(arr, dtype=np.int64), np.array([1, 2, -3], dtype=np.int64)
         )
 
+    def test_from_list_accepts_numpy_integer_scalars(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        arr = qiarray.from_list([np.int64(1), np.int32(-2), np.int64(3)])
+
+        assert isinstance(arr, np.ndarray)
+        assert arr.dtype == qiarray.dtype
+        np.testing.assert_array_equal(
+            np.asarray(arr, dtype=np.int64), np.array([1, -2, 3], dtype=np.int64)
+        )
+
+    def test_setitem_accepts_numpy_integer_scalars(self):
+        qiarray = pytest.importorskip("pyquadp.qiarray")
+        arr = qiarray.zeros(3)
+
+        arr[0] = np.int64(9)
+        arr[1] = np.int32(-4)
+        arr[2] = np.int64(7)
+
+        np.testing.assert_array_equal(
+            np.asarray(arr, dtype=np.int64), np.array([9, -4, 7], dtype=np.int64)
+        )
+
     def test_from_array_constructor(self):
         qiarray = pytest.importorskip("pyquadp.qiarray")
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)

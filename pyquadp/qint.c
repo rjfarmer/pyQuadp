@@ -1049,6 +1049,8 @@ static __int128 QuadIObject_int128(QuadIObject * out) {
 bool
 PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
 {
+    PyObject *int_obj;
+
     (void)alloc;
 
     if(QuadIObject_Check(in)){
@@ -1073,32 +1075,41 @@ PyObject_to_QuadIObject(PyObject * in, QuadIObject * out, const bool alloc)
         return true;
     }
 
-    if(PyNumber_Check(in)) {
-        // Is a number
-        if(PyLong_Check(in)){
-            // int
-            // Convert to string as we may be to big for PyLong
-            PyObject * str = PyUnicode_FromFormat("%S",in);
-            if (str == NULL) {
-                return false;
-            }
-            Py_ssize_t len;
-            const char *buf = PyUnicode_AsUTF8AndSize(str, &len);
-            if (buf==NULL){
-                Py_DECREF(str);
-                return false;
-            }
-
-            if(!str_to_int128(buf,len,&out->value)){
-                Py_DECREF(str);
-                PyErr_SetString(PyExc_TypeError, "Could not convert int to integer quad precision.");
-                return false;
-            }
-
-            Py_DECREF(str);
-
-            return true;
+    int_obj = PyNumber_Index(in);
+    if (int_obj != NULL) {
+        // Convert integer-like values (including numpy integer scalars)
+        // to string first so values outside C long long still parse correctly.
+        PyObject *str = PyUnicode_FromFormat("%S", int_obj);
+        if (str == NULL) {
+            Py_DECREF(int_obj);
+            return false;
         }
+
+        Py_ssize_t len;
+        const char *buf = PyUnicode_AsUTF8AndSize(str, &len);
+        if (buf == NULL) {
+            Py_DECREF(str);
+            Py_DECREF(int_obj);
+            return false;
+        }
+
+        if (!str_to_int128(buf, len, &out->value)) {
+            Py_DECREF(str);
+            Py_DECREF(int_obj);
+            PyErr_SetString(PyExc_TypeError, "Could not convert int to integer quad precision.");
+            return false;
+        }
+
+        Py_DECREF(str);
+        Py_DECREF(int_obj);
+        return true;
+    }
+
+    // Non-integral numerics (e.g., float, numpy floating scalars) are not valid qint inputs.
+    if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+        PyErr_Clear();
+    } else if (PyErr_Occurred()) {
+        return false;
     }
 
     return false;
