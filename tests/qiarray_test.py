@@ -3,6 +3,8 @@
 import numpy as np
 import pytest
 
+import pyquadp.qiarray as qiarray
+
 FIXED_WIDTH_DTYPES = [
     np.int8,
     np.int16,
@@ -14,18 +16,18 @@ FIXED_WIDTH_DTYPES = [
 @pytest.mark.qiarray
 class TestQIArrayImport:
     def test_qiarray_module_imports(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         assert qiarray is not None
 
     def test_qiarray_type_exported(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         assert hasattr(qiarray, "qiarray")
 
 
 @pytest.mark.qiarray
 class TestQIArrayConstructors:
     def test_arange_stop_constructor(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         arr = qiarray.arange(4)
 
         assert isinstance(arr, np.ndarray)
@@ -36,7 +38,7 @@ class TestQIArrayConstructors:
         )
 
     def test_arange_start_stop_step_constructor(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         arr = qiarray.arange(5, -1, -2)
 
         assert isinstance(arr, np.ndarray)
@@ -47,7 +49,6 @@ class TestQIArrayConstructors:
         )
 
     def test_empty_full_zeros_ones_constructors(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
 
         empty = qiarray.empty(5)
         full = qiarray.full(4, "-2")
@@ -70,7 +71,6 @@ class TestQIArrayConstructors:
         )
 
     def test_shape_tuple_constructors(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
 
         zeros = qiarray.zeros((2, 3))
         ones = qiarray.ones((2, 1, 2))
@@ -90,7 +90,7 @@ class TestQIArrayConstructors:
         )
 
     def test_from_list_constructor(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         arr = qiarray.from_list([1, "2", -3])
 
         assert isinstance(arr, np.ndarray)
@@ -101,7 +101,7 @@ class TestQIArrayConstructors:
         )
 
     def test_from_list_accepts_numpy_integer_scalars(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         arr = qiarray.from_list([np.int64(1), np.int32(-2), np.int64(3)])
 
         assert isinstance(arr, np.ndarray)
@@ -111,7 +111,7 @@ class TestQIArrayConstructors:
         )
 
     def test_setitem_accepts_numpy_integer_scalars(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         arr = qiarray.zeros(3)
 
         arr[0] = np.int64(9)
@@ -123,7 +123,7 @@ class TestQIArrayConstructors:
         )
 
     def test_from_array_constructor(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)
         arr = qiarray.from_array(src)
 
@@ -133,7 +133,7 @@ class TestQIArrayConstructors:
         np.testing.assert_array_equal(np.asarray(arr, dtype=np.int64), src)
 
     def test_array_and_asarray_aliases(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)
 
         arr1 = qiarray.array(src)
@@ -145,7 +145,7 @@ class TestQIArrayConstructors:
         assert arr2.shape == src.shape
 
     def test_asfortranarray_returns_fortran_contiguous(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)
 
         arr = qiarray.asfortranarray(src)
@@ -157,7 +157,7 @@ class TestQIArrayConstructors:
         np.testing.assert_array_equal(np.asarray(arr, dtype=np.int64), src)
 
     def test_ravel_returns_flat_qiarray(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)
 
         arr = qiarray.ravel(src)
@@ -170,7 +170,7 @@ class TestQIArrayConstructors:
         )
 
     def test_ravel_order_keyword(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)
 
         arr = qiarray.ravel(src, order="F")
@@ -181,7 +181,7 @@ class TestQIArrayConstructors:
         )
 
     def test_array_asarray_keyword_support(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([1, 2, 3], dtype=np.int64)
 
         arr = qiarray.array(src, ndmin=2, order="C", copy=True)
@@ -193,7 +193,7 @@ class TestQIArrayConstructors:
         assert asarr.shape == (1, 3)
 
     def test_like_constructors(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([[1, 2], [3, 4]], dtype=np.int64)
 
         empty = qiarray.empty_like(src)
@@ -224,7 +224,7 @@ class TestQIArrayConstructors:
 @pytest.mark.qiarray
 class TestQIArrayInterop:
     def test_cast_qiarray_to_int64(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         arr = qiarray.from_list([1, 2, 3])
 
         out = np.asarray(arr, dtype=np.int64)
@@ -232,7 +232,7 @@ class TestQIArrayInterop:
         np.testing.assert_array_equal(out, np.array([1, 2, 3], dtype=np.int64))
 
     def test_cast_int64_to_qiarray_dtype(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([1, -2, 3], dtype=np.int64)
 
         out = np.asarray(src, dtype=qiarray.dtype)
@@ -240,7 +240,7 @@ class TestQIArrayInterop:
         np.testing.assert_array_equal(np.asarray(out, dtype=np.int64), src)
 
     def test_cast_int32_to_qiarray_dtype(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([5, -7], dtype=np.int32)
 
         out = np.asarray(src, dtype=qiarray.dtype)
@@ -251,7 +251,7 @@ class TestQIArrayInterop:
 
     @pytest.mark.parametrize("dtype", FIXED_WIDTH_DTYPES)
     def test_cast_fixed_width_integer_dtype_to_qiarray_dtype(self, dtype):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         src = np.array([0, 1, 7], dtype=dtype)
 
         out = np.asarray(src, dtype=qiarray.dtype)
@@ -263,7 +263,7 @@ class TestQIArrayInterop:
 
     @pytest.mark.parametrize("dtype", FIXED_WIDTH_DTYPES)
     def test_cast_qiarray_to_fixed_width_integer_dtype(self, dtype):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         arr = qiarray.from_list([0, 1, 7])
 
         out = np.asarray(arr, dtype=dtype)
@@ -273,7 +273,7 @@ class TestQIArrayInterop:
         )
 
     def test_numpy_sum_and_prod_reduce_qiarray(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         values = np.array([[2, -3], [4, 5]], dtype=np.int64)
         arr = qiarray.from_array(values)
 
@@ -292,7 +292,7 @@ class TestQIArrayInterop:
         )
 
     def test_numpy_concatenate_qiarray_inputs(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         left = qiarray.from_list([1, 2])
         right = qiarray.from_list([-4, 7])
 
@@ -310,7 +310,7 @@ class TestQIArrayInterop:
         )
 
     def test_numpy_stack_qiarray_inputs(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         a = qiarray.from_list([1, -3, 2])
         b = qiarray.from_list([5, 4, -2])
 
@@ -330,7 +330,7 @@ class TestQIArrayInterop:
 @pytest.mark.qiarray
 class TestQIArrayUfuncs:
     def test_add_subtract_multiply_ufuncs(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         a = qiarray.from_list([4, 6, 8])
         b = qiarray.from_list([1, 2, 3])
 
@@ -352,7 +352,7 @@ class TestQIArrayUfuncs:
         )
 
     def test_mixed_qiarray_int64_binary_ufuncs(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         q = qiarray.from_list([2, 3, 4])
         i = np.array([10, 20, 30], dtype=np.int64)
 
@@ -381,7 +381,7 @@ class TestQIArrayUfuncs:
 
     @pytest.mark.parametrize("dtype", FIXED_WIDTH_DTYPES)
     def test_mixed_fixed_width_integer_binary_ufuncs(self, dtype):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         q = qiarray.from_list([2, 3, 4])
         values = np.array([5, 6, 7], dtype=dtype)
 
@@ -403,7 +403,7 @@ class TestQIArrayUfuncs:
         )
 
     def test_floor_divide_and_remainder_follow_python_integer_semantics(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         left = qiarray.from_list([-7, 7, -7, 7])
         right = qiarray.from_list([3, 3, -3, -3])
 
@@ -422,7 +422,7 @@ class TestQIArrayUfuncs:
         )
 
     def test_mixed_floor_divide_and_remainder_with_fixed_width_dtype(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         q = qiarray.from_list([-7, 7, -7, 7])
         i = np.array([3, 3, -3, -3], dtype=np.int16)
 
@@ -447,7 +447,7 @@ class TestQIArrayUfuncs:
         )
 
     def test_shift_ufuncs(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         values = qiarray.from_list([1, 8, 16])
         shifts = qiarray.from_list([1, 2, 3])
 
@@ -464,7 +464,7 @@ class TestQIArrayUfuncs:
         )
 
     def test_mixed_shift_ufuncs_with_fixed_width_dtype(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         q = qiarray.from_list([1, 8, 16])
         shift_counts = np.array([1, 2, 3], dtype=np.int16)
         base = np.array([4, 8, 16], dtype=np.int16)
@@ -496,7 +496,7 @@ class TestQIArrayUfuncs:
         )
 
     def test_unary_and_bitwise_ufuncs(self):
-        qiarray = pytest.importorskip("pyquadp.qiarray")
+
         a = qiarray.from_list([1, -2, 3])
         b = qiarray.from_list([7, 4, 1])
 

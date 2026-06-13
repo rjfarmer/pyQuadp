@@ -3,22 +3,24 @@
 import numpy as np
 import pytest
 
+import pyquadp.qarray as qarray
+
 
 @pytest.mark.qarray
 class TestQArrayImport:
     def test_qarray_module_imports(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         assert qarray is not None
 
     def test_qarray_type_exported(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         assert hasattr(qarray, "qarray")
 
 
 @pytest.mark.qarray
 class TestQArrayConstructors:
     def test_arange_stop_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.arange(4)
 
         assert isinstance(arr, np.ndarray)
@@ -27,7 +29,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(arr, dtype=np.float64), np.arange(4.0))
 
     def test_arange_start_stop_step_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.arange(1.5, 3.0, 0.5)
 
         assert isinstance(arr, np.ndarray)
@@ -36,7 +38,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(arr, dtype=np.float64), np.array([1.5, 2.0, 2.5]))
 
     def test_linspace_constructor_endpoint_true(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.linspace(1.0, 2.0, 5)
 
         assert isinstance(arr, np.ndarray)
@@ -45,7 +47,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(arr, dtype=np.float64), np.linspace(1.0, 2.0, 5))
 
     def test_linspace_constructor_endpoint_false(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.linspace(1.0, 2.0, 4, False)
 
         assert isinstance(arr, np.ndarray)
@@ -56,7 +58,7 @@ class TestQArrayConstructors:
         )
 
     def test_empty_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.empty(5)
 
         assert isinstance(arr, np.ndarray)
@@ -64,7 +66,7 @@ class TestQArrayConstructors:
         assert arr.dtype == qarray.dtype
 
     def test_full_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.full(4, -2.5)
 
         assert isinstance(arr, np.ndarray)
@@ -73,7 +75,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(arr, dtype=np.float64), [-2.5, -2.5, -2.5, -2.5])
 
     def test_zeros_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.zeros(4)
 
         assert isinstance(arr, np.ndarray)
@@ -82,7 +84,7 @@ class TestQArrayConstructors:
         assert arr.dtype.name == "qfloat"
 
     def test_ones_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.ones(3)
 
         assert isinstance(arr, np.ndarray)
@@ -90,7 +92,6 @@ class TestQArrayConstructors:
         assert arr.dtype == qarray.dtype
 
     def test_shape_tuple_constructors(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
 
         zeros = qarray.zeros((2, 3))
         ones = qarray.ones((2, 1, 2))
@@ -104,7 +105,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(full, dtype=np.float64), np.full((2, 2), -2.5))
 
     def test_from_list_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.from_list([1, 2.5, "3.5"])
 
         assert isinstance(arr, np.ndarray)
@@ -112,7 +113,7 @@ class TestQArrayConstructors:
         assert arr.dtype == qarray.dtype
 
     def test_from_array_constructor(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
         arr = qarray.from_array(src)
 
@@ -121,7 +122,7 @@ class TestQArrayConstructors:
         assert arr.dtype == qarray.dtype
 
     def test_array_and_asarray_aliases(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([[1.25, 2.5], [3.75, 4.0]], dtype=np.float64)
 
         arr1 = qarray.array(src)
@@ -133,7 +134,7 @@ class TestQArrayConstructors:
         assert arr2.shape == src.shape
 
     def test_asfortranarray_returns_fortran_contiguous(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([[1.25, 2.5], [3.75, 4.0]], dtype=np.float64)
 
         arr = qarray.asfortranarray(src)
@@ -145,7 +146,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(arr, dtype=np.float64), src)
 
     def test_ravel_returns_flat_qarray(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([[1.25, 2.5], [3.75, 4.0]], dtype=np.float64)
 
         arr = qarray.ravel(src)
@@ -156,7 +157,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(arr, dtype=np.float64), np.ravel(src, order="C"))
 
     def test_ravel_order_keyword(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([[1.25, 2.5], [3.75, 4.0]], dtype=np.float64)
 
         arr = qarray.ravel(src, order="F")
@@ -165,7 +166,7 @@ class TestQArrayConstructors:
         assert np.allclose(np.asarray(arr, dtype=np.float64), np.ravel(src, order="F"))
 
     def test_array_asarray_keyword_support(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([1.25, 2.5, 3.75], dtype=np.float64)
 
         arr = qarray.array(src, ndmin=2, order="C", copy=True)
@@ -177,7 +178,7 @@ class TestQArrayConstructors:
         assert asarr.shape == (1, 3)
 
     def test_like_constructors(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
 
         empty = qarray.empty_like(src)
@@ -202,7 +203,7 @@ class TestQArrayConstructors:
 @pytest.mark.qarray
 class TestQArrayInterop:
     def test_cast_qarray_to_float64(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.from_list([1.25, 2.5, 3.75])
 
         out = np.asarray(arr, dtype=np.float64)
@@ -210,7 +211,7 @@ class TestQArrayInterop:
         assert np.allclose(out, np.array([1.25, 2.5, 3.75], dtype=np.float64))
 
     def test_cast_float64_to_qarray_dtype(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([1.25, 2.5, 3.75], dtype=np.float64)
 
         out = np.asarray(src, dtype=qarray.dtype)
@@ -219,7 +220,7 @@ class TestQArrayInterop:
         assert float(out[2]) == pytest.approx(3.75)
 
     def test_cast_float32_to_qarray_dtype(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([0.5, 1.5], dtype=np.float32)
 
         out = np.asarray(src, dtype=qarray.dtype)
@@ -228,7 +229,7 @@ class TestQArrayInterop:
         assert float(out[1]) == pytest.approx(1.5)
 
     def test_numpy_sum_and_prod_reduce_qarray(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         values = np.array([[1.25, -3.0], [0.25, 5.5]], dtype=np.float64)
         arr = qarray.from_array(values)
 
@@ -245,7 +246,7 @@ class TestQArrayInterop:
         )
 
     def test_numpy_concatenate_qarray_inputs(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         left = qarray.from_list([1.5, 2.5])
         right = qarray.from_list([-4.0, 0.25])
 
@@ -263,7 +264,7 @@ class TestQArrayInterop:
         )
 
     def test_numpy_stack_qarray_inputs(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.25, -3.0, 0.25])
         b = qarray.from_list([0.5, 1.5, -2.0])
 
@@ -283,7 +284,7 @@ class TestQArrayInterop:
 @pytest.mark.qarray
 class TestQArrayUfuncs:
     def test_add_ufunc(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, 2.0, 3.0])
         b = qarray.from_list([0.5, 1.5, 2.5])
 
@@ -292,7 +293,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(out, dtype=np.float64), [1.5, 3.5, 5.5])
 
     def test_subtract_multiply_divide_ufuncs(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([4.0, 6.0, 8.0])
         b = qarray.from_list([2.0, 3.0, 4.0])
 
@@ -308,7 +309,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(div, dtype=np.float64), [2.0, 2.0, 2.0])
 
     def test_power_ufunc(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([2.0, 3.0, 4.0])
         b = qarray.from_list([3.0, 2.0, 0.5])
 
@@ -317,7 +318,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(out, dtype=np.float64), [8.0, 9.0, 2.0])
 
     def test_add_ufunc_broadcasting(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, 2.0, 3.0])
         b = qarray.from_list([10.0])
 
@@ -327,7 +328,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(out, dtype=np.float64), [11.0, 12.0, 13.0])
 
     def test_unary_positive_negative_ufuncs(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, -2.0, 3.0])
 
         pos = np.positive(a)
@@ -339,7 +340,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(neg, dtype=np.float64), [-1.0, 2.0, -3.0])
 
     def test_absolute_and_square_ufuncs(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([-1.5, 2.0, -3.0])
 
         abs_out = np.absolute(a)
@@ -351,7 +352,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(sq_out, dtype=np.float64), [2.25, 4.0, 9.0])
 
     def test_sqrt_exp_log_sin_cos_tan_sinh_cosh_ufuncs(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([0.25, 1.0, 4.0])
 
         sqrt_out = np.sqrt(a)
@@ -383,7 +384,7 @@ class TestQArrayUfuncs:
         assert np.allclose(np.asarray(cosh_out, dtype=np.float64), np.cosh(expected))
 
     def test_mixed_qarray_float64_binary_ufuncs_promote_to_qarray(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         q = qarray.from_list([2.0, 3.0, 4.0])
         d = np.array([0.5, 1.5, 2.0], dtype=np.float64)
 
@@ -428,7 +429,7 @@ class TestQArrayUfuncs:
 @pytest.mark.qarray
 class TestQArrayHardening:
     def test_nan_propagates_through_add(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, float("nan"), 3.0])
         b = qarray.from_list([2.0, 2.0, 2.0])
 
@@ -440,7 +441,7 @@ class TestQArrayHardening:
         assert vals[2] == pytest.approx(5.0)
 
     def test_inf_propagates_through_multiply(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, float("inf"), -1.0])
         b = qarray.from_list([2.0, 2.0, float("-inf")])
 
@@ -451,7 +452,7 @@ class TestQArrayHardening:
         assert np.isposinf(vals[2])
 
     def test_divide_by_zero_gives_inf(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, -1.0])
         b = qarray.from_list([0.0, 0.0])
 
@@ -462,7 +463,7 @@ class TestQArrayHardening:
         assert np.isneginf(vals[1])
 
     def test_sqrt_of_negative_gives_nan(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([-1.0, 4.0])
 
         with pytest.warns(RuntimeWarning):
@@ -472,7 +473,7 @@ class TestQArrayHardening:
         assert vals[1] == pytest.approx(2.0)
 
     def test_log_of_zero_gives_neg_inf(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([0.0, 1.0])
 
         with pytest.warns(RuntimeWarning, match="divide by zero"):
@@ -482,7 +483,7 @@ class TestQArrayHardening:
         assert vals[1] == pytest.approx(0.0)
 
     def test_absolute_of_nan_is_nan(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([float("nan"), -2.0])
 
         out = np.absolute(a)
@@ -492,7 +493,7 @@ class TestQArrayHardening:
         assert vals[1] == pytest.approx(2.0)
 
     def test_argmax_with_nan(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, float("nan"), 3.0])
 
         # NaN propagation: first NaN encountered becomes the "max"
@@ -500,14 +501,14 @@ class TestQArrayHardening:
         assert idx == 1
 
     def test_argmax_with_inf(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, float("inf"), 3.0])
 
         idx = np.argmax(a)
         assert idx == 1
 
     def test_argmin_with_nan(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, float("nan"), 3.0])
 
         # NaN propagation: first NaN encountered becomes the "min"
@@ -515,14 +516,14 @@ class TestQArrayHardening:
         assert idx == 1
 
     def test_argmin_with_neg_inf(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         a = qarray.from_list([1.0, float("-inf"), 3.0])
 
         idx = np.argmin(a)
         assert idx == 1
 
     def test_noncontiguous_add(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         base = qarray.from_list([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
         a = base[::2]  # [0, 2, 4] — non-contiguous stride
         b = base[1::2]  # [1, 3, 5] — non-contiguous stride
@@ -532,7 +533,7 @@ class TestQArrayHardening:
         assert np.allclose(np.asarray(out, dtype=np.float64), [1.0, 5.0, 9.0])
 
     def test_noncontiguous_unary(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         base = qarray.from_list([1.0, -2.0, 3.0, -4.0])
         sliced = base[1::2]  # [-2, -4] — non-contiguous
 
@@ -541,7 +542,7 @@ class TestQArrayHardening:
         assert np.allclose(np.asarray(out, dtype=np.float64), [2.0, 4.0])
 
     def test_2d_array_ufunc(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         src = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
         a = qarray.from_array(src)
         b = qarray.from_array(src * 2)
@@ -553,7 +554,7 @@ class TestQArrayHardening:
         assert np.allclose(np.asarray(out, dtype=np.float64), expected)
 
     def test_setitem_and_getitem_nan_inf(self):
-        qarray = pytest.importorskip("pyquadp.qarray")
+
         arr = qarray.zeros(3)
         arr[0] = float("nan")
         arr[1] = float("inf")
