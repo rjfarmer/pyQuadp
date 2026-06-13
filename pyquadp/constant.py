@@ -96,4 +96,5 @@ __all__ = [
     "nanj",
     "c_qfloat",
     "c_qcmplx",
+    "c_qint",
 ]
