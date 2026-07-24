@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install -y libopenblas-dev
-          pypy3 -m pip install build wheel pip-tools
+          pypy3 -m pip install build wheel pip-tools typing_extensions
           pip-compile -o requirements.txt --extra test --strip-extras
           pypy3 -m pip install -r requirements.txt
 
